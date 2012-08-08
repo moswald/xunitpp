@@ -1,0 +1,22 @@
+##########
+# by default, Mercurial uses python/perl regex to ignore files
+#
+# for help, see:
+# http://mercurial.selenic.com/wiki/.hgignore
+# http://docs.python.org/library/re.html
+##########
+
+##########
+# \b - matches empty string before or after a word
+##########
+
+# ignore output files
+\b(Debug|Release|obj|lib)\b
+
+# ignore Visual Studio config files
+.suo$
+.user$
+.sdf$
+
+# ignore resharper
+_ReSharper.
