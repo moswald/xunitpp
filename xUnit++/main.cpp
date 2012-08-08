@@ -176,20 +176,18 @@ FACT(FactFails)
     Assert.Equal(0, 1);
 }
 
-void TheoryWorks(int, char, bool);
-std::vector<std::tuple<int, char, bool>> DataGen();
-namespace { namespace TheoryWorks_ns { xUnit::Register reg(&TheoryWorks, &DataGen); } }
+#define THEORY_DATA(theory, ...) \
+    void theory(__VA_ARGS__); \
+    std::vector<std::tuple<__VA_ARGS__>> theory ## _data(); \
+    namespace { namespace theory ## _ns { xUnit::Register reg(&theory, &theory ## _data); } } \
+    std::vector<std::tuple<__VA_ARGS__>> theory ## _data()
 
-std::vector<std::tuple<int, char, bool>> DataGen()
-{
-    auto result = std::vector<std::tuple<int, char, bool>>();
-    result.push_back(std::make_tuple(1, (char)1, true));
-    result.push_back(std::make_tuple(0, (char)1, false));
-    result.push_back(std::make_tuple(0, (char)1, true));
-    return result;
-}
+//void TheoryWorks(int, char, bool);
+//std::vector<std::tuple<int, char, bool>> DataGen();
+//namespace { namespace TheoryWorks_ns { xUnit::Register reg(&TheoryWorks, &DataGen); } }
+//
 
-void TheoryWorks(int x, char y, bool equal)
+void Theory(int x, char y, bool equal)
 {
     if (equal)
     {
@@ -199,6 +197,17 @@ void TheoryWorks(int x, char y, bool equal)
     {
         Assert.NotEqual(x, y);
     }
+}
+
+
+THEORY_DATA(Theory, int, char, bool)
+//std::vector<std::tuple<int, char, bool>> DataGen()
+{
+    auto result = std::vector<std::tuple<int, char, bool>>();
+    result.push_back(std::make_tuple(1, (char)1, true));
+    result.push_back(std::make_tuple(0, (char)1, false));
+    result.push_back(std::make_tuple(0, (char)1, true));
+    return result;
 }
 
 int main()
