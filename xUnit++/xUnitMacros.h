@@ -11,7 +11,7 @@
         namespace xUnitSuite { \
             inline const std::string &Name() \
             { \
-                static std::string name = ""; \
+                static std::string name = #name; \
                 return name; \
             } \
         } \
