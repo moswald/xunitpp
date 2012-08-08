@@ -106,7 +106,7 @@ public:
             for (auto theory : theorySet.Theories())
             {
                 std::cout << "theory instance " << instance++ << " of " << count << std::endl;
-                theory();
+                theorySet.Run(theory);
             }
         }
     }
