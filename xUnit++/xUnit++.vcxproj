@@ -11,10 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Fact.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TestCollection.cpp" />
+    <ClCompile Include="Theory.cpp" />
+    <ClCompile Include="xUnitAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TupleHelpers.h" />
+    <ClInclude Include="Fact.h" />
+    <ClInclude Include="Suite.h" />
+    <ClInclude Include="TestCollection.h" />
+    <ClInclude Include=".\xUnitMacros.h" />
+    <ClInclude Include="Theory.h" />
+    <ClInclude Include="xUnitAssert.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
