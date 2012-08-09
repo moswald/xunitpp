@@ -20,8 +20,6 @@ public:
 
     const std::string &Suite() const;
 
-    void Run(std::function<void()> theory);
-
     const std::vector<std::function<void()>> &Theories() const;
 
 private:
