@@ -4,6 +4,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "TestRunner.h"
 #include "xUnitAssert.h"
 #include "xUnitMacros.h"
 
@@ -120,5 +121,5 @@ SUITE(Special)
 
 int main()
 {
-    xUnitpp::TestCollection::RunAllTests();
+    xUnitpp::RunAllTests();
 }

@@ -7,19 +7,13 @@ namespace xUnitpp
 
 Fact::Fact(std::function<void()> fact, const std::string &name, const std::string &suite, const std::string &filename, int line)
     : mFact(fact)
-    , mName(name)
-    , mSuite(suite)
-    , mFilename(filename)
-    , mLine(line)
+    , mTestDetails(name, suite, filename, line)
 {
 }
 
 Fact::Fact(const Fact &other)
     : mFact(other.mFact)
-    , mName(other.mName)
-    , mSuite(other.mSuite)
-    , mFilename(other.mFilename)
-    , mLine(other.mLine)
+    , mTestDetails(other.mTestDetails)
 {
 }
 
@@ -39,10 +33,12 @@ void swap(Fact &f0, Fact &f1)
     using std::swap;
 
     swap(f0.mFact, f1.mFact);
-    swap(f0.mName, f1.mName);
-    swap(f0.mSuite, f1.mSuite);
-    swap(f0.mFilename, f1.mFilename);
-    swap(f0.mLine, f1.mLine);
+    swap(f0.mTestDetails, f1.mTestDetails);
+}
+
+const std::string &Fact::Suite() const
+{
+    return mTestDetails.Suite;
 }
 
 void Fact::Run()
@@ -51,10 +47,10 @@ void Fact::Run()
     {
         mFact();
     }
-    catch (xUnitAssert &e)
+    catch (xUnitAssert &)
     {
     }
-    catch (std::exception &e)
+    catch (std::exception &)
     {
     }
     catch (...)

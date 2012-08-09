@@ -6,6 +6,8 @@
     <ClCompile Include="xUnitAssert.cpp" />
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="Theory.cpp" />
+    <ClCompile Include="TestRunner.cpp" />
+    <ClCompile Include="TestDetails.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fact.h" />
@@ -14,5 +16,7 @@
     <ClInclude Include="Suite.h" />
     <ClInclude Include=".\xUnitMacros.h" />
     <ClInclude Include="Theory.h" />
+    <ClInclude Include="TestRunner.h" />
+    <ClInclude Include="TestDetails.h" />
   </ItemGroup>
 </Project>
