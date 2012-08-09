@@ -4,6 +4,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include "TestDetails.h"
 
 namespace xUnitpp
 {
@@ -17,15 +18,14 @@ public:
     Fact &operator =(Fact other);
     friend void swap(Fact &f0, Fact &f1);
 
+    const std::string &Suite() const;
+
     void Run();
 
 private:
     std::function<void()> mFact;
 
-    std::string mName;
-    std::string mSuite;
-    std::string mFilename;
-    int mLine;
+    TestDetails mTestDetails;
 };
 
 }

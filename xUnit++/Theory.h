@@ -4,6 +4,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include "TestDetails.h"
 
 namespace xUnitpp
 {
@@ -17,6 +18,8 @@ public:
     Theory &operator =(Theory other);
     friend void swap(Theory &f0, Theory &f1);
 
+    const std::string &Suite() const;
+
     void Run(std::function<void()> theory);
 
     const std::vector<std::function<void()>> &Theories() const;
@@ -24,10 +27,7 @@ public:
 private:
     std::vector<std::function<void()>> mTheories;
 
-    std::string mName;
-    std::string mSuite;
-    std::string mFilename;
-    int mLine;
+    TestDetails mTestDetails;
 };
 
 }

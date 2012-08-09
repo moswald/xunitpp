@@ -6,19 +6,13 @@ namespace xUnitpp
 
 Theory::Theory(const std::vector<std::function<void()>> &theorySet, const std::string &name, const std::string &suite, const std::string &filename, int line)
     : mTheories(theorySet)
-    , mName(name)
-    , mSuite(suite)
-    , mFilename(filename)
-    , mLine(line)
+    , mTestDetails(name, suite, filename, line)
 {
 }
 
 Theory::Theory(const Theory &other)
     : mTheories(other.mTheories)
-    , mName(other.mName)
-    , mSuite(other.mSuite)
-    , mFilename(other.mFilename)
-    , mLine(other.mLine)
+    , mTestDetails(other.mTestDetails)
 {
 }
 
@@ -38,10 +32,12 @@ void swap(Theory &f0, Theory &f1)
     using std::swap;
 
     swap(f0.mTheories, f1.mTheories);
-    swap(f0.mName, f1.mName);
-    swap(f0.mSuite, f1.mSuite);
-    swap(f0.mFilename, f1.mFilename);
-    swap(f0.mLine, f1.mLine);
+    swap(f0.mTestDetails, f1.mTestDetails);
+}
+
+const std::string &Theory::Suite() const
+{
+    return mTestDetails.Suite;
 }
 
 const std::vector<std::function<void()>> &Theory::Theories() const

@@ -6,11 +6,6 @@
 #include "Fact.h"
 #include "Theory.h"
 
-
-// !!! temporary
-#include <iostream>
-#include "xUnitAssert.h"
-
 namespace xUnitpp
 {
 
@@ -82,41 +77,11 @@ public:
         }
     };
 
-    // !!! temporary
-    static void RunAllTests()
-    {
-        auto facts = 1;
-        auto theories = 1;
-
-        // !!! randomize
-        for (auto fact : Instance().mFacts)
-        {
-            std::cout << "fact " << facts++ << " of " << Instance().mFacts.size() << std::endl;
-            fact.Run();
-        }
-
-        // !!! randomize
-        for (auto theorySet : Instance().mTheories)
-        {
-            std::cout << "theory " << theories++ << " of " << Instance().mTheories.size() << std::endl;
-
-            auto instance = 1;
-            auto count = theorySet.Theories().size();
-
-            for (auto theory : theorySet.Theories())
-            {
-                std::cout << "theory instance " << instance++ << " of " << count << std::endl;
-                theorySet.Run(theory);
-            }
-        }
-    }
+    static const std::vector<Fact> &Facts();
+    static const std::vector<Theory> &Theories();
 
 private:
-    static TestCollection &Instance()
-    {
-        static TestCollection collection;
-        return collection;
-    }
+    static TestCollection &Instance();
 
     std::vector<Fact> mFacts;
     std::vector<Theory> mTheories;

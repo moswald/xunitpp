@@ -14,6 +14,8 @@
     <ClCompile Include="Fact.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCollection.cpp" />
+    <ClCompile Include="TestDetails.cpp" />
+    <ClCompile Include="TestRunner.cpp" />
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="xUnitAssert.cpp" />
   </ItemGroup>
@@ -22,6 +24,8 @@
     <ClInclude Include="Suite.h" />
     <ClInclude Include="TestCollection.h" />
     <ClInclude Include=".\xUnitMacros.h" />
+    <ClInclude Include="TestDetails.h" />
+    <ClInclude Include="TestRunner.h" />
     <ClInclude Include="Theory.h" />
     <ClInclude Include="xUnitAssert.h" />
   </ItemGroup>
