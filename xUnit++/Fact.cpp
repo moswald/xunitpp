@@ -41,21 +41,9 @@ const std::string &Fact::Suite() const
     return mTestDetails.Suite;
 }
 
-void Fact::Run()
+std::function<void()> Fact::Test() const
 {
-    try
-    {
-        mFact();
-    }
-    catch (xUnitAssert &)
-    {
-    }
-    catch (std::exception &)
-    {
-    }
-    catch (...)
-    {
-    }
+    return mFact;
 }
 
 }

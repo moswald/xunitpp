@@ -45,21 +45,4 @@ const std::vector<std::function<void()>> &Theory::Theories() const
     return mTheories;
 }
 
-void Theory::Run(std::function<void()> theory)
-{
-    try
-    {
-        theory();
     }
-    catch (xUnitAssert &)
-    {
-    }
-    catch (std::exception &)
-    {
-    }
-    catch (...)
-    {
-    }
-}
-
-}

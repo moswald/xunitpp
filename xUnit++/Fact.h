@@ -20,7 +20,7 @@ public:
 
     const std::string &Suite() const;
 
-    void Run();
+    std::function<void()> Test() const;
 
 private:
     std::function<void()> mFact;
