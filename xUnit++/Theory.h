@@ -18,14 +18,14 @@ public:
     Theory &operator =(Theory other);
     friend void swap(Theory &f0, Theory &f1);
 
-    const std::string &Suite() const;
+    const TestDetails &TestDetails() const;
 
     const std::vector<std::function<void()>> &Theories() const;
 
 private:
     std::vector<std::function<void()>> mTheories;
 
-    TestDetails mTestDetails;
+    xUnitpp::TestDetails mTestDetails;
 };
 
 }

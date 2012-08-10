@@ -35,9 +35,9 @@ void swap(Theory &f0, Theory &f1)
     swap(f0.mTestDetails, f1.mTestDetails);
 }
 
-const std::string &Theory::Suite() const
+const TestDetails &Theory::TestDetails() const
 {
-    return mTestDetails.Suite;
+    return mTestDetails;
 }
 
 const std::vector<std::function<void()>> &Theory::Theories() const
