@@ -1,4 +1,5 @@
 #include "TestCollection.h"
+#include "Fact.h"
 
 namespace xUnitpp
 {

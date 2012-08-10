@@ -5,6 +5,7 @@
 #include <mutex>
 #include <random>
 #include <vector>
+#include "Fact.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"

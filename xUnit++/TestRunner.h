@@ -6,12 +6,14 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Fact.h"
-#include "Theory.h"
 #include "xUnitTime.h"
 
 namespace xUnitpp
 {
+
+class Fact;
+class Theory;
+struct TestDetails;
 
 size_t RunAllTests(const std::string &suite = "", size_t maxTestRunTime = 0, size_t maxConcurrent = 0);
 

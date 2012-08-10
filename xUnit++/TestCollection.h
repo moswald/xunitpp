@@ -3,11 +3,12 @@
 
 #include <functional>
 #include <vector>
-#include "Fact.h"
 #include "Theory.h"
 
 namespace xUnitpp
 {
+
+class Fact;
 
 class TestCollection
 {
