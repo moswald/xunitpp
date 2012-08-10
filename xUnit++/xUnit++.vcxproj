@@ -28,6 +28,7 @@
     <ClInclude Include="TestRunner.h" />
     <ClInclude Include="Theory.h" />
     <ClInclude Include="xUnitAssert.h" />
+    <ClInclude Include="xUnitTime.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>

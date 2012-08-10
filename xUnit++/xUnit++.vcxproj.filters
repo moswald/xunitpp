@@ -18,5 +18,6 @@
     <ClInclude Include="Theory.h" />
     <ClInclude Include="TestRunner.h" />
     <ClInclude Include="TestDetails.h" />
+    <ClInclude Include="xUnitTime.h" />
   </ItemGroup>
 </Project>
