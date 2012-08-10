@@ -18,14 +18,14 @@ public:
     Fact &operator =(Fact other);
     friend void swap(Fact &f0, Fact &f1);
 
-    const std::string &Suite() const;
+    const TestDetails &TestDetails() const;
 
     std::function<void()> Test() const;
 
 private:
     std::function<void()> mFact;
 
-    TestDetails mTestDetails;
+    xUnitpp::TestDetails mTestDetails;
 };
 
 }

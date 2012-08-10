@@ -1,12 +1,18 @@
+#include "TestRunner.h"
 #include <atomic>
 #include <future>
 #include <limits>
 #include <mutex>
 #include <random>
 #include <vector>
-#include "TestRunner.h"
 #include "TestCollection.h"
+#include "TestDetails.h"
 #include "xUnitAssert.h"
+
+
+// !!! temporary
+#include <iostream>
+
 
 namespace
 {
@@ -16,13 +22,47 @@ class ActiveTests
 public:
     struct TestInstance
     {
-        TestInstance(int id, int groupId, int groupSize, std::function<void()> test)
-            : id(id)
+        TestInstance(const xUnitpp::TestDetails &testDetails, int id, int groupId, int groupSize, std::function<void()> test)
+            : testDetails(testDetails)
+            , id(id)
             , groupId(groupId)
             , groupSize(groupSize)
             , test(test)
         {
         }
+
+        TestInstance(const TestInstance &other)
+            : testDetails(other.testDetails)
+            , id(other.id)
+            , groupId(other.groupId)
+            , groupSize(other.groupSize)
+            , test(other.test)
+        {
+        }
+
+        TestInstance(TestInstance &&other)
+        {
+            swap(*this, other);
+        }
+
+        TestInstance &operator =(TestInstance other)
+        {
+            swap(*this, other);
+            return *this;
+        }
+
+        friend void swap(TestInstance &ti0, TestInstance &ti1)
+        {
+            using std::swap;
+
+            swap(ti0.testDetails, ti1.testDetails);
+            swap(ti0.id, ti1.id);
+            swap(ti0.groupId, ti1.groupId);
+            swap(ti0.groupSize, ti1.groupSize);
+            swap(ti0.test, ti1.test);
+        }
+
+        xUnitpp::TestDetails testDetails;
 
         size_t id;
         size_t groupId;
@@ -38,21 +78,21 @@ public:
 
         for (auto &fact : facts)
         {
-            if (suite == "" || fact.Suite() == suite)
+            if (suite == "" || fact.TestDetails().Suite == suite)
             {
-                mTests.emplace_back(TestInstance(++id, ++groupId, 1, fact.Test()));
+                mTests.emplace_back(TestInstance(fact.TestDetails(), ++id, ++groupId, 1, fact.Test()));
             }
         }
 
         for (auto &theorySet : theories)
         {
-            if (suite == "" || theorySet.Suite() == suite)
+            if (suite == "" || theorySet.TestDetails().Suite == suite)
             {
                 ++groupId;
 
                 for (auto &theory : theorySet.Theories())
                 {
-                    mTests.emplace_back(TestInstance(++id, groupId, theorySet.Theories().size(), theory));
+                    mTests.emplace_back(TestInstance(theorySet.TestDetails(), ++id, groupId, theorySet.Theories().size(), theory));
                 }
             }
         }
@@ -96,19 +136,19 @@ public:
     void OnTestStart(const TestDetails &details)
     {
         std::lock_guard<std::mutex> guard(mStartMtx);
-        OnTestStart(details);
+        mOnTestStart(details);
     }
 
     void OnTestFailure(const TestDetails &details, const std::string &message)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        OnTestFailure(details, message);
+        mOnTestFailure(details, message);
     }
 
     void OnTestFinish(const TestDetails &details, milliseconds time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
-        OnTestFinish(details, time);
+        mOnTestFinish(details, time);
     }
 
 
@@ -131,10 +171,10 @@ private:
 size_t RunAllTests(const std::string &suite, size_t maxTestRunTime, size_t maxConcurrent)
 {
     return
-        TestRunner([](const TestDetails &) {},
-                   [](const TestDetails &, const std::string &) {},
-                   [](const TestDetails &, milliseconds) {},
-                   [](int, int, int, milliseconds) {})
+        TestRunner([](const TestDetails &td) { std::cout << "starting test " << td.Name << std::endl; },
+                   [](const TestDetails &td, const std::string &message) { std::cout << "test " << td.Name << " had failure: " << message << std::endl; },
+                   [](const TestDetails &td, milliseconds time) { std::cout << "finished test " << td.Name << " in " << time.count() << " milliseconds" << std::endl; },
+                   [](int failed, int skipped, int total, milliseconds time) { std::cout << total << " tests run, " << failed << "failure" << (failed != 1 ? "s" : "") << skipped << " skipped, taking " << time.count() << " milliseconds" << std::endl; })
             .RunTests(TestCollection::Facts(), TestCollection::Theories(), suite, maxTestRunTime, maxConcurrent);
 }
 
@@ -187,7 +227,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
         std::condition_variable condition;
     } threadCounter(maxConcurrent);
 
-    size_t failedTests = 0;
+    std::atomic<size_t> failedTests = 0;
 
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
@@ -211,19 +251,26 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                     ThreadCounter &tc;
                 } counterGuard(threadCounter);
 
+                decltype(Clock::now()) testStart;
                 try
                 {
+                    mImpl->OnTestStart(test.testDetails);
+
+                    testStart = Clock::now();
                     test.test();
-                }
-                catch (xUnitAssert &assert)
-                {
                 }
                 catch (std::exception &e)
                 {
+                    mImpl->OnTestFailure(test.testDetails, e.what());
+                    ++failedTests;
                 }
                 catch (...)
                 {
+                    mImpl->OnTestFailure(test.testDetails, "Unknown exception caught: test has crashed");
+                    ++failedTests;
                 }
+
+                mImpl->OnTestFinish(test.testDetails, Clock::now() - testStart);
             }));
     }
 
@@ -231,6 +278,8 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
     {
         test.get();
     }
+    
+    mImpl->OnAllTestsComplete(futures.size(), failedTests, 0, Clock::now() - timeStart);
 
     return failedTests;
 }

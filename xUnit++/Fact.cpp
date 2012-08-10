@@ -36,9 +36,9 @@ void swap(Fact &f0, Fact &f1)
     swap(f0.mTestDetails, f1.mTestDetails);
 }
 
-const std::string &Fact::Suite() const
+const TestDetails &Fact::TestDetails() const
 {
-    return mTestDetails.Suite;
+    return mTestDetails;
 }
 
 std::function<void()> Fact::Test() const
