@@ -5,15 +5,11 @@
 #include <mutex>
 #include <random>
 #include <vector>
+#include "DefaultReporter.h"
 #include "Fact.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"
-
-
-// !!! temporary
-#include <iostream>
-
 
 namespace
 {
@@ -172,10 +168,10 @@ private:
 size_t RunAllTests(const std::string &suite, size_t maxTestRunTime, size_t maxConcurrent)
 {
     return
-        TestRunner([](const TestDetails &td) { std::cout << "starting test " << td.Name << std::endl; },
-                   [](const TestDetails &td, const std::string &message) { std::cout << "test " << td.Name << " had failure: " << message << std::endl; },
-                   [](const TestDetails &td, milliseconds time) { std::cout << "finished test " << td.Name << " in " << time.count() << " milliseconds" << std::endl; },
-                   [](int failed, int skipped, int total, milliseconds time) { std::cout << total << " tests run, " << failed << "failure" << (failed != 1 ? "s" : "") << skipped << " skipped, taking " << time.count() << " milliseconds" << std::endl; })
+        TestRunner(&DefaultReporter::ReportStart,
+                   &DefaultReporter::ReportFailure,
+                   &DefaultReporter::ReportFinish,
+                   &DefaultReporter::ReportAllTestsComplete)
             .RunTests(TestCollection::Facts(), TestCollection::Theories(), suite, maxTestRunTime, maxConcurrent);
 }
 

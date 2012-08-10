@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DefaultReporter.cpp" />
     <ClCompile Include="Fact.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCollection.cpp" />
@@ -20,6 +21,7 @@
     <ClCompile Include="xUnitAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DefaultReporter.h" />
     <ClInclude Include="Fact.h" />
     <ClInclude Include="Suite.h" />
     <ClInclude Include="TestCollection.h" />
