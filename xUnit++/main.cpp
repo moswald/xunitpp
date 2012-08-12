@@ -31,17 +31,102 @@ public:
         }
     }
 
-    // DoesNotThrow
-    // Throws
-    // Fail
-    // False
-    // True
-    // Empty
-    // NotEmpty
-    // Contains
-    // DoesNotContain
+    template<typename TFunc>
+    void DoesNotThrow(TFunc &&fn)
+    {
+        try
+        {
+            fn();
+        }
+        catch (std::exception &e)
+        {
+            throw xUnitAssert(std::string("Caught std::exception with message: ") + e.what());
+        }
+        catch (...)
+        {
+            throw xUnitAssert(std::string("Caught unknown exception (crash) with message: ") + e.what());
+        }
+    }
 
+    template<typename TException, typename TFunc>
+    TException Throws(TFunc &&fn)
+    {
+        try
+        {
+            fn();
+        }
+        catch (TException e)
+        {
+            return e;
+        }
+        catch (std::exception &e)
+        {
+            throw xUnitAssert(std::string("Caught std::exception with message: ") + e.what());
+        }
+        catch (...)
+        {
+            throw xUnitAssert(std::string("Caught unknown exception (crash) with message: ") + e.what());
+        }
 
+        throw xUnitAssert(std::string("Did not catch any exceptions."));
+    }
+
+    void Fail()
+    {
+        throw xUnitAssert("Fail.");
+    }
+
+    void False(bool b)
+    {
+        if (b)
+        {
+            throw xUnitAssert("Expected false.");
+        }
+    }
+
+    void True(bool b)
+    {
+        if (!b)
+        {
+            throw xUnitAssert("Expected true.");
+        }
+    }
+
+    template<typename TContainer>
+    void Empty(TContainer container)
+    {
+        if (!container.empty())
+        {
+            throw xUnitAssert("Container is not empty.");
+        }
+    }
+
+    template<typename TContainer>
+    void NotEmpty(TContainer container)
+    {
+        if (container.empty())
+        {
+            throw xUnitAssert("Container is empty.");
+        }
+    }
+
+    template<typename TContainer, typename TItem>
+    void DoesNotContain(TContainer container, TItem item)
+    {
+        if (std::find(container.begin(), container.end(), item))
+        {
+            throw xUnitAssert("Container contains item.");
+        }
+    }
+
+    template<typename TContainer, typename TItem>
+    void Contains(TContainer container, TItem item)
+    {
+        if (!std::find(container.begin(), container.end(), item))
+        {
+            throw xUnitAssert("Container does not contain item.");
+        }
+    }
 } Assert;
 
 FACT(SuccessfulFact)
