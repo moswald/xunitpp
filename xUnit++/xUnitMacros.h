@@ -20,7 +20,7 @@
 
 #define TIMED_FACT(FactName, timeout) \
     void FactName(); \
-    namespace { namespace FactName ## _ns { xUnitpp::TestCollection::Register reg(&FactName, #FactName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } } \
+    namespace FactName ## _ns { xUnitpp::TestCollection::Register reg(&FactName, #FactName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } \
     void FactName()
 
 #define FACT(FactName) TIMED_FACT(FactName, -1)
@@ -28,7 +28,7 @@
 #define TIMED_THEORY(TheoryName, timeout, ...) \
     void TheoryName(__VA_ARGS__); \
     std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data(); \
-    namespace { namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(&TheoryName, &TheoryName ## _data, #TheoryName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } } \
+    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(&TheoryName, &TheoryName ## _data, #TheoryName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } \
     std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data()
 
 #define THEORY(TheoryName, ...) TIMED_THEORY(TheoryName, -1, __VA_ARGS__)

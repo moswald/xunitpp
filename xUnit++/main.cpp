@@ -247,6 +247,7 @@ int main()
 
 /*
 things left to implement:
+separate SETUP/TEARDOWN and FIXTURE
 ASSERT macros (I hate macros :( ) (see unittestpp check macros, as well as xunit.net)
 traits (arbitrary category data)
 SKIP = reason
