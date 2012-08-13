@@ -222,5 +222,5 @@ TIMED_FACT(CustomLongRunning, 25)
 
 int main()
 {
-    return xUnitpp::RunAllTests("", 50);
+    return xUnitpp::RunAllTests(std::chrono::milliseconds(50));
 }
