@@ -1,6 +1,7 @@
 #ifndef FACT_H_
 #define FACT_H_
 
+#include <chrono>
 #include <functional>
 #include <string>
 #include <vector>
@@ -12,7 +13,7 @@ namespace xUnitpp
 class Fact
 {
 public:
-    Fact(std::function<void()> fact, const std::string &name, const std::string &suite, const std::string &filename, int line);
+    Fact(std::function<void()> fact, const std::string &name, const std::string &suite, std::chrono::milliseconds timeLimit, const std::string &filename, int line);
     Fact(const Fact &other);
     Fact(Fact &&other);
     Fact &operator =(Fact other);

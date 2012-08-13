@@ -1,6 +1,7 @@
 #ifndef TESTCOLLECTION_H_
 #define TESTCOLLECTION_H_
 
+#include <chrono>
 #include <functional>
 #include <vector>
 #include "Theory.h"
@@ -62,10 +63,10 @@ public:
         }
 
     public:
-        Register(const std::function<void()> &fn, const std::string &name, const std::string &suite, const std::string &filename, int line);
+        Register(const std::function<void()> &fn, const std::string &name, const std::string &suite, int milliseconds, const std::string &filename, int line);
 
         template<typename TTheory, typename TTheoryData>
-        Register(TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite, const std::string &filename, int line)
+        Register(TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite, int milliseconds, const std::string &filename, int line)
         {
             std::vector<std::function<void()>> theorySet;
 
@@ -74,7 +75,7 @@ public:
                 theorySet.emplace_back(TheoryHelper(theory, std::move(t)));
             }
         
-            TestCollection::Instance().mTheories.emplace_back(Theory(theorySet, name, suite, filename, line));
+            TestCollection::Instance().mTheories.emplace_back(Theory(theorySet, name, suite, std::chrono::milliseconds(milliseconds), filename, line));
         }
     };
 

@@ -10,9 +10,9 @@ TestCollection &TestCollection::Instance()
     return collection;
 }
 
-TestCollection::Register::Register(const std::function<void()> &fn, const std::string &name, const std::string &suite, const std::string &filename, int line)
+TestCollection::Register::Register(const std::function<void()> &fn, const std::string &name, const std::string &suite, int milliseconds, const std::string &filename, int line)
 {
-    TestCollection::Instance().mFacts.emplace_back(Fact(fn, name, suite, filename, line));
+    TestCollection::Instance().mFacts.emplace_back(Fact(fn, name, suite, std::chrono::milliseconds(milliseconds), filename, line));
 }
 
 const std::vector<Fact> &TestCollection::Facts()
