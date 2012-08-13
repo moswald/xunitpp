@@ -210,6 +210,16 @@ FACT(LongRunning)
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
 
+TIMED_FACT(LongRunningOk, 0)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+TIMED_FACT(CustomLongRunning, 25)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(35));
+}
+
 int main()
 {
     return xUnitpp::RunAllTests("", 50);

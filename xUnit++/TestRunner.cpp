@@ -11,8 +11,6 @@
 #include "TestDetails.h"
 #include "xUnitAssert.h"
 
-#include <iostream>
-
 namespace
 {
 
@@ -279,7 +277,13 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                         return testStart;
                     };
 
-                if (maxTestRunTime > 0)
+                auto testTimeLimit = test.testDetails.TimeLimit;
+                if (testTimeLimit < std::chrono::milliseconds::zero())
+                {
+                    testTimeLimit = std::chrono::milliseconds(maxTestRunTime);
+                }
+
+                if (testTimeLimit > std::chrono::milliseconds::zero())
                 {
                     //
                     // note that forcing a test to run in under a certain amount of time is inherently fragile
@@ -301,10 +305,10 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                         });
                     timedRunner.detach();
 
-                    if (threadStarted.wait_for(gate, std::chrono::milliseconds(maxTestRunTime)) == std::cv_status::timeout)
+                    if (threadStarted.wait_for(gate, testTimeLimit) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.testDetails, "Test failed to complete within " + std::to_string(maxTestRunTime) + " milliseconds.");
-                        mImpl->OnTestFinish(test.testDetails, std::chrono::milliseconds(maxTestRunTime));
+                        mImpl->OnTestFailure(test.testDetails, "Test failed to complete within " + std::to_string(testTimeLimit.count()) + " milliseconds.");
+                        mImpl->OnTestFinish(test.testDetails, testTimeLimit);
                         ++failedTests;
                     }
                     else

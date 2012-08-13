@@ -18,26 +18,32 @@
     } \
     namespace name ## _xUnitSuite
 
-#define FACT(FactName) \
+#define TIMED_FACT(FactName, timeout) \
     void FactName(); \
-    namespace { namespace FactName ## _ns { xUnitpp::TestCollection::Register reg(&FactName, #FactName, xUnitSuite::Name(), __FILE__, __LINE__); } } \
+    namespace { namespace FactName ## _ns { xUnitpp::TestCollection::Register reg(&FactName, #FactName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } } \
     void FactName()
 
-#define THEORY(TheoryName, ...) \
+#define FACT(FactName) TIMED_FACT(FactName, -1)
+
+#define TIMED_THEORY(TheoryName, timeout, ...) \
     void TheoryName(__VA_ARGS__); \
     std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data(); \
-    namespace { namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(&TheoryName, &TheoryName ## _data, #TheoryName, xUnitSuite::Name(), __FILE__, __LINE__); } } \
+    namespace { namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(&TheoryName, &TheoryName ## _data, #TheoryName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } } \
     std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data()
 
-#define FACT_FIXTURE(FactName, FixtureType) \
+#define THEORY(TheoryName, ...) TIMED_THEORY(TheoryName, -1, __VA_ARGS__)
+
+#define TIMED_FACT_FIXTURE(FactName, FixtureType, timeout) \
     namespace FactName ## _ns { \
         class FactName ## _Fixture : public FixtureType \
         { \
         public: \
             void FactName(); \
         } FactName ## _instance; \
-        xUnitpp::TestCollection::Register reg(std::bind(&FactName ## _Fixture::FactName, FactName ## _instance), #FactName, xUnitSuite::Name(), __FILE__, __LINE__); \
+        xUnitpp::TestCollection::Register reg(std::bind(&FactName ## _Fixture::FactName, FactName ## _instance), #FactName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); \
     } \
     void FactName ## _ns::FactName ## _Fixture::FactName()
+
+#define FACT_FIXTURE(FactName, FixtureType) TIMED_FACT_FIXTURE(FactName, FixtureType, -1)
 
 #endif
