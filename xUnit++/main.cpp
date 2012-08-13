@@ -2,6 +2,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <vector>
 #include "TestRunner.h"
@@ -204,7 +205,12 @@ SUITE(Special)
     }
 }
 
+FACT(LongRunning)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
 int main()
 {
-    xUnitpp::RunAllTests();
+    return xUnitpp::RunAllTests("", 50);
 }
