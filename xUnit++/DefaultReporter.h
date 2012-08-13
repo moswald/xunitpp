@@ -13,8 +13,8 @@ namespace DefaultReporter
 {
     void ReportStart(const TestDetails &);
     void ReportFailure(const TestDetails &testDetails, const std::string &msg);
-    void ReportFinish(const TestDetails &, milliseconds);
-    void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, milliseconds totalTime); 
+    void ReportFinish(const TestDetails &, std::chrono::milliseconds);
+    void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, std::chrono::milliseconds totalTime); 
 }
 
 }

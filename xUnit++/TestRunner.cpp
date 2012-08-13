@@ -11,6 +11,8 @@
 #include "TestDetails.h"
 #include "xUnitAssert.h"
 
+#include <iostream>
+
 namespace
 {
 
@@ -121,8 +123,8 @@ class TestRunner::Impl
 public:
     Impl(std::function<void(const TestDetails &)> onTestStart,
          std::function<void(const TestDetails &, const std::string &)> onTestFailure,
-         std::function<void(const TestDetails &, milliseconds)> onTestFinish,
-         std::function<void(int, int, int, milliseconds)> onAllTestsComplete)
+         std::function<void(const TestDetails &, std::chrono::milliseconds)> onTestFinish,
+         std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
         : mOnTestStart(onTestStart)
         , mOnTestFailure(onTestFailure)
         , mOnTestFinish(onTestFinish)
@@ -142,14 +144,14 @@ public:
         mOnTestFailure(details, message);
     }
 
-    void OnTestFinish(const TestDetails &details, milliseconds time)
+    void OnTestFinish(const TestDetails &details, std::chrono::milliseconds time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
         mOnTestFinish(details, time);
     }
 
 
-    void OnAllTestsComplete(int total, int skipped, int failed, milliseconds totalTime)
+    void OnAllTestsComplete(int total, int skipped, int failed, std::chrono::milliseconds totalTime)
     {
         mOnAllTestsComplete(total, skipped, failed, totalTime);
     }
@@ -157,8 +159,8 @@ public:
 private:
     std::function<void(const TestDetails &)> mOnTestStart;
     std::function<void(const TestDetails &, const std::string &)> mOnTestFailure;
-    std::function<void(const TestDetails &, milliseconds)> mOnTestFinish;
-    std::function<void(int, int, int, milliseconds)> mOnAllTestsComplete;
+    std::function<void(const TestDetails &, std::chrono::milliseconds)> mOnTestFinish;
+    std::function<void(int, int, int, std::chrono::milliseconds)> mOnAllTestsComplete;
 
     std::mutex mStartMtx;
     std::mutex mFailureMtx;
@@ -177,8 +179,8 @@ size_t RunAllTests(const std::string &suite, size_t maxTestRunTime, size_t maxCo
 
 TestRunner::TestRunner(std::function<void(const TestDetails &)> onTestStart,
                        std::function<void(const TestDetails &, const std::string &)> onTestFailure,
-                       std::function<void(const TestDetails &, milliseconds)> onTestFinish,
-                       std::function<void(int, int, int, milliseconds)> onAllTestsComplete)
+                       std::function<void(const TestDetails &, std::chrono::milliseconds)> onTestFinish,
+                       std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
     : mImpl(new Impl(onTestStart, onTestFailure, onTestFinish, onAllTestsComplete))
 {
 }
@@ -248,26 +250,72 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                     ThreadCounter &tc;
                 } counterGuard(threadCounter);
 
-                decltype(Clock::now()) testStart;
-                try
-                {
-                    mImpl->OnTestStart(test.testDetails);
+                auto actualTest = [&](bool reportEnd) -> TimeStamp
+                    {
+                        TimeStamp testStart;
+                        try
+                        {
+                            mImpl->OnTestStart(test.testDetails);
 
-                    testStart = Clock::now();
-                    test.test();
-                }
-                catch (std::exception &e)
-                {
-                    mImpl->OnTestFailure(test.testDetails, e.what());
-                    ++failedTests;
-                }
-                catch (...)
-                {
-                    mImpl->OnTestFailure(test.testDetails, "Unknown exception caught: test has crashed");
-                    ++failedTests;
-                }
+                            testStart = Clock::now();
+                            test.test();
+                        }
+                        catch (std::exception &e)
+                        {
+                            mImpl->OnTestFailure(test.testDetails, e.what());
+                            ++failedTests;
+                        }
+                        catch (...)
+                        {
+                            mImpl->OnTestFailure(test.testDetails, "Unknown exception caught: test has crashed");
+                            ++failedTests;
+                        }
 
-                mImpl->OnTestFinish(test.testDetails, Clock::now() - testStart);
+                        if (reportEnd)
+                        {
+                            mImpl->OnTestFinish(test.testDetails, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                        }
+
+                        return testStart;
+                    };
+
+                if (maxTestRunTime > 0)
+                {
+                    //
+                    // note that forcing a test to run in under a certain amount of time is inherently fragile
+                    // there's no guarantee that a thread, once started, actually gets `maxTestRunTime` milliseconds of CPU
+
+                    TimeStamp testStart;
+
+                    std::mutex m;
+                    std::unique_lock<std::mutex> gate(m);
+
+                    std::condition_variable threadStarted;
+                    std::thread timedRunner([&]()
+                        {
+                            m.lock();
+                            m.unlock();
+
+                            testStart = actualTest(false);
+                            threadStarted.notify_all();
+                        });
+                    timedRunner.detach();
+
+                    if (threadStarted.wait_for(gate, std::chrono::milliseconds(maxTestRunTime)) == std::cv_status::timeout)
+                    {
+                        mImpl->OnTestFailure(test.testDetails, "Test failed to complete within " + std::to_string(maxTestRunTime) + " milliseconds.");
+                        mImpl->OnTestFinish(test.testDetails, std::chrono::milliseconds(maxTestRunTime));
+                        ++failedTests;
+                    }
+                    else
+                    {
+                        mImpl->OnTestFinish(test.testDetails, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                    }
+                }
+                else
+                {
+                    actualTest(true);
+                }
             }));
     }
 
@@ -276,7 +324,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
         test.get();
     }
     
-    mImpl->OnAllTestsComplete(futures.size(), failedTests, 0, Clock::now() - timeStart);
+    mImpl->OnAllTestsComplete(futures.size(), failedTests, 0, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - timeStart));
 
     return failedTests;
 }

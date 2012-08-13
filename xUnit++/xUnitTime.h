@@ -7,7 +7,7 @@ namespace xUnitpp
 {
 
 typedef std::chrono::high_resolution_clock Clock;
-typedef std::chrono::duration<float, std::milli> milliseconds;
+typedef decltype(Clock::now()) TimeStamp;
 
 }
 

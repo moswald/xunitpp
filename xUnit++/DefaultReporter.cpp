@@ -17,11 +17,11 @@ namespace DefaultReporter
             " error: Test [" + testDetails.Name + "] failed with: " + msg + "\n");
     }
 
-    void ReportFinish(const TestDetails &, milliseconds)
+    void ReportFinish(const TestDetails &, std::chrono::milliseconds)
     {
     }
 
-    void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, milliseconds totalTime)
+    void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, std::chrono::milliseconds totalTime)
     {
         std::string total = std::to_string(testCount) + " tests, ";
         std::string failures = std::to_string(failureCount) + " failed, ";
