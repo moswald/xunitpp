@@ -15,7 +15,9 @@ class Fact;
 class Theory;
 struct TestDetails;
 
-size_t RunAllTests(const std::string &suite = "", size_t maxTestRunTime = 0, size_t maxConcurrent = 0);
+size_t RunAllTests(const std::string &suite);
+size_t RunAllTests(std::chrono::milliseconds maxTestRunTime);
+size_t RunAllTests(const std::string &suite = "", std::chrono::milliseconds maxTestRunTime = std::chrono::milliseconds::zero(), size_t maxConcurrent = 0);
 
 class TestRunner
 {
@@ -24,7 +26,8 @@ public:
                std::function<void(const TestDetails &, const std::string &)> onTestFailure,
                std::function<void(const TestDetails &, std::chrono::milliseconds)> onTestFinish,
                std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete);
-    size_t RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, size_t maxTestRunTime = 0, size_t maxConcurrent = 0);
+    size_t RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite,
+                    std::chrono::milliseconds maxTestRunTime = std::chrono::milliseconds::zero(), size_t maxConcurrent = 0);
 
 private:
     class Impl;

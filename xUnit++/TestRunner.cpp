@@ -165,7 +165,17 @@ private:
     std::mutex mFinishMtx;
 };
 
-size_t RunAllTests(const std::string &suite, size_t maxTestRunTime, size_t maxConcurrent)
+size_t RunAllTests(const std::string &suite)
+{
+    return RunAllTests(suite, std::chrono::milliseconds::zero());
+}
+
+size_t RunAllTests(std::chrono::milliseconds maxTestRunTime)
+{
+    return RunAllTests("", maxTestRunTime);
+}
+
+size_t RunAllTests(const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
 {
     return
         TestRunner(&DefaultReporter::ReportStart,
@@ -183,7 +193,7 @@ TestRunner::TestRunner(std::function<void(const TestDetails &)> onTestStart,
 {
 }
 
-size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, size_t maxTestRunTime, size_t maxConcurrent)
+size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
@@ -280,7 +290,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                 auto testTimeLimit = test.testDetails.TimeLimit;
                 if (testTimeLimit < std::chrono::milliseconds::zero())
                 {
-                    testTimeLimit = std::chrono::milliseconds(maxTestRunTime);
+                    testTimeLimit = maxTestRunTime;
                 }
 
                 if (testTimeLimit > std::chrono::milliseconds::zero())
