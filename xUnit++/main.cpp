@@ -72,9 +72,9 @@ public:
         throw xUnitAssert(std::string("Did not catch any exceptions."));
     }
 
-    void Fail()
+    void Fail(const std::string &msg)
     {
-        throw xUnitAssert("Fail.");
+        throw xUnitAssert(msg);
     }
 
     void False(bool b)
@@ -126,6 +126,24 @@ public:
         if (!std::find(container.begin(), container.end(), item))
         {
             throw xUnitAssert("Container does not contain item.");
+        }
+    }
+
+    template<typename TActual, typename TRange>
+    void InRange(TActual actual, TRange min, TRange max)
+    {
+        if (actual < min || actual >= max)
+        {
+            throw xUnitAssert("Value does not exist in range.");
+        }
+    }
+
+    template<typename TActual, typename TRange>
+    void NotInRange(TActual actual, TRange min, TRange max)
+    {
+        if (actual >= min && actual < max)
+        {
+            throw xUnitAssert("Value does not exist in range.");
         }
     }
 } Assert;
@@ -224,3 +242,13 @@ int main()
 {
     return xUnitpp::RunAllTests(std::chrono::milliseconds(50));
 }
+
+
+
+/*
+things left to implement:
+ASSERT macros (I hate macros :( ) (see unittestpp check macros, as well as xunit.net)
+traits (arbitrary category data)
+SKIP = reason
+Assert extensibility (see http://xunit.codeplex.com/wikipage?title=WhyDidWeBuildXunit&referringTitle=Home#Extensibility)
+*/
