@@ -25,13 +25,12 @@
 
 #define FACT(FactName) TIMED_FACT(FactName, -1)
 
-#define TIMED_THEORY(TheoryName, timeout, ...) \
-    void TheoryName(__VA_ARGS__); \
-    std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data(); \
-    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(&TheoryName, &TheoryName ## _data, #TheoryName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } \
-    std::vector<std::tuple<__VA_ARGS__>> TheoryName ## _data()
+#define TIMED_THEORY(TheoryName, params, DataProvider, timeout) \
+    void TheoryName params; \
+    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), timeout, __FILE__, __LINE__); } \
+    void TheoryName params
 
-#define THEORY(TheoryName, ...) TIMED_THEORY(TheoryName, -1, __VA_ARGS__)
+#define THEORY(TheoryName, params, DataProvider) TIMED_THEORY(TheoryName, params, DataProvider, -1)
 
 #define TIMED_FACT_FIXTURE(FactName, FixtureType, timeout) \
     namespace FactName ## _ns { \
