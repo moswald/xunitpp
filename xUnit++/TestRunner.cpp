@@ -340,7 +340,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
     
     mImpl->OnAllTestsComplete(futures.size(), failedTests, 0, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - timeStart));
 
-    return failedTests;
+    return -failedTests;
 }
 
 }
