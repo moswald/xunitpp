@@ -8,17 +8,25 @@ namespace xUnitpp
 
 namespace DefaultReporter
 {
-    void ReportStart(const TestDetails &)
+    void ReportStart(const TestDetails &, int)
     {
     }
 
-    void ReportFailure(const TestDetails &testDetails, const std::string &msg)
+    void ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg)
     {
-        std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
-            "): error " + testDetails.Name + ": " + msg + "\n");
+        if (dataIndex < 0)
+        {
+            std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
+                "): error " + testDetails.Name + ": " + msg + "\n");
+        }
+        else
+        {
+            std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
+                "): error " + testDetails.Name + "(" + std::to_string(dataIndex) + "): " + msg + "\n");
+        }
     }
 
-    void ReportFinish(const TestDetails &, std::chrono::milliseconds)
+    void ReportFinish(const TestDetails &, int, std::chrono::milliseconds)
     {
     }
 

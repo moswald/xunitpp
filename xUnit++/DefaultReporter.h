@@ -11,9 +11,9 @@ struct TestDetails;
 
 namespace DefaultReporter
 {
-    void ReportStart(const TestDetails &);
-    void ReportFailure(const TestDetails &testDetails, const std::string &msg);
-    void ReportFinish(const TestDetails &, std::chrono::milliseconds);
+    void ReportStart(const TestDetails &, int);
+    void ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg);
+    void ReportFinish(const TestDetails &, int, std::chrono::milliseconds);
     void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, std::chrono::milliseconds totalTime); 
 }
 

@@ -22,6 +22,17 @@ public:
         TestInstance(const xUnitpp::TestDetails &testDetails, int id, int groupId, int groupSize, std::function<void()> test)
             : testDetails(testDetails)
             , id(id)
+            , dataIndex(-1)
+            , groupId(groupId)
+            , groupSize(groupSize)
+            , test(test)
+        {
+        }
+
+        TestInstance(const xUnitpp::TestDetails &testDetails, int id, int dataIndex, int groupId, int groupSize, std::function<void()> test)
+            : testDetails(testDetails)
+            , id(id)
+            , dataIndex(dataIndex)
             , groupId(groupId)
             , groupSize(groupSize)
             , test(test)
@@ -31,6 +42,7 @@ public:
         TestInstance(const TestInstance &other)
             : testDetails(other.testDetails)
             , id(other.id)
+            , dataIndex(other.dataIndex)
             , groupId(other.groupId)
             , groupSize(other.groupSize)
             , test(other.test)
@@ -54,6 +66,7 @@ public:
 
             swap(ti0.testDetails, ti1.testDetails);
             swap(ti0.id, ti1.id);
+            swap(ti0.dataIndex, ti1.dataIndex);
             swap(ti0.groupId, ti1.groupId);
             swap(ti0.groupSize, ti1.groupSize);
             swap(ti0.test, ti1.test);
@@ -62,6 +75,7 @@ public:
         xUnitpp::TestDetails testDetails;
 
         size_t id;
+        size_t dataIndex;
         size_t groupId;
         size_t groupSize;
 
@@ -86,10 +100,10 @@ public:
             if (suite == "" || theorySet.TestDetails().Suite == suite)
             {
                 ++groupId;
-
+                size_t dataIndex = 0;
                 for (auto &theory : theorySet.Theories())
                 {
-                    mTests.emplace_back(TestInstance(theorySet.TestDetails(), ++id, groupId, theorySet.Theories().size(), theory));
+                    mTests.emplace_back(TestInstance(theorySet.TestDetails(), ++id, dataIndex++, groupId, theorySet.Theories().size(), theory));
                 }
             }
         }
@@ -119,9 +133,9 @@ namespace xUnitpp
 class TestRunner::Impl
 {
 public:
-    Impl(std::function<void(const TestDetails &)> onTestStart,
-         std::function<void(const TestDetails &, const std::string &)> onTestFailure,
-         std::function<void(const TestDetails &, std::chrono::milliseconds)> onTestFinish,
+    Impl(std::function<void(const TestDetails &, int)> onTestStart,
+         std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
+         std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
          std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
         : mOnTestStart(onTestStart)
         , mOnTestFailure(onTestFailure)
@@ -130,22 +144,22 @@ public:
     {
     }
 
-    void OnTestStart(const TestDetails &details)
+    void OnTestStart(const TestDetails &details, int dataIndex)
     {
         std::lock_guard<std::mutex> guard(mStartMtx);
-        mOnTestStart(details);
+        mOnTestStart(details, dataIndex);
     }
 
-    void OnTestFailure(const TestDetails &details, const std::string &message)
+    void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        mOnTestFailure(details, message);
+        mOnTestFailure(details, dataIndex, message);
     }
 
-    void OnTestFinish(const TestDetails &details, std::chrono::milliseconds time)
+    void OnTestFinish(const TestDetails &details, int dataIndex, std::chrono::milliseconds time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
-        mOnTestFinish(details, time);
+        mOnTestFinish(details, dataIndex, time);
     }
 
 
@@ -155,9 +169,9 @@ public:
     }
 
 private:
-    std::function<void(const TestDetails &)> mOnTestStart;
-    std::function<void(const TestDetails &, const std::string &)> mOnTestFailure;
-    std::function<void(const TestDetails &, std::chrono::milliseconds)> mOnTestFinish;
+    std::function<void(const TestDetails &, int)> mOnTestStart;
+    std::function<void(const TestDetails &, int, const std::string &)> mOnTestFailure;
+    std::function<void(const TestDetails &, int, std::chrono::milliseconds)> mOnTestFinish;
     std::function<void(int, int, int, std::chrono::milliseconds)> mOnAllTestsComplete;
 
     std::mutex mStartMtx;
@@ -185,9 +199,9 @@ size_t RunAllTests(const std::string &suite, std::chrono::milliseconds maxTestRu
             .RunTests(TestCollection::Facts(), TestCollection::Theories(), suite, maxTestRunTime, maxConcurrent);
 }
 
-TestRunner::TestRunner(std::function<void(const TestDetails &)> onTestStart,
-                       std::function<void(const TestDetails &, const std::string &)> onTestFailure,
-                       std::function<void(const TestDetails &, std::chrono::milliseconds)> onTestFinish,
+TestRunner::TestRunner(std::function<void(const TestDetails &, int)> onTestStart,
+                       std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
+                       std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
                        std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
     : mImpl(new Impl(onTestStart, onTestFailure, onTestFinish, onAllTestsComplete))
 {
@@ -263,25 +277,25 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                         TimeStamp testStart;
                         try
                         {
-                            mImpl->OnTestStart(test.testDetails);
+                            mImpl->OnTestStart(test.testDetails, test.dataIndex);
 
                             testStart = Clock::now();
                             test.test();
                         }
                         catch (std::exception &e)
                         {
-                            mImpl->OnTestFailure(test.testDetails, e.what());
+                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what());
                             ++failedTests;
                         }
                         catch (...)
                         {
-                            mImpl->OnTestFailure(test.testDetails, "Unknown exception caught: test has crashed");
+                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Unknown exception caught: test has crashed");
                             ++failedTests;
                         }
 
                         if (reportEnd)
                         {
-                            mImpl->OnTestFinish(test.testDetails, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                            mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
                         }
 
                         return testStart;
@@ -317,13 +331,13 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
 
                     if (threadStarted->wait_for(gate, testTimeLimit) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.testDetails, "Test failed to complete within " + std::to_string(testTimeLimit.count()) + " milliseconds.");
-                        mImpl->OnTestFinish(test.testDetails, testTimeLimit);
+                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(testTimeLimit.count()) + " milliseconds.");
+                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, testTimeLimit);
                         ++failedTests;
                     }
                     else
                     {
-                        mImpl->OnTestFinish(test.testDetails, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
                     }
                 }
                 else
