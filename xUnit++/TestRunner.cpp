@@ -304,18 +304,18 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                     std::mutex m;
                     std::unique_lock<std::mutex> gate(m);
 
-                    std::condition_variable threadStarted;
-                    std::thread timedRunner([&]()
+                    auto threadStarted = std::make_shared<std::condition_variable>();
+                    std::thread timedRunner([&, threadStarted]()
                         {
                             m.lock();
                             m.unlock();
 
                             testStart = actualTest(false);
-                            threadStarted.notify_all();
+                            threadStarted->notify_all();
                         });
                     timedRunner.detach();
 
-                    if (threadStarted.wait_for(gate, testTimeLimit) == std::cv_status::timeout)
+                    if (threadStarted->wait_for(gate, testTimeLimit) == std::cv_status::timeout)
                     {
                         mImpl->OnTestFailure(test.testDetails, "Test failed to complete within " + std::to_string(testTimeLimit.count()) + " milliseconds.");
                         mImpl->OnTestFinish(test.testDetails, testTimeLimit);
