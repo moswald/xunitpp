@@ -51,6 +51,8 @@ public:
         Equal(er, ar, [](double er, double ar) { return er == ar; });
     }
 
+    // !!! enable_if has std::begin, std::end
+    // then template on template of type T
     template<typename T, typename TComparer>
     void Equal(const std::vector<T> &expected, const std::vector<T> &actual, TComparer comparer) const
     {
@@ -65,6 +67,8 @@ public:
         }
     }
 
+    // !!! enable_if has std::begin, std::end
+    // then template on template of type T
     template<typename T>
     void Equal(const std::vector<T> &expected, const std::vector<T> &actual) const
     {
