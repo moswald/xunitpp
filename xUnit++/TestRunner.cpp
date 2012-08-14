@@ -234,7 +234,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
         std::condition_variable condition;
     } threadCounter(maxConcurrent);
 
-    std::atomic<size_t> failedTests = 0;
+    std::atomic<int> failedTests = 0;
 
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
