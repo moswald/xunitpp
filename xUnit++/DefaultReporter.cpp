@@ -1,4 +1,5 @@
 #include "DefaultReporter.h"
+#include <cstdio>
 #include <iostream>
 #include "TestDetails.h"
 
@@ -13,8 +14,8 @@ namespace DefaultReporter
 
     void ReportFailure(const TestDetails &testDetails, const std::string &msg)
     {
-        std::cout << (testDetails.Filename + ":" + std::to_string(testDetails.Line) +
-            " error: Test [" + testDetails.Name + "] failed with: " + msg + "\n");
+        std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
+            "): error " + testDetails.Name + ": " + msg + "\n");
     }
 
     void ReportFinish(const TestDetails &, std::chrono::milliseconds)
