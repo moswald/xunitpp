@@ -43,7 +43,7 @@ public:
         Equal(t0, t1, [](T0 t0, T1 t1) { return t0 == t1; });
     }
 
-    void Equal(double expected, double actual, size_t precision) const 
+    void Equal(double expected, double actual, size_t precision) const
     {
         auto er = round(expected, precision);
         auto ar = round(actual, precision);
@@ -66,7 +66,7 @@ public:
     }
 
     template<typename T>
-    void Equal(const std::vector<T> &expected, const std::vector<T> &actual) const 
+    void Equal(const std::vector<T> &expected, const std::vector<T> &actual) const
     {
         Equal(expected, actual, [](const T &t0, const T &t1) { return t0 == t1; });
     }
@@ -379,12 +379,3 @@ int main()
 {
     return xUnitpp::RunAllTests(std::chrono::milliseconds(50));
 }
-
-
-
-/*
-things left to implement:
-ASSERT macros (I hate macros :( ) (see unittestpp check macros, as well as xunit.net)
-unit test the lib
-xml output
-*/
