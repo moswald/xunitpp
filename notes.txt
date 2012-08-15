@@ -1,0 +1,13 @@
+Visual Studio 2012 notes
+------------------------
+will need to export a function that reports a list of tests
+implement ITestDiscoverer and ITestExecutor
+
+
+General
+-------
+see VS2012's implementation of method attributes
+support wstring
+consider doing LINEINFO the way VS2012 does
+unit test the lib
+xml output
