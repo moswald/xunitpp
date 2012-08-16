@@ -17,12 +17,12 @@ namespace DefaultReporter
         if (dataIndex < 0)
         {
             std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
-                "): error " + testDetails.Name + ": " + msg + "\n");
+                "): error in " + testDetails.Name + ": " + msg + "\n");
         }
         else
         {
             std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
-                "): error " + testDetails.Name + "(" + std::to_string(dataIndex) + "): " + msg + "\n");
+                "): error in " + testDetails.Name + "(" + std::to_string(dataIndex) + "): " + msg + "\n");
         }
     }
 
