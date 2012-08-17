@@ -23,8 +23,6 @@ namespace
             }
         }
 
-        
-
         if (!expected.empty())
         {
             msg += "\n     Expected: " + expected;
@@ -58,7 +56,12 @@ double Assert::round(double value, size_t precision)
     }
 }
 
-void Assert::Equal(double expected, double actual, size_t precision, const std::string &msg) const
+void Assert::Equal(float expected, float actual, int precision, const std::string &msg) const
+{
+    Equal((double)expected, (double)actual, precision, msg);
+}
+
+void Assert::Equal(double expected, double actual, int precision, const std::string &msg) const
 {
     auto er = round(expected, precision);
     auto ar = round(actual, precision);
@@ -87,6 +90,11 @@ void Assert::True(bool b, const std::string &msg) const
     }
 }
 
+void Assert::DoesNotContain(const char *actualString, const char *value, const std::string &msg) const
+{
+    DoesNotContain(std::string(actualString), std::string(value), msg);
+}
+
 void Assert::DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg) const
 {
     auto found = actualString.find(value);
@@ -94,6 +102,11 @@ void Assert::DoesNotContain(const std::string &actualString, const std::string &
     {
         throw xUnitAssert("DoesNotContain", msg, "Found: \"" + value + "\" at position " + std::to_string(found) + ".", "", "");
     }
+}
+
+void Assert::Contains(const char *actualString, const char *value, const std::string &msg) const
+{
+    Contains(std::string(actualString), std::string(value), msg);
 }
 
 void Assert::Contains(const std::string &actualString, const std::string &value, const std::string &msg) const

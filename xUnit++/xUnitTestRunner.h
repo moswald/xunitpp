@@ -1,5 +1,5 @@
-#ifndef TESTRUNNER_H_
-#define TESTRUNNER_H_
+#ifndef XUNITTESTRUNNER_H_
+#define XUNITTESTRUNNER_H_
 
 #include <chrono>
 #include <functional>

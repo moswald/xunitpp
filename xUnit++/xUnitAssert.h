@@ -71,7 +71,8 @@ public:
         Equal(t0, t1, [](T0 t0, T1 t1) { return t0 == t1; }, msg);
     }
 
-    void Equal(double expected, double actual, size_t precision, const std::string &msg = "") const;
+    void Equal(float expected, float actual, int precision, const std::string &msg = "") const;
+    void Equal(double expected, double actual, int precision, const std::string &msg = "") const;
 
     template<typename TSeq0, typename TSeq1, typename TComparer>
     void Equal(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, TComparer comparer, const std::string &msg = "") const
@@ -226,6 +227,8 @@ public:
         }
     }
 
+    void DoesNotContain(const char *actualString, const char *value, const std::string &msg = "") const;
+
     void DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
 
     template<typename TSequence, typename T>
@@ -238,6 +241,8 @@ public:
             throw xUnitAssert("Contains", msg, "", "", "");
         }
     }
+
+    void Contains(const char *actualString, const char *value, const std::string &msg = "") const;
 
     void Contains(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
 
