@@ -11,7 +11,7 @@ FACT(FalseSuccess)
     Assert.False(false);
 }
 
-FACT(FailsAssertsOnTrue)
+FACT(FalseAssertsOnTrue)
 {
     Assert.Throws<xUnitAssert>([]() { Assert.False(true); });
 }

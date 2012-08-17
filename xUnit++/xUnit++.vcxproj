@@ -22,6 +22,7 @@
     <ClCompile Include="Tests\Assert.False.cpp" />
     <ClCompile Include="Tests\Assert.NotEqual.cpp" />
     <ClCompile Include="Tests\Assert.Throws.cpp" />
+    <ClCompile Include="Tests\Assert.True.cpp" />
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="xUnitAssert.cpp" />
     <ClCompile Include="xUnitTestRunner.cpp" />
