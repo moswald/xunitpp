@@ -17,6 +17,7 @@
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="TestDetails.cpp" />
     <ClCompile Include="Tests\Assert.Equal.cpp" />
+    <ClCompile Include="Tests\Assert.NotEqual.cpp" />
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="xUnitAssert.cpp" />
     <ClCompile Include="xUnitTestRunner.cpp" />

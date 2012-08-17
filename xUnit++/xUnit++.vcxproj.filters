@@ -12,6 +12,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="xUnitTestRunner.cpp" />
+    <ClCompile Include="Tests\Assert.NotEqual.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fact.h" />

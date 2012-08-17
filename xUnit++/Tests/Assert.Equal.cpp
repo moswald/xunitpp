@@ -3,6 +3,9 @@
 using xUnitpp::xUnitAssert;
 using xUnitpp::Assert;
 
+SUITE(AssertEqual)
+{
+
 FACT(AssertEqualWithDefaultComparerWithSuccess)
 {
 	Assert.Equal(0, 0);
@@ -148,4 +151,6 @@ FACT(AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch)
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return false; }); });
 
     Assert.Contains(assert.what(), "at location 0");
+}
+
 }
