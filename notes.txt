@@ -9,5 +9,6 @@ General
 see VS2012's implementation of method attributes
 support wstring
 consider doing LINEINFO the way VS2012 does
-unit test the lib
+unit test the lib - started
+custom xUnitAsserts per assert (revisit unit tests at that point)
 xml output
