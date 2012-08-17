@@ -140,10 +140,13 @@ public:
             ++cur1;
         }
 
-        throw xUnitAssert("NotEqual", msg, "", "", "");
+        if (cur0 == end0 && cur1 == end1)
+        {
+            throw xUnitAssert("NotEqual", msg, "", "", "");
+        }
     }
 
-    template<typename TSeq0, typename TSeq1, typename TComparer>
+    template<typename TSeq0, typename TSeq1>
     void NotEqual(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, const std::string &msg = "") const
     {
         NotEqual(begin0, end0, begin1, end1, [](decltype(*begin0) a, decltype(*begin1) b) { return a == b; }, msg);
