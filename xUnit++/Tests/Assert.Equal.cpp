@@ -8,7 +8,7 @@ SUITE(AssertEqual)
 
 FACT(AssertEqualWithDefaultComparerWithSuccess)
 {
-	Assert.Equal(0, 0);
+    Assert.Equal(0, 0);
 }
 
 FACT(AssertEqualWithDefaultComparerAssertsOnFailure)
