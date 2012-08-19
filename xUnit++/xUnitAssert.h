@@ -44,7 +44,7 @@ private:
         class check {};
 
         template<typename C>
-        static char f(check<void (C::*)(), &C::empty> *);
+        static char f(check<bool (C::*)() const, &C::empty> *);
 
         template<typename C>
         static long f(...);
@@ -211,7 +211,7 @@ public:
     typename std::enable_if<!has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const std::string &msg = "") const
     {
         using namespace std;
-
+    
         if (begin(sequence) != end(sequence))
         {
             throw xUnitAssert("Empty", msg, "", "", "");
