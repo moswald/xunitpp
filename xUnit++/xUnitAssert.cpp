@@ -113,7 +113,7 @@ void Assert::Contains(const std::string &actualString, const std::string &value,
 {
     if (actualString.find(value) == std::string::npos)
     {
-        throw xUnitAssert("Contains", msg, "", "", "");
+        throw xUnitAssert("Contains", msg, "", actualString, value);
     }
 }
 
