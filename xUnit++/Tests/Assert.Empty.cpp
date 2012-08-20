@@ -32,7 +32,7 @@ namespace
     }
 }
 
-SUITE(AssertEqual)
+SUITE(AssertEmpty)
 {
 
 FACT(EmptyCallsEmptyForContainerWithConstEmptyMember)

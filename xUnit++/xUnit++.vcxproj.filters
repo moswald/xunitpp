@@ -33,6 +33,9 @@
     <ClCompile Include="Tests\Assert.Empty.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\Assert.DoesNotContain.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fact.h" />

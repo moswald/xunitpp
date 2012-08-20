@@ -1,3 +1,7 @@
+Bugs
+----
+Setting max concurrency smaller than the number of tests results in an infinite loop
+
 Visual Studio 2012 notes
 ------------------------
 will need to export a function that reports a list of tests
@@ -12,3 +16,4 @@ consider doing LINEINFO the way VS2012 does
 unit test the lib - started
 custom xUnitAsserts per assert (revisit unit tests at that point)
 xml output
+support versions of DoesNotContain/Contains that call find_if
