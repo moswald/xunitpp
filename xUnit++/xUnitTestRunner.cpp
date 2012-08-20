@@ -237,13 +237,13 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
 
         void operator--()
         {
-            std::lock_guard<std::mutex> guard(mtx);
             --activeThreads;
+            condition.notify_one();
         }
 
     private:
         size_t maxThreads;
-        size_t activeThreads;
+        std::atomic<size_t> activeThreads;
         std::mutex mtx;
         std::condition_variable condition;
     } threadCounter(maxConcurrent);
