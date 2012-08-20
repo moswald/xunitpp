@@ -34,24 +34,24 @@ FACT(DoesNotContainForSequenceAppendsUserMessage)
 
 FACT(DoesNotContainForStringSuccess)
 {
-    std::string expected = "abcd";
+    std::string actual = "abcd";
 
-    Assert.DoesNotContain(expected, "xyz");
+    Assert.DoesNotContain(actual, "xyz");
 }
 
 FACT(DoesNotContainForStringAssertsOnFailure)
 {
-    std::string expected = "abcd";
+    std::string actual = "abcd";
 
-    Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(expected, "bc"); });
+    Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(actual, "bc"); });
 }
 
 FACT(DoesNotContainForStringAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
-    std::string expected = "abcd";
+    std::string actual = "abcd";
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(expected, "ab", msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(actual, "ab", msg); });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

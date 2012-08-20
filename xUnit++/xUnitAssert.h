@@ -249,6 +249,8 @@ public:
 
     void Contains(const char *actualString, const char *value, const std::string &msg = "") const;
 
+    void Contains(const std::string &actualString, const char *value, const std::string &msg = "") const;
+
     void Contains(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
 
     template<typename TActual, typename TRange>

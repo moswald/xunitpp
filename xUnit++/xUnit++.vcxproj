@@ -16,6 +16,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="TestDetails.cpp" />
+    <ClCompile Include="Tests\Assert.Contains.cpp" />
     <ClCompile Include="Tests\Assert.DoesNotContain.cpp" />
     <ClCompile Include="Tests\Assert.DoesNotThrow.cpp" />
     <ClCompile Include="Tests\Assert.Empty.cpp" />
