@@ -95,6 +95,11 @@ void Assert::DoesNotContain(const char *actualString, const char *value, const s
     DoesNotContain(std::string(actualString), std::string(value), msg);
 }
 
+void Assert::DoesNotContain(const std::string &actualString, const char *value, const std::string &msg) const
+{
+    DoesNotContain(actualString, std::string(value), msg);
+}
+
 void Assert::DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg) const
 {
     auto found = actualString.find(value);
