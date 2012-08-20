@@ -17,3 +17,4 @@ unit test the lib - started
 custom xUnitAsserts per assert (revisit unit tests at that point)
 xml output
 support versions of DoesNotContain/Contains that call find_if
+external test runner (since ITestExecutor will need the same thing)

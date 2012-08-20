@@ -114,6 +114,11 @@ void Assert::Contains(const char *actualString, const char *value, const std::st
     Contains(std::string(actualString), std::string(value), msg);
 }
 
+void Assert::Contains(const std::string &actualString, const char *value, const std::string &msg) const
+{
+    Contains(actualString, std::string(value), msg);
+}
+
 void Assert::Contains(const std::string &actualString, const std::string &value, const std::string &msg) const
 {
     if (actualString.find(value) == std::string::npos)
