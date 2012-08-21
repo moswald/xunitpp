@@ -23,8 +23,10 @@
     <ClCompile Include="Tests\Assert.Equal.cpp" />
     <ClCompile Include="Tests\Assert.Fail.cpp" />
     <ClCompile Include="Tests\Assert.False.cpp" />
+    <ClCompile Include="Tests\Assert.InRange.cpp" />
     <ClCompile Include="Tests\Assert.NotEqual.cpp" />
     <ClCompile Include="Tests\Assert.NotInRange.cpp" />
+    <ClCompile Include="Tests\Assert.NotNull.cpp" />
     <ClCompile Include="Tests\Assert.Throws.cpp" />
     <ClCompile Include="Tests\Assert.True.cpp" />
     <ClCompile Include="Theory.cpp" />
