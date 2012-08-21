@@ -282,7 +282,7 @@ public:
     }
 
     template<typename T>
-    void NotNull(T value, const std::string &msg = "") const
+    void NotNull(const T &value, const std::string &msg = "") const
     {
         if (value == nullptr)
         {
