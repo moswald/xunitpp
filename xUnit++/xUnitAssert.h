@@ -256,6 +256,11 @@ public:
     template<typename TActual, typename TRange>
     void InRange(TActual actual, TRange min, TRange max, const std::string &msg = "") const
     {
+        if (min >= max)
+        {
+            throw std::invalid_argument("Assert.InRange argument error: min (" + std::to_string(min) + ") must be strictly less than max (" + std::to_string(max) + ").");
+        }
+
         if (actual < min || actual >= max)
         {
             throw xUnitAssert("InRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual));
@@ -265,6 +270,11 @@ public:
     template<typename TActual, typename TRange>
     void NotInRange(TActual actual, TRange min, TRange max, const std::string &msg = "") const
     {
+        if (min >= max)
+        {
+            throw std::invalid_argument("Assert.NotInRange argument error: min (" + std::to_string(min) + ") must be strictly less than max (" + std::to_string(max) + ").");
+        }
+
         if (actual >= min && actual < max)
         {
             throw xUnitAssert("NotInRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual));
