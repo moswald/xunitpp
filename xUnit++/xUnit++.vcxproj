@@ -27,7 +27,9 @@
     <ClCompile Include="Tests\Assert.NotEqual.cpp" />
     <ClCompile Include="Tests\Assert.NotInRange.cpp" />
     <ClCompile Include="Tests\Assert.NotNull.cpp" />
+    <ClCompile Include="Tests\Assert.NotSame.cpp" />
     <ClCompile Include="Tests\Assert.Null.cpp" />
+    <ClCompile Include="Tests\Assert.Same.cpp" />
     <ClCompile Include="Tests\Assert.Throws.cpp" />
     <ClCompile Include="Tests\Assert.True.cpp" />
     <ClCompile Include="Theory.cpp" />

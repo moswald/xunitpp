@@ -309,9 +309,36 @@ public:
     }
 
     template<typename T>
+    void NotSame(const T *t0, const T *t1, const std::string &msg = "") const
+    {
+        if (t0 == t1)
+        {
+            throw xUnitAssert("NotSame", msg, "", "", "");
+        }
+    }
+
+    template<typename T>
     void Same(const T &t0, const T &t1, const std::string &msg = "") const
     {
         if (&t0 != &t1)
+        {
+            throw xUnitAssert("Same", msg, "", "", "");
+        }
+    }
+
+    template<typename T>
+    void Same(T *t0, T *t1, const std::string &msg = "") const
+    {
+        if (t0 != t1)
+        {
+            throw xUnitAssert("Same", msg, "", "", "");
+        }
+    }
+
+    template<typename T>
+    void Same(const T *t0, const T *t1, const std::string &msg = "") const
+    {
+        if (t0 != t1)
         {
             throw xUnitAssert("Same", msg, "", "", "");
         }
