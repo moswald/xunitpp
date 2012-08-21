@@ -291,7 +291,7 @@ public:
     }
 
     template<typename T>
-    void Null(T value, const std::string &msg = "") const
+    void Null(const T &value, const std::string &msg = "") const
     {
         if (value != nullptr)
         {
