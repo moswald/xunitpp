@@ -1,4 +1,4 @@
-#include "../xUnit++.h"
+#include "xUnit++.h"
 
 using xUnitpp::xUnitAssert;
 using xUnitpp::Assert;
@@ -18,12 +18,12 @@ FACT(AssertEqualWithDefaultComparerAssertsOnFailure)
 
 FACT(AssertEqualWithCustomComparerWithSuccess)
 {
-    Assert.Equal(0, 1, [](int a, int b) { return true; });
+    Assert.Equal(0, 1, [](int, int) { return true; });
 }
 
 FACT(AssertEqualWithCustomComparerAssertsOnFailure)
 {
-    Assert.Throws<xUnitAssert>([]() { Assert.Equal(0, 0, [](int a, int b) { return false; }); });
+    Assert.Throws<xUnitAssert>([]() { Assert.Equal(0, 0, [](int, int) { return false; }); });
 }
 
 FACT(AssertEqualAppendsUserMessage)
@@ -116,7 +116,7 @@ FACT(AssertSequenceEqualCustomComparerWithSuccess)
     v1.push_back(12);
     v1.push_back(13);
 
-    Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return true; });
+    Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; });
 }
 
 FACT(AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength)
@@ -131,7 +131,7 @@ FACT(AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength)
     v1.push_back(2);
     v1.push_back(3);
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return true; }); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; }); });
 
     Assert.Contains(assert.what(), "at location 2");
 }
@@ -148,7 +148,7 @@ FACT(AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch)
     v1.push_back(2);
     v1.push_back(3);
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return false; }); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return false; }); });
 
     Assert.Contains(assert.what(), "at location 0");
 }
