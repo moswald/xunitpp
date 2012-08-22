@@ -4,6 +4,7 @@
 #include <limits>
 #include <mutex>
 #include <random>
+#include <stdexcept>
 #include <vector>
 #include "DefaultReporter.h"
 #include "Fact.h"
@@ -74,10 +75,10 @@ public:
 
         xUnitpp::TestDetails testDetails;
 
-        size_t id;
-        size_t dataIndex;
-        size_t groupId;
-        size_t groupSize;
+        int id;
+        int dataIndex;
+        int groupId;
+        int groupSize;
 
         std::function<void()> test;
     };
@@ -269,6 +270,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
                     }
 
                 private:
+                    CounterGuard &operator =(const CounterGuard &) { throw std::logic_error("not supported"); }
                     ThreadCounter &tc;
                 } counterGuard(threadCounter);
 

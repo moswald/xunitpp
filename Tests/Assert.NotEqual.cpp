@@ -1,4 +1,4 @@
-#include "../xUnit++.h"
+#include "xUnit++.h"
 
 using xUnitpp::xUnitAssert;
 using xUnitpp::Assert;
@@ -82,7 +82,7 @@ FACT(AssertSequenceNotEqualCustomComparerWithSuccess)
     v1.push_back(2);
     v1.push_back(3);
 
-    Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return false; });
+    Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return false; });
 }
 
 FACT(AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch)
@@ -99,7 +99,7 @@ FACT(AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch)
     v1.push_back(12);
     v1.push_back(13);
 
-    Assert.Throws<xUnitAssert>([&]() { Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int a, long long b) { return true; }); });
+    Assert.Throws<xUnitAssert>([&]() { Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; }); });
 }
 
 }

@@ -1,5 +1,23 @@
+#include <string>
+#include <vector>
 #include "TestCollection.h"
 #include "Fact.h"
+
+namespace
+{
+    extern "C" __declspec(dllexport) void ListAllTests(std::vector<std::string> &tests)
+    {
+        for (const auto &fact : xUnitpp::TestCollection::Facts())
+        {
+            tests.push_back(fact.TestDetails().Name);
+        }
+
+        for (const auto &theory : xUnitpp::TestCollection::Theories())
+        {
+            tests.push_back(theory.TestDetails().Name);
+        }
+    }
+}
 
 namespace xUnitpp
 {

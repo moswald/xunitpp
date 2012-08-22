@@ -1,62 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Fact.cpp" />
     <ClCompile Include="xUnitAssert.cpp" />
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="TestDetails.cpp" />
     <ClCompile Include="DefaultReporter.cpp" />
-    <ClCompile Include="Tests\Assert.Equal.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="xUnitTestRunner.cpp" />
-    <ClCompile Include="Tests\Assert.NotEqual.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.DoesNotThrow.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Throws.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Fail.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.False.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.True.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Empty.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.DoesNotContain.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Contains.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.NotInRange.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.InRange.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.NotNull.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Null.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.NotSame.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\Assert.Same.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fact.h" />
@@ -70,10 +21,5 @@
     <ClInclude Include="DefaultReporter.h" />
     <ClInclude Include="xUnit++.h" />
     <ClInclude Include="xUnitTestRunner.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Tests">
-      <UniqueIdentifier>{f2938ea3-789e-45dd-95bf-6dd64ff5780e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
 </Project>

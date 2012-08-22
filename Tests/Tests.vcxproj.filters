@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Assert.Contains.cpp" />
+    <ClCompile Include="Assert.DoesNotContain.cpp" />
+    <ClCompile Include="Assert.DoesNotThrow.cpp" />
+    <ClCompile Include="Assert.Empty.cpp" />
+    <ClCompile Include="Assert.Equal.cpp" />
+    <ClCompile Include="Assert.Fail.cpp" />
+    <ClCompile Include="Assert.False.cpp" />
+    <ClCompile Include="Assert.InRange.cpp" />
+    <ClCompile Include="Assert.NotEqual.cpp" />
+    <ClCompile Include="Assert.NotInRange.cpp" />
+    <ClCompile Include="Assert.NotNull.cpp" />
+    <ClCompile Include="Assert.NotSame.cpp" />
+    <ClCompile Include="Assert.Null.cpp" />
+    <ClCompile Include="Assert.Same.cpp" />
+    <ClCompile Include="Assert.Throws.cpp" />
+    <ClCompile Include="Assert.True.cpp" />
+  </ItemGroup>
+</Project>

@@ -11,7 +11,7 @@
 ##########
 
 # ignore output files
-\b(Debug|Release|obj|lib)\b
+\b(bin|int)\b
 
 # ignore Visual Studio config files
 .suo$
