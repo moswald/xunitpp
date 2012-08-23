@@ -3,24 +3,36 @@
 #include <tuple>
 #include <vector>
 #include <Windows.h>
+#include "CommandLine.h"
 #include "TestDetails.h"
 #include "xUnitTestRunner.h"
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    std::vector<std::string> libraries;
+
+    try
     {
-        std::cerr << "usage: xunit.console.exe <test assembly>" << std::endl;
+        xUnitpp::Utilities::CommandLine commandLine(argc, argv);
+        libraries = commandLine.TestLibraries();
+    }
+    catch (std::invalid_argument &e)
+    {
+        std::cerr << e.what();
         return -1;
     }
 
-    auto testlib = LoadLibrary(argv[1]);
+    int failures = 0;
 
-    if (testlib == nullptr)
+    for (const auto &lib : libraries)
     {
-        std::cerr << "unable to load " << argv[1] << std::endl;
-        return -1;
-    }
+        auto testlib = LoadLibrary(lib.c_str());
+
+        if (testlib == nullptr)
+        {
+            std::cerr << "unable to load " << argv[1] << std::endl;
+            return -1;
+        }
 
     //typedef void (*ListAllTests)(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests);
     //ListAllTests listAllTests = (ListAllTests)GetProcAddress(testlib, "ListAllTests");
@@ -45,14 +57,17 @@ int main(int argc, char **argv)
     //    }
     //}
 
-    typedef size_t (*RunAll)();
-    RunAll runAll = (RunAll)GetProcAddress(testlib, "RunAll");
+        typedef size_t (*RunAll)();
+        RunAll runAll = (RunAll)GetProcAddress(testlib, "RunAll");
 
-    if (runAll == nullptr)
-    {
-        std::cerr << "unable to get RunAll" << std::endl;
-        return -1;
+        if (runAll == nullptr)
+        {
+            std::cerr << "unable to get RunAll" << std::endl;
+            return -1;
+        }
+
+        failures += runAll();
     }
 
-    return runAll();
+    return failures;
 }
