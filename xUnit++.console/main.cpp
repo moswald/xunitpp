@@ -22,26 +22,37 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    typedef void (*ListAllTests)(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests);
-    ListAllTests listAllTests = (ListAllTests)GetProcAddress(testlib, "ListAllTests");
+    //typedef void (*ListAllTests)(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests);
+    //ListAllTests listAllTests = (ListAllTests)GetProcAddress(testlib, "ListAllTests");
+    //
+    //if (listAllTests == nullptr)
+    //{
+    //    std::cerr << "unable to get ListAllTests" << std::endl;
+    //    return -1;
+    //}
+    //
+    //std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> tests;
+    //listAllTests(tests);
+    //
+    //for (const auto &t : tests)
+    //{
+    //    std::cout << std::get<0>(t) << std::endl;
+    //
+    //    const auto &attributes = std::get<1>(t);
+    //    for (const auto &a : attributes)
+    //    {
+    //        std::cout << "  [" << a.first << " : " << a.second << "]" << std::endl;
+    //    }
+    //}
 
-    if (listAllTests == nullptr)
+    typedef size_t (*RunAll)();
+    RunAll runAll = (RunAll)GetProcAddress(testlib, "RunAll");
+
+    if (runAll == nullptr)
     {
-        std::cerr << "unable to get ListAllTests" << std::endl;
+        std::cerr << "unable to get RunAll" << std::endl;
         return -1;
     }
 
-    std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> tests;
-    listAllTests(tests);
-
-    for (const auto &t : tests)
-    {
-        std::cout << std::get<0>(t) << std::endl;
-    
-        const auto &attributes = std::get<1>(t);
-        for (const auto &a : attributes)
-        {
-            std::cout << "  [" << a.first << " : " << a.second << "]" << std::endl;
-        }
-    }
+    return runAll();
 }

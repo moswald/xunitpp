@@ -1,8 +1,9 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "TestCollection.h"
 #include "Fact.h"
+#include "TestCollection.h"
+#include "xUnitTestRunner.h"
 
 namespace
 {
@@ -17,6 +18,11 @@ namespace
         {
             tests.emplace_back(std::make_tuple(theory.TestDetails().Name, theory.TestDetails().Attributes));
         }
+    }
+
+    extern "C" __declspec(dllexport) void RunAll()
+    {
+        xUnitpp::RunAllTests();
     }
 }
 
