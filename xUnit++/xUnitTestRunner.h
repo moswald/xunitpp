@@ -24,6 +24,7 @@ class TestRunner
 public:
     TestRunner(std::function<void(const TestDetails &, int)> onTestStart,
                std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
+               std::function<void(const TestDetails &, const std::string &)> onTestSkip,
                std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
                std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete);
     size_t RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite,

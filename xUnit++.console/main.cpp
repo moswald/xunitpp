@@ -1,7 +1,10 @@
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <Windows.h>
+#include "TestDetails.h"
+#include "xUnitTestRunner.h"
 
 int main(int argc, char **argv)
 {
@@ -19,7 +22,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    typedef void (*ListAllTests)(std::vector<std::string> &tests);
+    typedef void (*ListAllTests)(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests);
     ListAllTests listAllTests = (ListAllTests)GetProcAddress(testlib, "ListAllTests");
 
     if (listAllTests == nullptr)
@@ -28,11 +31,17 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    std::vector<std::string> tests;
+    std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> tests;
     listAllTests(tests);
 
-    for (auto t : tests)
+    for (const auto &t : tests)
     {
-        std::cout << t << std::endl;
+        std::cout << std::get<0>(t) << std::endl;
+    
+        const auto &attributes = std::get<1>(t);
+        for (const auto &a : attributes)
+        {
+            std::cout << "  [" << a.first << " : " << a.second << "]" << std::endl;
+        }
     }
 }

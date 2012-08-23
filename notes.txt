@@ -1,13 +1,13 @@
 Visual Studio 2012 notes
 ------------------------
-will need to export a function that reports a list of tests
+will need to export a function that reports a list of tests - started
 implement ITestDiscoverer and ITestExecutor
 
 
 General
 -------
 unit test the lib - started
-create lib/include structure, create NuGet package
+create lib/include structure, create NuGet package/template
 ensure gcc support
 xml output
 support wstring
@@ -17,6 +17,5 @@ support versions of DoesNotContain/Contains that call find_if
 "2.0"
 -----
 custom xUnitAsserts per assert (revisit unit tests at that point)
-see VS2012's implementation of method attributes
 consider doing LINEINFO the way VS2012 does
-external test runner (since ITestExecutor will need the same thing)
+external test runner (since ITestExecutor will need the same thing) - started

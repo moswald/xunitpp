@@ -12,7 +12,9 @@ namespace xUnitpp
 class Theory
 {
 public:
-    Theory(const std::vector<std::function<void()>> &theorySet, const std::string &name, const std::string &suite, std::chrono::milliseconds timeLimit, const std::string &filename, int line);
+    Theory(const std::vector<std::function<void()>> &theorySet, const std::string &name,
+           const std::string &suite, const AttributeCollection &attributes,
+           std::chrono::milliseconds timeLimit, const std::string &filename, int line);
     Theory(const Theory &other);
     Theory(Theory &&other);
     Theory &operator =(Theory other);

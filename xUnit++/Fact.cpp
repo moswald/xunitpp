@@ -5,9 +5,10 @@
 namespace xUnitpp
 {
 
-Fact::Fact(std::function<void()> fact, const std::string &name, const std::string &suite, std::chrono::milliseconds timeLimit, const std::string &filename, int line)
+Fact::Fact(std::function<void()> fact, const std::string &name, const std::string &suite,
+           const AttributeCollection &attributes, std::chrono::milliseconds timeLimit, const std::string &filename, int line)
     : mFact(fact)
-    , mTestDetails(name, suite, timeLimit, filename, line)
+    , mTestDetails(name, suite, attributes, timeLimit, filename, line)
 {
 }
 

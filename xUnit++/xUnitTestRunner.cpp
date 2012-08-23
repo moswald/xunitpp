@@ -136,10 +136,12 @@ class TestRunner::Impl
 public:
     Impl(std::function<void(const TestDetails &, int)> onTestStart,
          std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
+         std::function<void(const TestDetails &, const std::string &)> onTestSkip,
          std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
          std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
         : mOnTestStart(onTestStart)
         , mOnTestFailure(onTestFailure)
+        , mOnTestSkip(onTestSkip)
         , mOnTestFinish(onTestFinish)
         , mOnAllTestsComplete(onAllTestsComplete)
     {
@@ -157,6 +159,11 @@ public:
         mOnTestFailure(details, dataIndex, message);
     }
 
+    void OnTestSkip(const TestDetails &details, const std::string &reason)
+    {
+        mOnTestSkip(details, reason);
+    }
+
     void OnTestFinish(const TestDetails &details, int dataIndex, std::chrono::milliseconds time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
@@ -172,6 +179,7 @@ public:
 private:
     std::function<void(const TestDetails &, int)> mOnTestStart;
     std::function<void(const TestDetails &, int, const std::string &)> mOnTestFailure;
+    std::function<void(const TestDetails &, const std::string &)> mOnTestSkip;
     std::function<void(const TestDetails &, int, std::chrono::milliseconds)> mOnTestFinish;
     std::function<void(int, int, int, std::chrono::milliseconds)> mOnAllTestsComplete;
 
@@ -195,6 +203,7 @@ size_t RunAllTests(const std::string &suite, std::chrono::milliseconds maxTestRu
     return
         TestRunner(&DefaultReporter::ReportStart,
                    &DefaultReporter::ReportFailure,
+                   &DefaultReporter::ReportSkip,
                    &DefaultReporter::ReportFinish,
                    &DefaultReporter::ReportAllTestsComplete)
             .RunTests(TestCollection::Facts(), TestCollection::Theories(), suite, maxTestRunTime, maxConcurrent);
@@ -202,9 +211,10 @@ size_t RunAllTests(const std::string &suite, std::chrono::milliseconds maxTestRu
 
 TestRunner::TestRunner(std::function<void(const TestDetails &, int)> onTestStart,
                        std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
+                       std::function<void(const TestDetails &, const std::string &)> onTestSkip,
                        std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
                        std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
-    : mImpl(new Impl(onTestStart, onTestFailure, onTestFinish, onAllTestsComplete))
+    : mImpl(new Impl(onTestStart, onTestFailure, onTestSkip, onTestFinish, onAllTestsComplete))
 {
 }
 
@@ -250,10 +260,18 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
     } threadCounter(maxConcurrent);
 
     std::atomic<int> failedTests = 0;
+    int skippedTests = 0;
 
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
     {
+        if (test.testDetails.Attributes.find("Skip") != test.testDetails.Attributes.end())
+        {
+            skippedTests++;
+            mImpl->OnTestSkip(test.testDetails, test.testDetails.Attributes["Skip"]);
+            continue;
+        }
+
         futures.push_back(std::async([&]()
             {
                 struct CounterGuard
@@ -354,7 +372,7 @@ size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Th
         test.get();
     }
     
-    mImpl->OnAllTestsComplete(futures.size(), failedTests, 0, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - timeStart));
+    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - timeStart));
 
     return -failedTests;
 }
