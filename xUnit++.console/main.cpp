@@ -9,22 +9,20 @@
 
 int main(int argc, char **argv)
 {
-    std::vector<std::string> libraries;
+    xUnitpp::Utilities::CommandLine::Options options;
 
-    try
     {
-        xUnitpp::Utilities::CommandLine commandLine(argc, argv);
-        libraries = commandLine.TestLibraries();
-    }
-    catch (std::invalid_argument &e)
-    {
-        std::cerr << e.what();
-        return -1;
+        auto result = xUnitpp::Utilities::CommandLine::Parse(argc, argv, options);
+        if (!result.empty())
+        {
+            std::cerr << result;
+            return -1;
+        }
     }
 
     int failures = 0;
 
-    for (const auto &lib : libraries)
+    for (const auto &lib : options.libraries)
     {
         auto testlib = LoadLibrary(lib.c_str());
 

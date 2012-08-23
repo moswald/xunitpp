@@ -1,4 +1,5 @@
 #include "CommandLine.h"
+#include <filesystem>
 #include <functional>
 #include <stack>
 #include <sstream>
@@ -16,7 +17,7 @@ namespace
     {
         if (arguments.empty())
         {
-            return opt + " expects at least one attribute argument.\n";
+            return opt + " expects at least one attribute argument.";
         }
 
         do
@@ -26,7 +27,7 @@ namespace
             auto pos = raw.find('=');
             if (pos == std::string::npos)
             {
-                return raw + " is not a valid format for " + opt + " (should be \"name=[value]\").\n";
+                return raw + " is not a valid format for " + opt + " (should be \"name=[value]\").";
             }
 
             auto key = raw.substr(0, pos);
@@ -54,100 +55,109 @@ namespace
 
 namespace xUnitpp { namespace Utilities {
 
-CommandLine::CommandLine(int argc, char **argv)
-    : mVerbose(false)
-    , mTimeLimit(0)
+namespace CommandLine
 {
-    std::stack<std::string> arguments;
-
-    for (int i = 1; i != argc; ++i)
+    Options::Options()
+        : verbose(false)
+        , timeLimit(0)
     {
-        arguments.emplace(argv[i]);
     }
 
-    while (!arguments.empty())
+    std::string Parse(int argc, char **argv, Options &options)
     {
-        auto opt = PopTop(arguments);
-
-        if (opt[0] == '-')
+        auto exe = [=]()
         {
-            if (opt == "-v")
-            {
-                mVerbose = true;
-            }
-            else if (opt == "-i" || opt == "--include")
-            {
-                auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { mInclusiveAttributes.emplace_back(kv); });
+            return std::tr2::sys::path(argv[0]).leaf();
+        };
 
-                if (!error.empty())
-                {
-                    throw std::invalid_argument((error + Usage(argv[0])).c_str());
-                }
-            }
-            else if (opt == "-e" || opt == "--exclude")
-            {
-                auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { mExclusiveAttributes.emplace_back(kv); });
+        std::stack<std::string> arguments;
 
-                if (!error.empty())
-                {
-                    throw std::invalid_argument((error + Usage(argv[0])).c_str());
-                }
-            }
-            else if (opt == "-x" || opt == "--xml")
-            {
-                if (arguments.empty())
-                {
-                    throw std::invalid_argument((opt + " expects a following filename argument." + Usage(argv[0])).c_str());
-                }
+        for (int i = 1; i != argc; ++i)
+        {
+            arguments.emplace(argv[i]);
+        }
 
-                mXmlOutput = PopTop(arguments);
-            }
-            else if (opt == "-t" || opt == "--timelimit")
+        while (!arguments.empty())
+        {
+            auto opt = PopTop(arguments);
+
+            if (opt[0] == '-')
             {
-                if (arguments.empty() || Throws([&]() { std::istringstream(PopTop(arguments)) >> mTimeLimit; }))
+                if (opt == "-v")
                 {
-                    throw std::invalid_argument((opt + " expects a following timelimit specified in milliseconds." + Usage(argv[0])).c_str());
+                    options.verbose = true;
+                }
+                else if (opt == "-i" || opt == "--include")
+                {
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { options.inclusiveAttributes.emplace_back(kv); });
+
+                    if (!error.empty())
+                    {
+                        return error + Usage(exe());
+                    }
+                }
+                else if (opt == "-e" || opt == "--exclude")
+                {
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { options.exclusiveAttributes.emplace_back(kv); });
+
+                    if (!error.empty())
+                    {
+                        return error + Usage(exe());
+                    }
+                }
+                else if (opt == "-x" || opt == "--xml")
+                {
+                    if (arguments.empty())
+                    {
+                        return opt + " expects a following filename argument." + Usage(exe());
+                    }
+
+                    options.xmlOutput = PopTop(arguments);
+                }
+                else if (opt == "-t" || opt == "--timelimit")
+                {
+                    if (arguments.empty() || Throws([&]() { std::istringstream(PopTop(arguments)) >> options.timeLimit; }))
+                    {
+                        return opt + " expects a following timelimit specified in milliseconds." + Usage(exe());
+                    }
+                }
+                else
+                {
+                    return "Unrecognized option " + opt + "." + Usage(exe());
                 }
             }
             else
             {
-                throw std::invalid_argument(("Unrecognized option " + opt + "." + Usage(argv[0])).c_str());
+                options.libraries.push_back(opt);
             }
         }
-        else
+
+        if (options.libraries.empty())
         {
-            mTestLibraries.push_back(opt);
+            return "At least one testLibrary must be specified." + Usage(exe());
         }
+
+        return "";
     }
 
-    if (mTestLibraries.empty())
+    std::string Usage(const std::string &exe)
     {
-        throw std::invalid_argument(("At least one testLibrary must be specified." + Usage(argv[0])).c_str());
+        static const std::string usage =
+            " <testLibrary>+ [option]+\n"
+            "\n"
+            "options:\n\n"
+            "  -v                             : Verbose mode: include successful test details\n"
+            "  -i --include <NAME=[VALUE]>+   : Include tests with a matching <name=value> attribute\n"
+            "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with a matching <name=value> attribute\n"
+            "  -t --timelimit <MILLISECONDS>  : Set the default test time limit\n"
+            "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
+            "\n"
+            "Tests are selected with an OR operation for inclusive attributes.\n"
+            "Tests are excluded with an AND operation for exclusive attributes.\n"
+            "When VALUE is omitted, any attribute with name NAME is matched.\n";
+
+        return "\nusage: " + exe + usage;
     }
-}
-
-std::string CommandLine::Usage(const std::string &exe)
-{
-    static const std::string usage =
-        " <testLibrary>+ [option]+\n"
-        "\n"
-        "options:\n\n"
-        "  -v                             : Verbose mode: include successful test details\n"
-        "  -i --include <NAME=[VALUE]>+   : Include tests with a matching <name=value> attribute\n"
-        "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with a matching <name=value> attribute\n"
-        "  -t --timelimit <MILLISECONDS>  : Set the default test time limit\n"
-        "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
-        "\n"
-        "Tests are selected with an OR operation for inclusive attributes.\n"
-        "Tests are excluded with an AND operation for exclusive attributes.\n"
-        "When VALUE is omitted, any attribute with name NAME is matched.\n";
-
-    return "\nusage: " + exe + usage;
-}
-
-const std::vector<std::string> &CommandLine::TestLibraries()
-{
-    return mTestLibraries;
 }
 
 }}

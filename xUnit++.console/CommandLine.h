@@ -5,30 +5,26 @@
 #include <tuple>
 #include <vector>
 
-namespace xUnitpp
-{
+namespace xUnitpp { namespace Utilities {
 
-namespace Utilities
+namespace CommandLine
 {
-    class CommandLine
+    struct Options
     {
-    public:
-        CommandLine(int argc, char **argv);
+        Options();
 
-        static std::string Usage(const std::string &exe);
-
-        const std::vector<std::string> &TestLibraries();
-
-    private:
-        bool mVerbose;
-        std::vector<std::tuple<std::string, std::string>> mInclusiveAttributes;
-        std::vector<std::tuple<std::string, std::string>> mExclusiveAttributes;
-        std::vector<std::string> mTestLibraries;
-        std::string mXmlOutput;
-        int mTimeLimit;
+        bool verbose;
+        std::vector<std::tuple<std::string, std::string>> inclusiveAttributes;
+        std::vector<std::tuple<std::string, std::string>> exclusiveAttributes;
+        std::vector<std::string> libraries;
+        std::string xmlOutput;
+        int timeLimit;
     };
+
+    std::string Parse(int argc, char **argv, Options &options);
+    std::string Usage(const std::string &exe);
 }
 
-}
+}}
 
 #endif
