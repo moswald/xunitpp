@@ -46,15 +46,15 @@ namespace DefaultReporter
 
         if (failureCount > 0)
         {
-            header = "FAILURE: ";
+            header = "\nFAILURE: ";
         }
         else if (skipped > 0)
         {
-            header = "WARNING: ";
+            header = "\nWARNING: ";
         }
         else
         {
-            header = "Success: ";
+            header = "\nSuccess: ";
         }
 
         std::cout << (header + total + failures + skips);
