@@ -28,6 +28,7 @@
     <ClCompile Include="xUnitTestRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Attributes.h" />
     <ClInclude Include="DefaultReporter.h" />
     <ClInclude Include="Fact.h" />
     <ClInclude Include="Suite.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="Theory.h" />
     <ClInclude Include="xUnit++.h" />
     <ClInclude Include="xUnitAssert.h" />
+    <ClInclude Include="xUnitMacroHelpers.h" />
     <ClInclude Include="xUnitTestRunner.h" />
     <ClInclude Include="xUnitTime.h" />
   </ItemGroup>

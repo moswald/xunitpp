@@ -26,11 +26,17 @@ namespace DefaultReporter
         }
     }
 
+    void ReportSkip(const TestDetails &testDetails, const std::string &reason)
+    {
+        std::cerr << (testDetails.Filename + "(" + std::to_string(testDetails.Line) +
+            "): skipping " + testDetails.Name + ": " + reason + "\n");
+    }
+
     void ReportFinish(const TestDetails &, int, std::chrono::milliseconds)
     {
     }
 
-    void ReportAllTestsComplete(size_t testCount, size_t failureCount, size_t skipped, std::chrono::milliseconds totalTime)
+    void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, std::chrono::milliseconds totalTime)
     {
         std::string total = std::to_string(testCount) + " tests, ";
         std::string failures = std::to_string(failureCount) + " failed, ";

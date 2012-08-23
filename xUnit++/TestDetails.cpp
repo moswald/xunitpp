@@ -8,9 +8,11 @@ TestDetails::TestDetails()
 {
 }
 
-TestDetails::TestDetails(const std::string &name, const std::string &suite, std::chrono::milliseconds timeLimit, const std::string &filename, int line)
+TestDetails::TestDetails(const std::string &name, const std::string &suite, const AttributeCollection &attributes,
+                         std::chrono::milliseconds timeLimit, const std::string &filename, int line)
     : Name(name)
     , Suite(suite)
+    , Attributes(attributes)
     , TimeLimit(timeLimit)
     , Filename(filename)
     , Line(line)
@@ -20,6 +22,7 @@ TestDetails::TestDetails(const std::string &name, const std::string &suite, std:
 TestDetails::TestDetails(const TestDetails &other)
     : Name(other.Name)
     , Suite(other.Suite)
+    , Attributes(other.Attributes)
     , TimeLimit(other.TimeLimit)
     , Filename(other.Filename)
     , Line(other.Line)
@@ -43,6 +46,7 @@ void swap(TestDetails &td0, TestDetails &td1)
 
     swap(td0.Name, td1.Name);
     swap(td0.Suite, td1.Suite);
+    swap(td0.Attributes, td1.Attributes);
     swap(td0.TimeLimit, td1.TimeLimit);
     swap(td0.Filename, td1.Filename);
     swap(td0.Line, td1.Line);

@@ -1,20 +1,21 @@
 #include <string>
+#include <tuple>
 #include <vector>
 #include "TestCollection.h"
 #include "Fact.h"
 
 namespace
 {
-    extern "C" __declspec(dllexport) void ListAllTests(std::vector<std::string> &tests)
+    extern "C" __declspec(dllexport) void ListAllTests(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests)
     {
         for (const auto &fact : xUnitpp::TestCollection::Facts())
         {
-            tests.push_back(fact.TestDetails().Name);
+            tests.emplace_back(std::make_tuple(fact.TestDetails().Name, fact.TestDetails().Attributes));
         }
 
         for (const auto &theory : xUnitpp::TestCollection::Theories())
         {
-            tests.push_back(theory.TestDetails().Name);
+            tests.emplace_back(std::make_tuple(theory.TestDetails().Name, theory.TestDetails().Attributes));
         }
     }
 }
@@ -28,9 +29,10 @@ TestCollection &TestCollection::Instance()
     return collection;
 }
 
-TestCollection::Register::Register(const std::function<void()> &fn, const std::string &name, const std::string &suite, int milliseconds, const std::string &filename, int line)
+TestCollection::Register::Register(const std::function<void()> &fn, const std::string &name, const std::string &suite,
+                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line)
 {
-    TestCollection::Instance().mFacts.emplace_back(Fact(fn, name, suite, std::chrono::milliseconds(milliseconds), filename, line));
+    TestCollection::Instance().mFacts.emplace_back(Fact(fn, name, suite, attributes, std::chrono::milliseconds(milliseconds), filename, line));
 }
 
 const std::vector<Fact> &TestCollection::Facts()

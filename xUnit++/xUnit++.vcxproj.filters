@@ -21,5 +21,7 @@
     <ClInclude Include="DefaultReporter.h" />
     <ClInclude Include="xUnit++.h" />
     <ClInclude Include="xUnitTestRunner.h" />
+    <ClInclude Include="Attributes.h" />
+    <ClInclude Include="xUnitMacroHelpers.h" />
   </ItemGroup>
 </Project>
