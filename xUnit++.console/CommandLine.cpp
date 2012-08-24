@@ -59,6 +59,7 @@ namespace CommandLine
 {
     Options::Options()
         : verbose(false)
+        , veryVerbose(false)
         , timeLimit(0)
     {
     }
@@ -86,6 +87,11 @@ namespace CommandLine
                 if (opt == "-v")
                 {
                     options.verbose = true;
+                }
+                else if (opt == "-vv")
+                {
+                    options.verbose = true;
+                    options.veryVerbose = true;
                 }
                 else if (opt == "-i" || opt == "--include")
                 {
@@ -146,10 +152,11 @@ namespace CommandLine
             " <testLibrary>+ [option]+\n"
             "\n"
             "options:\n\n"
-            "  -v                             : Verbose mode: include successful test details\n"
+            "  -v                             : Verbose mode: include successful test timing\n"
+            "  -vv                            : Very verbose: write test start message\n"
             "  -i --include <NAME=[VALUE]>+   : Include tests with a matching <name=value> attribute\n"
             "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with a matching <name=value> attribute\n"
-            "  -t --timelimit <MILLISECONDS>  : Set the default test time limit\n"
+            "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
             "\n"
             "Tests are selected with an OR operation for inclusive attributes.\n"

@@ -76,22 +76,22 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUnit++.runners</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUint++.runners</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUint++.runners</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUint++.runners</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -99,6 +99,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\xUnit++.runners\xUnit++.runners.vcxproj">
+      <Project>{8f27bf25-235d-4739-b4d0-1f0e0f0aacdd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xUnit++\xUnit++.vcxproj">
       <Project>{25df3961-f288-4a96-ae6b-a4950a00ab8e}</Project>
     </ProjectReference>
