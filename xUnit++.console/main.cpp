@@ -4,6 +4,7 @@
 #include <vector>
 #include <Windows.h>
 #include "CommandLine.h"
+#include "StdOutReporter.h"
 #include "TestDetails.h"
 #include "xUnitTestRunner.h"
 
@@ -32,39 +33,22 @@ int main(int argc, char **argv)
             return -1;
         }
 
-    //typedef void (*ListAllTests)(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests);
-    //ListAllTests listAllTests = (ListAllTests)GetProcAddress(testlib, "ListAllTests");
-    //
-    //if (listAllTests == nullptr)
-    //{
-    //    std::cerr << "unable to get ListAllTests" << std::endl;
-    //    return -1;
-    //}
-    //
-    //std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> tests;
-    //listAllTests(tests);
-    //
-    //for (const auto &t : tests)
-    //{
-    //    std::cout << std::get<0>(t) << std::endl;
-    //
-    //    const auto &attributes = std::get<1>(t);
-    //    for (const auto &a : attributes)
-    //    {
-    //        std::cout << "  [" << a.first << " : " << a.second << "]" << std::endl;
-    //    }
-    //}
+        xUnitpp::FilteredTestsRunner filteredTestRunner = (xUnitpp::FilteredTestsRunner)GetProcAddress(testlib, "FilteredTestsRunner");
 
-        typedef size_t (*RunAll)();
-        RunAll runAll = (RunAll)GetProcAddress(testlib, "RunAll");
-
-        if (runAll == nullptr)
+        if (!filteredTestRunner)
         {
-            std::cerr << "unable to get RunAll" << std::endl;
+            std::cerr << "unable to get RunFilteredTests" << std::endl;
             return -1;
         }
 
-        failures += runAll();
+        failures += filteredTestRunner(options.timeLimit,
+            options.xmlOutput.empty() ? 
+                std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose) :
+                std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose),
+            [&](const xUnitpp::TestDetails &testDetails)
+            {
+                return false;
+            });
     }
 
     return failures;

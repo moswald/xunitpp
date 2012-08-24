@@ -6,7 +6,6 @@
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="TestDetails.cpp" />
-    <ClCompile Include="DefaultReporter.cpp" />
     <ClCompile Include="xUnitTestRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -18,10 +17,10 @@
     <ClInclude Include="Theory.h" />
     <ClInclude Include="TestDetails.h" />
     <ClInclude Include="xUnitTime.h" />
-    <ClInclude Include="DefaultReporter.h" />
     <ClInclude Include="xUnit++.h" />
     <ClInclude Include="xUnitTestRunner.h" />
     <ClInclude Include="Attributes.h" />
     <ClInclude Include="xUnitMacroHelpers.h" />
+    <ClInclude Include="IOutput.h" />
   </ItemGroup>
 </Project>

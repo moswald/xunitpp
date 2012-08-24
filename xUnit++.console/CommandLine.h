@@ -14,6 +14,7 @@ namespace CommandLine
         Options();
 
         bool verbose;
+        bool veryVerbose;
         std::vector<std::tuple<std::string, std::string>> inclusiveAttributes;
         std::vector<std::tuple<std::string, std::string>> exclusiveAttributes;
         std::vector<std::string> libraries;

@@ -2,27 +2,28 @@
 #include <tuple>
 #include <vector>
 #include "Fact.h"
+#include "IOutput.h"
 #include "TestCollection.h"
 #include "xUnitTestRunner.h"
 
 namespace
 {
-    extern "C" __declspec(dllexport) void ListAllTests(std::vector<std::tuple<std::string, xUnitpp::AttributeCollection>> &tests)
+    extern "C" __declspec(dllexport) void ListAllTests(std::vector<xUnitpp::TestDetails> &tests)
     {
         for (const auto &fact : xUnitpp::TestCollection::Facts())
         {
-            tests.emplace_back(std::make_tuple(fact.TestDetails().Name, fact.TestDetails().Attributes));
+            tests.push_back(fact.TestDetails());
         }
 
         for (const auto &theory : xUnitpp::TestCollection::Theories())
         {
-            tests.emplace_back(std::make_tuple(theory.TestDetails().Name, theory.TestDetails().Attributes));
+            tests.push_back(theory.TestDetails());
         }
     }
 
-    extern "C" __declspec(dllexport) void RunAll()
+    extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
     {
-        xUnitpp::RunAllTests();
+        return xUnitpp::RunFilteredTests(timeLimit, testReporter, filter);
     }
 }
 

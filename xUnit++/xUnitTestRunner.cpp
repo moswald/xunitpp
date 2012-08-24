@@ -6,11 +6,12 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
-#include "DefaultReporter.h"
 #include "Fact.h"
+#include "IOutput.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"
+#include "xUnitTime.h"
 
 namespace
 {
@@ -131,94 +132,67 @@ private:
 namespace xUnitpp
 {
 
+int RunFilteredTests(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
+{
+    return xUnitpp::TestRunner(testReporter)
+        .RunTests(xUnitpp::TestCollection::Facts(), xUnitpp::TestCollection::Theories(), "", std::chrono::milliseconds(timeLimit), 0);
+}
+
+IOutput::~IOutput()
+{
+}
+
 class TestRunner::Impl
 {
 public:
-    Impl(std::function<void(const TestDetails &, int)> onTestStart,
-         std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
-         std::function<void(const TestDetails &, const std::string &)> onTestSkip,
-         std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
-         std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
-        : mOnTestStart(onTestStart)
-        , mOnTestFailure(onTestFailure)
-        , mOnTestSkip(onTestSkip)
-        , mOnTestFinish(onTestFinish)
-        , mOnAllTestsComplete(onAllTestsComplete)
+    Impl(std::shared_ptr<IOutput> testReporter)
+        : mTestReporter(testReporter)
     {
     }
 
     void OnTestStart(const TestDetails &details, int dataIndex)
     {
         std::lock_guard<std::mutex> guard(mStartMtx);
-        mOnTestStart(details, dataIndex);
+        mTestReporter->ReportStart(details, dataIndex);
     }
 
     void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        mOnTestFailure(details, dataIndex, message);
+        mTestReporter->ReportFailure(details, dataIndex, message);
     }
 
     void OnTestSkip(const TestDetails &details, const std::string &reason)
     {
-        mOnTestSkip(details, reason);
+        mTestReporter->ReportSkip(details, reason);
     }
 
     void OnTestFinish(const TestDetails &details, int dataIndex, std::chrono::milliseconds time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
-        mOnTestFinish(details, dataIndex, time);
+        mTestReporter->ReportFinish(details, dataIndex, time);
     }
 
 
     void OnAllTestsComplete(int total, int skipped, int failed, std::chrono::milliseconds totalTime)
     {
-        mOnAllTestsComplete(total, skipped, failed, totalTime);
+        mTestReporter->ReportAllTestsComplete(total, skipped, failed, totalTime);
     }
 
 private:
-    std::function<void(const TestDetails &, int)> mOnTestStart;
-    std::function<void(const TestDetails &, int, const std::string &)> mOnTestFailure;
-    std::function<void(const TestDetails &, const std::string &)> mOnTestSkip;
-    std::function<void(const TestDetails &, int, std::chrono::milliseconds)> mOnTestFinish;
-    std::function<void(int, int, int, std::chrono::milliseconds)> mOnAllTestsComplete;
+    std::shared_ptr<IOutput> mTestReporter;
 
     std::mutex mStartMtx;
     std::mutex mFailureMtx;
     std::mutex mFinishMtx;
 };
 
-size_t RunAllTests(const std::string &suite)
-{
-    return RunAllTests(suite, std::chrono::milliseconds::zero());
-}
-
-size_t RunAllTests(std::chrono::milliseconds maxTestRunTime)
-{
-    return RunAllTests("", maxTestRunTime);
-}
-
-size_t RunAllTests(const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
-{
-    return
-        TestRunner(&DefaultReporter::ReportStart,
-                   &DefaultReporter::ReportFailure,
-                   &DefaultReporter::ReportSkip,
-                   &DefaultReporter::ReportFinish,
-                   &DefaultReporter::ReportAllTestsComplete)
-            .RunTests(TestCollection::Facts(), TestCollection::Theories(), suite, maxTestRunTime, maxConcurrent);
-}
-
-TestRunner::TestRunner(std::function<void(const TestDetails &, int)> onTestStart,
-                       std::function<void(const TestDetails &, int, const std::string &)> onTestFailure,
-                       std::function<void(const TestDetails &, const std::string &)> onTestSkip,
-                       std::function<void(const TestDetails &, int, std::chrono::milliseconds)> onTestFinish,
-                       std::function<void(int, int, int, std::chrono::milliseconds)> onAllTestsComplete)
-    : mImpl(new Impl(onTestStart, onTestFailure, onTestSkip, onTestFinish, onAllTestsComplete))
+TestRunner::TestRunner(std::shared_ptr<IOutput> testReporter)
+    : mImpl(new Impl(testReporter))
 {
 }
 
-size_t TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
+int TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
