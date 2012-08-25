@@ -9,7 +9,7 @@
 namespace xUnitpp
 {
 
-typedef std::map<std::string, std::string> AttributeCollection;
+typedef std::multimap<std::string, std::string> AttributeCollection;
 
 struct TestDetails
 {
@@ -22,6 +22,7 @@ struct TestDetails
     TestDetails &operator =(TestDetails other);
     friend void swap(TestDetails &td0, TestDetails &td1);
 
+    int Id;
     std::string Name;
     std::string Suite;
     AttributeCollection Attributes;

@@ -1,6 +1,15 @@
 #include "TestDetails.h"
 #include <utility>
 
+namespace
+{
+    inline int NextId()
+    {
+        static int id = 0;
+        return id++;
+    }
+}
+
 namespace xUnitpp
 {
 
@@ -10,7 +19,8 @@ TestDetails::TestDetails()
 
 TestDetails::TestDetails(const std::string &name, const std::string &suite, const AttributeCollection &attributes,
                          std::chrono::milliseconds timeLimit, const std::string &filename, int line)
-    : Name(name)
+    : Id(NextId())
+    , Name(name)
     , Suite(suite)
     , Attributes(attributes)
     , TimeLimit(timeLimit)
@@ -20,7 +30,8 @@ TestDetails::TestDetails(const std::string &name, const std::string &suite, cons
 }
 
 TestDetails::TestDetails(const TestDetails &other)
-    : Name(other.Name)
+    : Id(other.Id)
+    , Name(other.Name)
     , Suite(other.Suite)
     , Attributes(other.Attributes)
     , TimeLimit(other.TimeLimit)
@@ -44,6 +55,7 @@ void swap(TestDetails &td0, TestDetails &td1)
 {
     using std::swap;
 
+    swap(td0.Id, td1.Id);
     swap(td0.Name, td1.Name);
     swap(td0.Suite, td1.Suite);
     swap(td0.Attributes, td1.Attributes);

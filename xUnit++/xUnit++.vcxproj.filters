@@ -22,5 +22,7 @@
     <ClInclude Include="Attributes.h" />
     <ClInclude Include="xUnitMacroHelpers.h" />
     <ClInclude Include="IOutput.h" />
+    <ClInclude Include="ForceLinkModuleMacros.h" />
+    <ClInclude Include="ExportApi.h" />
   </ItemGroup>
 </Project>
