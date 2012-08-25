@@ -4,17 +4,24 @@ implement ITestDiscoverer and ITestExecutor
 
 
 General
+Visual Studio 2012 notes
+------------------------
+implement ITestDiscoverer and ITestExecutor
+
+
+General
 -------
 unit test the lib - started
-create lib/include structure, create NuGet package/template
-ensure gcc support
+create lib/include structure
+ensure gcc/linux support
 xml output
 
 
-"2.0"
+Stretch
 -----
 custom xUnitAsserts per assert (revisit unit tests at that point)
 consider doing LINEINFO the way VS2012 does
 support wstring - what does that mean?
     - as an assert call paarameter?
     - define std::tstring and add yet another set of compile targets?
+create NuGet package/template (NuGet does not support C++ projects, yet)
