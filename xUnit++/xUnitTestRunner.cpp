@@ -7,14 +7,23 @@
 #include <stdexcept>
 #include <vector>
 #include "Fact.h"
+#include "ForceLinkModuleMacros.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"
 #include "xUnitTime.h"
 
+ENABLE_MODULE_LINK(TestRunner)
+
 namespace
 {
+
+extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
+{
+    return xUnitpp::TestRunner(testReporter)
+        .RunTests(filter, xUnitpp::TestCollection::Facts(), xUnitpp::TestCollection::Theories(), std::chrono::milliseconds(timeLimit), 0);
+}
 
 class ActiveTests
 {
@@ -84,14 +93,14 @@ public:
         std::function<void()> test;
     };
 
-    ActiveTests(const std::vector<xUnitpp::Fact> &facts, const std::vector<xUnitpp::Theory> &theories, const std::string &suite)
+    ActiveTests(std::function<bool(const xUnitpp::TestDetails &)> filter, const std::vector<xUnitpp::Fact> &facts, const std::vector<xUnitpp::Theory> &theories)
     {
         size_t id = 0;
         size_t groupId = 0;
 
         for (auto &fact : facts)
         {
-            if (suite == "" || fact.TestDetails().Suite == suite)
+            if (filter(fact.TestDetails()))
             {
                 mTests.emplace_back(TestInstance(fact.TestDetails(), ++id, ++groupId, 1, fact.Test()));
             }
@@ -99,7 +108,7 @@ public:
 
         for (auto &theorySet : theories)
         {
-            if (suite == "" || theorySet.TestDetails().Suite == suite)
+            if (filter(theorySet.TestDetails()))
             {
                 ++groupId;
                 size_t dataIndex = 0;
@@ -131,12 +140,6 @@ private:
 
 namespace xUnitpp
 {
-
-int RunFilteredTests(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
-{
-    return xUnitpp::TestRunner(testReporter)
-        .RunTests(xUnitpp::TestCollection::Facts(), xUnitpp::TestCollection::Theories(), "", std::chrono::milliseconds(timeLimit), 0);
-}
 
 IOutput::~IOutput()
 {
@@ -192,11 +195,11 @@ TestRunner::TestRunner(std::shared_ptr<IOutput> testReporter)
 {
 }
 
-int TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
+int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
-    ActiveTests activeTests(facts, theories, suite);
+    ActiveTests activeTests(filter, facts, theories);
 
     if (maxConcurrent == 0)
     {
@@ -239,11 +242,14 @@ int TestRunner::RunTests(const std::vector<Fact> &facts, const std::vector<Theor
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
     {
-        if (test.testDetails.Attributes.find("Skip") != test.testDetails.Attributes.end())
         {
-            skippedTests++;
-            mImpl->OnTestSkip(test.testDetails, test.testDetails.Attributes["Skip"]);
-            continue;
+            auto skip = test.testDetails.Attributes.find("Skip");
+            if (skip != test.testDetails.Attributes.end())
+            {
+                skippedTests++;
+                mImpl->OnTestSkip(test.testDetails, skip->second);
+                continue;
+            }
         }
 
         futures.push_back(std::async([&]()

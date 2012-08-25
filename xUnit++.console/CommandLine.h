@@ -1,6 +1,7 @@
 #ifndef COMMANDLINE_H_
 #define COMMANDLINE_H_
 
+#include <map>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -15,8 +16,10 @@ namespace CommandLine
 
         bool verbose;
         bool veryVerbose;
-        std::vector<std::tuple<std::string, std::string>> inclusiveAttributes;
-        std::vector<std::tuple<std::string, std::string>> exclusiveAttributes;
+        bool list;
+        std::vector<std::string> suites;
+        std::multimap<std::string, std::string> inclusiveAttributes;
+        std::multimap<std::string, std::string> exclusiveAttributes;
         std::vector<std::string> libraries;
         std::string xmlOutput;
         int timeLimit;

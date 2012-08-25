@@ -1,19 +1,19 @@
 #include "CommandLine.h"
 #include <filesystem>
 #include <functional>
-#include <stack>
+#include <queue>
 #include <sstream>
 
 namespace
 {
-    std::string PopTop(std::stack<std::string> &stack)
+    std::string TakeFront(std::queue<std::string> &queue)
     {
-        auto s = stack.top();
-        stack.pop();
+        auto s = queue.front();
+        queue.pop();
         return s;
     }
 
-    std::string EatKeyValuePairs(const std::string &opt, std::stack<std::string> &arguments, std::function<void (std::tuple<std::string, std::string> &&)> onParsedPair)
+    std::string EatKeyValuePairs(const std::string &opt, std::queue<std::string> &arguments, std::function<void (std::pair<std::string, std::string> &&)> onParsedPair)
     {
         if (arguments.empty())
         {
@@ -22,7 +22,7 @@ namespace
 
         do
         {
-            auto raw = PopTop(arguments);
+            auto raw = TakeFront(arguments);
 
             auto pos = raw.find('=');
             if (pos == std::string::npos)
@@ -33,23 +33,19 @@ namespace
             auto key = raw.substr(0, pos);
             auto value = raw.substr(pos + 1, std::string::npos);
 
-            onParsedPair(std::make_tuple(key, value));
-        } while (!arguments.empty() && arguments.top().find('=') != std::string::npos);
+            onParsedPair(std::make_pair(key, value));
+        } while (!arguments.empty() && arguments.front().find('=') != std::string::npos);
 
         return "";
     }
 
-    bool Throws(std::function<void()> fn)
+    bool GetInt(std::queue<std::string> &queue, int &value)
     {
-        try
-        {
-            fn();
-            return false;
-        }
-        catch (...)
-        {
-            return true;
-        }
+        std::istringstream stream(TakeFront(queue));
+        
+        stream >> value;
+
+        return stream.failbit;
     }
 }
 
@@ -60,6 +56,7 @@ namespace CommandLine
     Options::Options()
         : verbose(false)
         , veryVerbose(false)
+        , list(false)
         , timeLimit(0)
     {
     }
@@ -71,7 +68,7 @@ namespace CommandLine
             return std::tr2::sys::path(argv[0]).leaf();
         };
 
-        std::stack<std::string> arguments;
+        std::queue<std::string> arguments;
 
         for (int i = 1; i != argc; ++i)
         {
@@ -80,7 +77,7 @@ namespace CommandLine
 
         while (!arguments.empty())
         {
-            auto opt = PopTop(arguments);
+            auto opt = TakeFront(arguments);
 
             if (opt[0] == '-')
             {
@@ -93,9 +90,22 @@ namespace CommandLine
                     options.verbose = true;
                     options.veryVerbose = true;
                 }
+                else if (opt == "-l" || opt == "--list")
+                {
+                    options.list = true;
+                }
+                else if (opt == "-s" || opt == "--suite")
+                {
+                    if (arguments.empty())
+                    {
+                        return opt + " expects a following suite name argument." + Usage(exe());
+                    }
+
+                    options.suites.push_back(TakeFront(arguments));
+                }
                 else if (opt == "-i" || opt == "--include")
                 {
-                    auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { options.inclusiveAttributes.emplace_back(kv); });
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.inclusiveAttributes.emplace(kv); });
 
                     if (!error.empty())
                     {
@@ -104,7 +114,7 @@ namespace CommandLine
                 }
                 else if (opt == "-e" || opt == "--exclude")
                 {
-                    auto error = EatKeyValuePairs(opt, arguments, [&](std::tuple<std::string, std::string> &&kv) { options.exclusiveAttributes.emplace_back(kv); });
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.exclusiveAttributes.emplace(kv); });
 
                     if (!error.empty())
                     {
@@ -118,11 +128,11 @@ namespace CommandLine
                         return opt + " expects a following filename argument." + Usage(exe());
                     }
 
-                    options.xmlOutput = PopTop(arguments);
+                    options.xmlOutput = TakeFront(arguments);
                 }
                 else if (opt == "-t" || opt == "--timelimit")
                 {
-                    if (arguments.empty() || Throws([&]() { std::istringstream(PopTop(arguments)) >> options.timeLimit; }))
+                    if (arguments.empty() || !GetInt(arguments, options.timeLimit))
                     {
                         return opt + " expects a following timelimit specified in milliseconds." + Usage(exe());
                     }
@@ -154,8 +164,10 @@ namespace CommandLine
             "options:\n\n"
             "  -v                             : Verbose mode: include successful test timing\n"
             "  -vv                            : Very verbose: write test start message\n"
-            "  -i --include <NAME=[VALUE]>+   : Include tests with a matching <name=value> attribute\n"
-            "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with a matching <name=value> attribute\n"
+            "  -l --list                      : Do not run tests, just list the ones that pass the filters\n"
+            "  -s --suite <SUITE>+            : Suite(s) of tests to run\n"
+            "  -i --include <NAME=[VALUE]>+   : Include tests with matching <name=value> attribute(s)\n"
+            "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with matching <name=value> attribute(s)\n"
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
             "\n"

@@ -15,15 +15,12 @@ struct IOutput;
 struct TestDetails;
 class Theory;
 
-typedef int(*FilteredTestsRunner)(int, std::shared_ptr<IOutput>, std::function<bool(const TestDetails &)>);
-int RunFilteredTests(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter);
-
 class TestRunner
 {
 public:
     TestRunner(std::shared_ptr<IOutput> testReporter);
-    int RunTests(const std::vector<Fact> &facts, const std::vector<Theory> &theories, const std::string &suite,
-                 std::chrono::milliseconds maxTestRunTime = std::chrono::milliseconds::zero(), size_t maxConcurrent = 0);
+    int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories,
+                 std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent);
 
 private:
     class Impl;

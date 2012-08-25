@@ -4,6 +4,9 @@
 
 using xUnitpp::Assert;
 
+SUITE(Attributes)
+{
+
 ATTRIBUTES(TestWithAttributes, ("Cats", "Meow"))
 FACT(TestWithAttributes)
 {
@@ -25,4 +28,6 @@ ATTRIBUTES(SkippedTest, ("Skip", "no reason"))
 FACT(SkippedTest)
 {
     Assert.Fail("Skipped tests should not be run.");
+}
+
 }

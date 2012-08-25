@@ -28,7 +28,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Attributes.h" />
+    <ClInclude Include="ExportApi.h" />
     <ClInclude Include="Fact.h" />
+    <ClInclude Include="ForceLinkModuleMacros.h" />
     <ClInclude Include="IOutput.h" />
     <ClInclude Include="Suite.h" />
     <ClInclude Include="TestCollection.h" />

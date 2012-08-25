@@ -2,9 +2,12 @@
 #include <tuple>
 #include <vector>
 #include "Fact.h"
+#include "ForceLinkModuleMacros.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "xUnitTestRunner.h"
+
+LINK_MODULE(TestRunner)
 
 namespace
 {
@@ -19,11 +22,6 @@ namespace
         {
             tests.push_back(theory.TestDetails());
         }
-    }
-
-    extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
-    {
-        return xUnitpp::RunFilteredTests(timeLimit, testReporter, filter);
     }
 }
 
