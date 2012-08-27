@@ -24,7 +24,7 @@ public:
 
 private:
     class Impl;
-    std::unique_ptr<Impl> mImpl;
+    std::shared_ptr<Impl> mImpl;
 };
 
 }

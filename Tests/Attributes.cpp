@@ -1,5 +1,7 @@
 #include "Fact.h"
+#include "IOutput.h"
 #include "TestCollection.h"
+#include "xUnitTestRunner.h"
 #include "xUnit++.h"
 
 using xUnitpp::Assert;
@@ -10,7 +12,7 @@ SUITE(Attributes)
 ATTRIBUTES(TestWithAttributes, ("Cats", "Meow"))
 FACT(TestWithAttributes)
 {
-    for (const auto &fact : xUnitpp::TestCollection::Facts())
+    for (const auto &fact : xUnitpp::TestCollection::Instance().Facts())
     {
         if (fact.TestDetails().Name == "TestWithAttributes")
         {
@@ -24,10 +26,54 @@ FACT(TestWithAttributes)
     Assert.Fail("Could not find self in test list.");
 }
 
-ATTRIBUTES(SkippedTest, ("Skip", "no reason"))
-FACT(SkippedTest)
+FACT(SkippedTestsShouldNotBeInstantiated)
 {
-    Assert.Fail("Skipped tests should not be run.");
+    // have to set this internal test up manually since the macros don't work embedded within each other
+    struct SkippedTest : xUnitpp::NoFixture
+    {
+        SkippedTest()
+        {
+            Assert.False("Should not be instantiated.");
+        }
+    
+        void RunTest()
+        {
+            Assert.False("Should not be run.");
+        }
+    };
+
+    struct EmptyReporter : xUnitpp::IOutput
+    {
+        virtual void ReportStart(const xUnitpp::TestDetails &, int) override
+        {
+        }
+
+        virtual void ReportFailure(const xUnitpp::TestDetails &, int, const std::string &) override
+        {
+        }
+
+        virtual void ReportSkip(const xUnitpp::TestDetails &, const std::string &) override
+        {
+        }
+
+        virtual void ReportFinish(const xUnitpp::TestDetails &, int, std::chrono::milliseconds) override
+        {
+        }
+
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, std::chrono::milliseconds) override 
+        {
+        }
+    };
+
+    xUnitpp::AttributeCollection attributes;
+    attributes.insert(std::make_pair("Skip", "Testing skip."));
+
+    xUnitpp::TestCollection collection;
+    xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); }, "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__);
+
+    xUnitpp::TestRunner local(std::make_shared<EmptyReporter>());
+    local.RunTests([](const xUnitpp::TestDetails &) { return true; },
+        collection.Facts(), collection.Theories(), std::chrono::milliseconds::zero(), 0);
 }
 
 }

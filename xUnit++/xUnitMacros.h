@@ -41,8 +41,9 @@ namespace xUnitpp { struct NoFixture {}; }
         { \
         public: \
             void FactName(); \
-        } FactName ## _instance; \
-        xUnitpp::TestCollection::Register reg(std::bind(&FactName ## _Fixture::FactName, FactName ## _instance), #FactName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+        }; \
+        void FactName ## _runner() { FactName ## _Fixture().FactName(); } \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), &FactName ## _runner, #FactName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
     } \
     void FactName ## _ns::FactName ## _Fixture::FactName()
 
@@ -54,7 +55,7 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define TIMED_THEORY(TheoryName, params, DataProvider, timeout) \
     void TheoryName params; \
-    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); } \
+    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); } \
     void TheoryName params
 
 #define THEORY(TheoryName, params, DataProvider) TIMED_THEORY(TheoryName, params, DataProvider, -1)

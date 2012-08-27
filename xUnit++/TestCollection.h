@@ -64,11 +64,11 @@ public:
         }
 
     public:
-        Register(const std::function<void()> &fn, const std::string &name, const std::string &suite,
+        Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
             const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line);
 
         template<typename TTheory, typename TTheoryData>
-        Register(TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
+        Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
             const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line)
         {
             std::vector<std::function<void()>> theorySet;
@@ -78,16 +78,16 @@ public:
                 theorySet.emplace_back(TheoryHelper(theory, std::move(t)));
             }
         
-            TestCollection::Instance().mTheories.emplace_back(Theory(theorySet, name, suite, attributes, std::chrono::milliseconds(milliseconds), filename, line));
+            collection.mTheories.emplace_back(Theory(theorySet, name, suite, attributes, std::chrono::milliseconds(milliseconds), filename, line));
         }
     };
 
-    static const std::vector<Fact> &Facts();
-    static const std::vector<Theory> &Theories();
-
-private:
     static TestCollection &Instance();
 
+    const std::vector<Fact> &Facts();
+    const std::vector<Theory> &Theories();
+
+private:
     std::vector<Fact> mFacts;
     std::vector<Theory> mTheories;
 };
