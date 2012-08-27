@@ -33,12 +33,12 @@ FACT(SkippedTestsShouldNotBeInstantiated)
     {
         SkippedTest()
         {
-            Assert.False("Should not be instantiated.");
+            Assert.Fail("Should not be instantiated.");
         }
     
         void RunTest()
         {
-            Assert.False("Should not be run.");
+            Assert.Fail("Should not be run.");
         }
     };
 
