@@ -112,6 +112,7 @@
     <ClCompile Include="Assert.Throws.cpp" />
     <ClCompile Include="Assert.True.cpp" />
     <ClCompile Include="Attributes.cpp" />
+    <ClCompile Include="Theory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\xUnit++\xUnit++.vcxproj">
