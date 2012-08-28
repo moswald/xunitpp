@@ -8,6 +8,7 @@
 #include "ExportApi.h"
 #include "StdOutReporter.h"
 #include "TestDetails.h"
+#include "XmlReporter.h"
 
 int main(int argc, char **argv)
 {
@@ -140,10 +141,18 @@ int main(int argc, char **argv)
                 continue;
             }
 
-            failures += filteredTestRunner(options.timeLimit,
-                options.xmlOutput.empty() ? 
-                    std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose) :
-                    std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose),
+            std::shared_ptr<xUnitpp::IOutput> reporter;
+            
+            if (options.xmlOutput.empty())
+            {
+                reporter = std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose);
+            }
+            else
+            {
+                reporter = std::make_shared<xUnitpp::XmlReporter>(options.xmlOutput);
+            }
+
+            failures += filteredTestRunner(options.timeLimit, reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);

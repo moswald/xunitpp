@@ -98,6 +98,7 @@
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="StdOutReporter.cpp" />
+    <ClCompile Include="XmlReporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\xUnit++\xUnit++.vcxproj">
@@ -107,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="CommandLine.h" />
     <ClInclude Include="StdOutReporter.h" />
+    <ClInclude Include="XmlReporter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
