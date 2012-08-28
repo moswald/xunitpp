@@ -3,8 +3,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="StdOutReporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandLine.h" />
+    <ClInclude Include="StdOutReporter.h" />
   </ItemGroup>
 </Project>
