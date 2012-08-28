@@ -10,8 +10,11 @@ namespace xUnitpp
     struct IOutput;
     struct TestDetails;
 
-    typedef int(*FilteredTestsRunner)(int, std::shared_ptr<IOutput>, std::function<bool(const TestDetails &)>);
-    typedef void(*ListAllTests)(std::vector<TestDetails> &tests);
+    typedef std::function<void(const TestDetails &)> EnumerateTestDetailsCallback;
+    typedef void(*EnumerateTestDetails)(EnumerateTestDetailsCallback callback);
+
+    typedef std::function<bool(const TestDetails &)> TestFilterCallback;
+    typedef int(*FilteredTestsRunner)(int, std::shared_ptr<IOutput>, TestFilterCallback );
 }
 
 #endif

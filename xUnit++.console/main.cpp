@@ -34,19 +34,15 @@ int main(int argc, char **argv)
             continue;
         }
 
-        xUnitpp::ListAllTests listAllTests = (xUnitpp::ListAllTests)GetProcAddress(testlib, "ListAllTests");
+        xUnitpp::EnumerateTestDetails enumerateTests = (xUnitpp::EnumerateTestDetails)GetProcAddress(testlib, "EnumerateTestDetails");
 
-        if (!listAllTests)
+        if (!enumerateTests)
         {
-            std::cerr << "unable to load ListAllTests" << std::endl;
+            std::cerr << "unable to load EnumerateTestDetails" << std::endl;
             continue;
         }
 
-        std::vector<xUnitpp::TestDetails> tests;
-        listAllTests(tests);
-
         std::vector<int> activeTestIds;
-
         auto onList = [&](const xUnitpp::TestDetails &td)
             {
                 if (options.list)
@@ -65,82 +61,72 @@ int main(int argc, char **argv)
                 }
             };
 
-        // put together a list of the tests that we will run
-        for (const auto &td : tests)
-        {
-            // check suites:
-            // if any suites are specified, a test has to belong to one of them to be run
-            if (!options.suites.empty())
+        enumerateTests([&](const xUnitpp::TestDetails &td)
             {
-                if (std::find(options.suites.begin(), options.suites.end(), td.Suite) == options.suites.end())
+                // check suites:
+                // if any suites are specified, a test has to belong to one of them to be run
+                if (!options.suites.empty())
                 {
-                    continue;
-                }
-            }
-
-            // check inclusive attributes:
-            // a test has to have *any* matching attribute key and value to be run
-            if (!options.inclusiveAttributes.empty())
-            {
-                bool included = false;
-
-                for (auto att = td.Attributes.begin(); !included && att != td.Attributes.end(); ++att)
-                {
-                    auto it = options.inclusiveAttributes.equal_range(att->first);
-
-                    for (auto test = it.first; test != it.second; ++test)
+                    if (std::find(options.suites.begin(), options.suites.end(), td.Suite) == options.suites.end())
                     {
-                        if (test->second == "" || test->second == att->second)
-                        {
-                            included = true;
-                            break;
-                        }
+                        return;
                     }
                 }
 
-                if (!included)
+                // check inclusive attributes:
+                // a test has to have *any* matching attribute key and value to be run
+                if (!options.inclusiveAttributes.empty())
                 {
-                    continue;
-                }
-            }
+                    bool included = false;
 
-            // check exclusive attributes:
-            // if a test has *all* matching keys, it is excluded
-            if (!options.exclusiveAttributes.empty())
-            {
-                bool excluded = false;
-
-                for (auto test = options.exclusiveAttributes.begin(); !excluded && test != options.exclusiveAttributes.end(); ++test)
-                {
-                    auto range = td.Attributes.equal_range(test->first);
-
-                    if (range.first != range.second)
+                    for (auto att = td.Attributes.begin(); !included && att != td.Attributes.end(); ++att)
                     {
-                        if (test->second == "")
-                        {
-                            excluded = true;
-                            break;
-                        }
+                        auto it = options.inclusiveAttributes.equal_range(att->first);
 
-                        for (auto att = range.first; att != range.second; ++att)
+                        for (auto test = it.first; test != it.second; ++test)
                         {
-                            if (att->second == test->second)
+                            if (test->second == "" || test->second == att->second)
                             {
-                                excluded = true;
+                                included = true;
                                 break;
+                            }
+                        }
+                    }
+
+                    if (!included)
+                    {
+                        return;
+                    }
+                }
+
+                // check exclusive attributes:
+                // if a test has *all* matching keys, it is excluded
+                if (!options.exclusiveAttributes.empty())
+                {
+                    for (auto test = options.exclusiveAttributes.begin(); test != options.exclusiveAttributes.end(); ++test)
+                    {
+                        auto range = td.Attributes.equal_range(test->first);
+
+                        if (range.first != range.second)
+                        {
+                            if (test->second == "")
+                            {
+                                return;
+                            }
+
+                            for (auto att = range.first; att != range.second; ++att)
+                            {
+                                if (att->second == test->second)
+                                {
+                                    return;
+                                }
                             }
                         }
                     }
                 }
 
-                if (excluded)
-                {
-                    continue;
-                }
-            }
-
-            onList(td);
-        }
+                onList(td);
+            });
 
         if (!options.list)
         {
@@ -150,7 +136,7 @@ int main(int argc, char **argv)
 
             if (!filteredTestRunner)
             {
-                std::cerr << "unable to get RunFilteredTests" << std::endl;
+                std::cerr << "unable to get FilteredTestsRunner" << std::endl;
                 continue;
             }
 
