@@ -4,17 +4,11 @@ implement ITestDiscoverer and ITestExecutor
 
 
 General
-Visual Studio 2012 notes
-------------------------
-implement ITestDiscoverer and ITestExecutor
-
-
-General
 -------
 unit test the lib - started
 create lib/include structure
 ensure gcc/linux support
-xml output
+switch to microseconds (or even nanoseconds) instead of milliseconds
 
 
 Stretch
