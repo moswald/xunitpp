@@ -1,6 +1,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "ExportApi.h"
 #include "Fact.h"
 #include "ForceLinkModuleMacros.h"
 #include "IOutput.h"
@@ -11,16 +12,16 @@ LINK_MODULE(TestRunner)
 
 namespace
 {
-    extern "C" __declspec(dllexport) void ListAllTests(std::vector<xUnitpp::TestDetails> &tests)
+    extern "C" __declspec(dllexport) void EnumerateTestDetails(xUnitpp::EnumerateTestDetailsCallback callback)
     {
         for (const auto &fact : xUnitpp::TestCollection::Instance().Facts())
         {
-            tests.push_back(fact.TestDetails());
+            callback(fact.TestDetails());
         }
 
         for (const auto &theory : xUnitpp::TestCollection::Instance().Theories())
         {
-            tests.push_back(theory.TestDetails());
+            callback(theory.TestDetails());
         }
     }
 }
