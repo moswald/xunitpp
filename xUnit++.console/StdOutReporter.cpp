@@ -7,7 +7,7 @@
 
 namespace
 {
-    std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo lineInfo)
+    std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo &lineInfo)
     {
         auto file = lineInfo.file.empty() ? td.Filename : lineInfo.file;
         auto line = lineInfo.file.empty() ? td.Line : lineInfo.line;
