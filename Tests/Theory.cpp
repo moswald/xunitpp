@@ -17,7 +17,7 @@ void TheoryUnderTest(int x)
 struct TheoryFixture
 {
 private:
-    struct EmptyReporter : xUnitpp::IOutput
+    struct : xUnitpp::IOutput
     {
         virtual void ReportStart(const xUnitpp::TestDetails &, int) override
         {
@@ -38,11 +38,11 @@ private:
         virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
         {
         }
-    };
+    } emptyReporter;
 
 public:
     TheoryFixture()
-        : localRunner(std::make_shared<EmptyReporter>())
+        : localRunner(emptyReporter)
     {
     }
 
