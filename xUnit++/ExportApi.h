@@ -14,7 +14,7 @@ namespace xUnitpp
     typedef void(*EnumerateTestDetails)(EnumerateTestDetailsCallback callback);
 
     typedef std::function<bool(const TestDetails &)> TestFilterCallback;
-    typedef int(*FilteredTestsRunner)(int, std::shared_ptr<IOutput>, TestFilterCallback );
+    typedef int(*FilteredTestsRunner)(int, IOutput &, TestFilterCallback );
 }
 
 #endif

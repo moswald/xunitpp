@@ -19,7 +19,7 @@ class TestCollection
 public:
     class Register
     {
-        // !!! someday, Visual Studio will understand variadic macros
+        // !!!VS someday, Visual Studio will understand variadic macros
         // when it does, fix this collection
 
         // !!! should use a macro system to automate this

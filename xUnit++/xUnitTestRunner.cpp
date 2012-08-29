@@ -20,7 +20,7 @@ ENABLE_MODULE_LINK(TestRunner)
 namespace
 {
 
-extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
+extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, xUnitpp::IOutput &testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
 {
     return xUnitpp::TestRunner(testReporter)
         .RunTests(filter, xUnitpp::TestCollection::Instance().Facts(), xUnitpp::TestCollection::Instance().Theories(),
@@ -150,7 +150,7 @@ IOutput::~IOutput()
 class TestRunner::Impl
 {
 public:
-    Impl(std::shared_ptr<IOutput> testReporter)
+    Impl(IOutput &testReporter)
         : mTestReporter(testReporter)
     {
     }
@@ -158,41 +158,45 @@ public:
     void OnTestStart(const TestDetails &details, int dataIndex)
     {
         std::lock_guard<std::mutex> guard(mStartMtx);
-        mTestReporter->ReportStart(details, dataIndex);
+        mTestReporter.ReportStart(details, dataIndex);
     }
 
     void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        mTestReporter->ReportFailure(details, dataIndex, message);
+        mTestReporter.ReportFailure(details, dataIndex, message);
     }
 
     void OnTestSkip(const TestDetails &details, const std::string &reason)
     {
-        mTestReporter->ReportSkip(details, reason);
+        mTestReporter.ReportSkip(details, reason);
     }
 
     void OnTestFinish(const TestDetails &details, int dataIndex, xUnitpp::Duration time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
-        mTestReporter->ReportFinish(details, dataIndex, time);
+        mTestReporter.ReportFinish(details, dataIndex, time);
     }
 
 
     void OnAllTestsComplete(int total, int skipped, int failed, xUnitpp::Duration totalTime)
     {
-        mTestReporter->ReportAllTestsComplete(total, skipped, failed, totalTime);
+        mTestReporter.ReportAllTestsComplete(total, skipped, failed, totalTime);
     }
 
 private:
-    std::shared_ptr<IOutput> mTestReporter;
+    Impl(const Impl &);
+    Impl &operator=(Impl);
+
+private:
+    IOutput &mTestReporter;
 
     std::mutex mStartMtx;
     std::mutex mFailureMtx;
     std::mutex mFinishMtx;
 };
 
-TestRunner::TestRunner(std::shared_ptr<IOutput> testReporter)
+TestRunner::TestRunner(IOutput &testReporter)
     : mImpl(new Impl(testReporter))
 {
 }

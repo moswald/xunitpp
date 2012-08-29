@@ -141,18 +141,10 @@ int main(int argc, char **argv)
                 continue;
             }
 
-            std::shared_ptr<xUnitpp::IOutput> reporter;
-            
-            if (options.xmlOutput.empty())
-            {
-                reporter = std::make_shared<xUnitpp::StdOutReporter>(options.verbose, options.veryVerbose);
-            }
-            else
-            {
-                reporter = std::make_shared<xUnitpp::XmlReporter>(options.xmlOutput);
-            }
-
-            failures += filteredTestRunner(options.timeLimit, reporter,
+            std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
+                (xUnitpp::IOutput *)new xUnitpp::StdOutReporter(options.verbose, options.veryVerbose) :
+                (xUnitpp::IOutput *)new xUnitpp::XmlReporter(options.xmlOutput));
+            failures += filteredTestRunner(options.timeLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);

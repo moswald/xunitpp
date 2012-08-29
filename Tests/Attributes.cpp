@@ -42,7 +42,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
         }
     };
 
-    struct EmptyReporter : xUnitpp::IOutput
+    struct : xUnitpp::IOutput
     {
         virtual void ReportStart(const xUnitpp::TestDetails &, int) override
         {
@@ -63,7 +63,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
         virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
         {
         }
-    };
+    } emptyReporter;
 
     xUnitpp::AttributeCollection attributes;
     attributes.insert(std::make_pair("Skip", "Testing skip."));
@@ -71,7 +71,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
     xUnitpp::TestCollection collection;
     xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); }, "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__);
 
-    xUnitpp::TestRunner local(std::make_shared<EmptyReporter>());
+    xUnitpp::TestRunner local(emptyReporter);
     local.RunTests([](const xUnitpp::TestDetails &) { return true; },
         collection.Facts(), collection.Theories(), xUnitpp::Duration::zero(), 0);
 }

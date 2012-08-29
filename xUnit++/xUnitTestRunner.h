@@ -19,7 +19,7 @@ class Theory;
 class TestRunner
 {
 public:
-    TestRunner(std::shared_ptr<IOutput> testReporter);
+    TestRunner(IOutput &testReporter);
     int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories,
                  xUnitpp::Duration maxTestRunTime, size_t maxConcurrent);
 
