@@ -1,4 +1,5 @@
 #include "StdOutReporter.h"
+#include <chrono>
 #include <cstdio>
 #include <iostream>
 #include "TestDetails.h"
@@ -52,15 +53,16 @@ void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::strin
         ": skipping " + testDetails.Name + ": " + reason + "\n");
 }
 
-void StdOutReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, std::chrono::milliseconds timeTaken)
+void StdOutReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken)
 {
     if (mVerbose)
     {
-        std::cout << (NameAndDataIndex(testDetails.Name, dataIndex) + ": Completed in " + (timeTaken.count() == 0 ? std::string("under 1") : std::to_string(timeTaken.count())) + "ms.\n");
+        auto ms = ToMilliseconds(timeTaken);
+        std::cout << (NameAndDataIndex(testDetails.Name, dataIndex) + ": Completed in " + (ms.count() == 0 ? (std::to_string(timeTaken.count()) + " nanoseconds.\n") : (std::to_string(ms.count()) + " milliseconds.\n")));
     }
 }
 
-void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, std::chrono::milliseconds totalTime)
+void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime)
 {
     std::string total = std::to_string(testCount) + " tests, ";
     std::string failures = std::to_string(failureCount) + " failed, ";
@@ -84,7 +86,17 @@ void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, si
     std::cout << (header + total + failures + skips);
 
     header = "Test time: ";
-    std::cout << (header + std::to_string(totalTime.count()) + " milliseconds.\n");
+
+    auto ms = ToMilliseconds(totalTime);
+
+    if (ms.count() > 500)
+    {
+        std::cout << (header + std::to_string(ToSeconds(totalTime).count()) + " seconds.\n");
+    }
+    else
+    {
+        std::cout << (header + std::to_string(ms.count()) + " milliseconds.\n");
+    }
 }
 
 }

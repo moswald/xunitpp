@@ -8,7 +8,6 @@ General
 unit test the lib - started
 create lib/include structure
 ensure gcc/linux support
-switch to microseconds (or even nanoseconds) instead of milliseconds
 
 
 Stretch

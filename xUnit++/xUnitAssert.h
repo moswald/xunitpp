@@ -14,8 +14,8 @@ class xUnitAssert : public std::exception
     typedef std::exception base;
 
 public:
-    explicit xUnitAssert(const std::string &call, const std::string &userMsg, const std::string &customMsg,
-                         const std::string &expected, const std::string &actual);
+    xUnitAssert(const std::string &call, const std::string &userMsg, const std::string &customMsg,
+                const std::string &expected, const std::string &actual);
 };
 
 const class Assert
@@ -218,22 +218,22 @@ public:
         }
     }
 
-    template<typename TSequence, typename T, typename TPredicate>
-    void DoesNotContain(const TSequence &sequence, T value, TPredicate &&predicate, const std::string &msg = "") const
+    template<typename TSequence, typename TPredicate>
+    void DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg = "") const
     {
         using namespace std;
 
         auto found = find_if(begin(sequence), end(sequence), predicate);
         if (found != end(sequence))
         {
-            throw xUnitAssert("DoesNotContain", msg, "Found: " + to_string(value) + " at position " + to_string(distance(begin(sequence), found)) + ".", "", "");
+            throw xUnitAssert("DoesNotContain", msg, "Found: matching value at position " + to_string(distance(begin(sequence), found)) + ".", "", "");
         }
     }
 
     template<typename TSequence, typename T>
     void DoesNotContain(const TSequence &sequence, T value, const std::string &msg = "") const
     {
-        DoesNotContain(sequence, value, [&value](const T& actual) { return actual == value; }, msg);
+        DoesNotContainPred(sequence, [&value](const T& actual) { return actual == value; }, msg);
     }
 
     void DoesNotContain(const char *actualString, const char *value, const std::string &msg = "") const;
@@ -242,8 +242,8 @@ public:
 
     void DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
 
-    template<typename TSequence, typename T, typename TPredicate>
-    void Contains(const TSequence &sequence, T value, TPredicate &&predicate, const std::string &msg = "") const
+    template<typename TSequence, typename TPredicate>
+    void ContainsPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg = "") const
     {
         using namespace std;
 
@@ -256,7 +256,7 @@ public:
     template<typename TSequence, typename T>
     void Contains(const TSequence &sequence, T value, const std::string &msg = "") const
     {
-        Contains(sequence, value, [&value](const T &actual) { return actual == value; }, msg); 
+        ContainsPred(sequence, [&value](const T &actual) { return actual == value; }, msg); 
     }
 
     void Contains(const char *actualString, const char *value, const std::string &msg = "") const;

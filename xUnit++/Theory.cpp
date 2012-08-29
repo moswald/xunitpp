@@ -6,7 +6,7 @@ namespace xUnitpp
 
 Theory::Theory(const std::vector<std::function<void()>> &theorySet, const std::string &name, const std::string &suite,
                const AttributeCollection &attributes,
-               std::chrono::milliseconds timeLimit, const std::string &filename, int line)
+               xUnitpp::Duration timeLimit, const std::string &filename, int line)
     : mTheories(theorySet)
     , mTestDetails(name, suite, attributes, timeLimit, filename, line)
 {

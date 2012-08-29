@@ -1,5 +1,6 @@
 #include "TestDetails.h"
 #include <utility>
+#include "xUnitTime.h"
 
 namespace
 {
@@ -18,7 +19,7 @@ TestDetails::TestDetails()
 }
 
 TestDetails::TestDetails(const std::string &name, const std::string &suite, const AttributeCollection &attributes,
-                         std::chrono::milliseconds timeLimit, const std::string &filename, int line)
+                         xUnitpp::Duration timeLimit, const std::string &filename, int line)
     : Id(NextId())
     , Name(name)
     , Suite(suite)

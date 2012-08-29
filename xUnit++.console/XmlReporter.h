@@ -15,8 +15,8 @@ public:
     virtual void ReportStart(const TestDetails &td, int dataIndex) override;
     virtual void ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg) override;
     virtual void ReportSkip(const TestDetails &testDetails, const std::string &reason) override;
-    virtual void ReportFinish(const TestDetails &testDetails, int dataIndex, std::chrono::milliseconds timeTaken) override;
-    virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, std::chrono::milliseconds totalTime) override;
+    virtual void ReportFinish(const TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken) override;
+    virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime) override;
 
 public:
     struct SuiteResult;

@@ -28,7 +28,7 @@ namespace
             Skipped
         } status;
 
-        std::chrono::milliseconds time;
+        xUnitpp::Duration time;
         std::string message;
     };
 }
@@ -71,19 +71,14 @@ namespace
 
     float SuiteTime(const xUnitpp::XmlReporter::SuiteResult &suiteResult)
     {
-        std::chrono::milliseconds timeTaken = std::chrono::milliseconds::zero();
+        xUnitpp::Duration timeTaken = xUnitpp::Duration::zero();
 
         for (const auto &test : suiteResult.testResults)
         {
             timeTaken += test.second.time;
         }
 
-        return std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1>>>(timeTaken).count();
-    }
-
-    float XmlTime(std::chrono::milliseconds timeTaken)
-    {
-        return std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1>>>(timeTaken).count();
+        return xUnitpp::ToSeconds(timeTaken).count();
     }
 
     void ReplaceChar(std::string &str, char c, const std::string &replacement)
@@ -132,13 +127,13 @@ namespace
             " ?>\n";
     }
 
-    std::string XmlBeginResults(size_t tests, size_t failures, std::chrono::milliseconds totalTime)
+    std::string XmlBeginResults(size_t tests, size_t failures, xUnitpp::Duration totalTime)
     {
         return
             "<testsuites" +
                 XmlAttribute("tests", tests) +
                 XmlAttribute("failures", failures) +
-                XmlAttribute("time", XmlTime(totalTime)) +
+                XmlAttribute("time", xUnitpp::ToSeconds(totalTime).count()) +
             ">\n";
     }
 
@@ -170,7 +165,7 @@ namespace
         return std::string("      ") +
             "<testcase" +
                 XmlAttribute("name", testName) +
-                XmlAttribute("time", test.time.count());
+                XmlAttribute("time", xUnitpp::ToSeconds(test.time).count());
     }
 
     std::string XmlEndTest(bool singleTag)
@@ -218,7 +213,7 @@ XmlReporter::XmlReporter(const std::string &filename)
 {
 }
 
-void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, std::chrono::milliseconds totalTime)
+void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, xUnitpp::Duration totalTime)
 {
     auto report = [&](std::ostream &stream)
         {
@@ -309,7 +304,7 @@ void XmlReporter::ReportSkip(const TestDetails &testDetails, const std::string &
     suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Skipped;
 }
 
-void XmlReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, std::chrono::milliseconds timeTaken)
+void XmlReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken)
 {
     std::string testName = TestName(testDetails.Name, dataIndex);
     suiteResults[testDetails.Suite].testResults[testName].time = timeTaken;

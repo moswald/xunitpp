@@ -77,8 +77,9 @@ public:
             {
                 theorySet.emplace_back(TheoryHelper(theory, std::move(t)));
             }
-        
-            collection.mTheories.emplace_back(Theory(theorySet, name, suite, attributes, std::chrono::milliseconds(milliseconds), filename, line));
+
+            collection.mTheories.emplace_back(
+                Theory(theorySet, name, suite, attributes, std::chrono::duration_cast<xUnitpp::Duration>(std::chrono::milliseconds(milliseconds)), filename, line));
         }
     };
 

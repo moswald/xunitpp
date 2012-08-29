@@ -1,5 +1,6 @@
 #include "xUnitTestRunner.h"
 #include <atomic>
+#include <chrono>
 #include <future>
 #include <limits>
 #include <mutex>
@@ -22,7 +23,8 @@ namespace
 extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, std::shared_ptr<xUnitpp::IOutput> testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
 {
     return xUnitpp::TestRunner(testReporter)
-        .RunTests(filter, xUnitpp::TestCollection::Instance().Facts(), xUnitpp::TestCollection::Instance().Theories(), std::chrono::milliseconds(timeLimit), 0);
+        .RunTests(filter, xUnitpp::TestCollection::Instance().Facts(), xUnitpp::TestCollection::Instance().Theories(),
+                  std::chrono::duration_cast<xUnitpp::Duration>(std::chrono::milliseconds(timeLimit)), 0);
 }
 
 class ActiveTests
@@ -170,14 +172,14 @@ public:
         mTestReporter->ReportSkip(details, reason);
     }
 
-    void OnTestFinish(const TestDetails &details, int dataIndex, std::chrono::milliseconds time)
+    void OnTestFinish(const TestDetails &details, int dataIndex, xUnitpp::Duration time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
         mTestReporter->ReportFinish(details, dataIndex, time);
     }
 
 
-    void OnAllTestsComplete(int total, int skipped, int failed, std::chrono::milliseconds totalTime)
+    void OnAllTestsComplete(int total, int skipped, int failed, xUnitpp::Duration totalTime)
     {
         mTestReporter->ReportAllTestsComplete(total, skipped, failed, totalTime);
     }
@@ -195,7 +197,7 @@ TestRunner::TestRunner(std::shared_ptr<IOutput> testReporter)
 {
 }
 
-int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories, std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent)
+int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories, xUnitpp::Duration maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
@@ -295,23 +297,23 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
 
                         if (reportEnd)
                         {
-                            mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                            mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - testStart));
                         }
 
                         return testStart;
                     };
 
                 auto testTimeLimit = test.testDetails.TimeLimit;
-                if (testTimeLimit < std::chrono::milliseconds::zero())
+                if (testTimeLimit < xUnitpp::Duration::zero())
                 {
                     testTimeLimit = maxTestRunTime;
                 }
 
-                if (testTimeLimit > std::chrono::milliseconds::zero())
+                if (testTimeLimit > xUnitpp::Duration::zero())
                 {
                     //
                     // note that forcing a test to run in under a certain amount of time is inherently fragile
-                    // there's no guarantee that a thread, once started, actually gets `maxTestRunTime` milliseconds of CPU
+                    // there's no guarantee that a thread, once started, actually gets `maxTestRunTime` nanoseconds of CPU
 
                     TimeStamp testStart;
 
@@ -329,15 +331,15 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                         });
                     timedRunner.detach();
 
-                    if (threadStarted->wait_for(gate, testTimeLimit) == std::cv_status::timeout)
+                    if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(testTimeLimit.count()) + " milliseconds.");
+                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(ToMilliseconds(testTimeLimit).count()) + " milliseconds.");
                         mImpl->OnTestFinish(test.testDetails, test.dataIndex, testTimeLimit);
                         ++failedTests;
                     }
                     else
                     {
-                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - testStart));
+                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - testStart));
                     }
                 }
                 else
@@ -352,7 +354,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
         test.get();
     }
     
-    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - timeStart));
+    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - timeStart));
 
     return -failedTests;
 }
