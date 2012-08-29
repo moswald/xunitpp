@@ -31,11 +31,11 @@ private:
         {
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &, int, std::chrono::milliseconds) override
+        virtual void ReportFinish(const xUnitpp::TestDetails &, int, xUnitpp::Duration) override
         {
         }
 
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, std::chrono::milliseconds) override 
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
         {
         }
     };
@@ -55,7 +55,7 @@ public:
     void Run()
     {
         localRunner.RunTests([](const xUnitpp::TestDetails &) { return true; },
-            collection.Facts(), collection.Theories(), std::chrono::milliseconds::zero(), 0);
+            collection.Facts(), collection.Theories(), xUnitpp::Duration::zero(), 0);
     }
 
     template<typename TTheoryData>
@@ -112,45 +112,28 @@ FACT_FIXTURE(TheoriesAcceptFunctors, TheoryFixture)
 
 FACT_FIXTURE(TheoriesGetAllDataPassedToThem, TheoryFixture)
 {
-    struct localTheory
-    {
-        void operator()(int x)
-        {
-            dataProvided.push_back(x);
-        }
+    std::vector<int> dataProvided;
 
-        std::vector<int> dataProvided;
-    } theory;
+    // !!! this line appears to fix a somewhat random buffer overrun bug
+    // I am not sure why. Investigate later.
+    dataProvided.reserve(5);
 
-    auto doTheory = [&](int x) { theory(x); };
+    auto doTheory = [&](int x) { dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider, "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__);
 
     Run();
 
-    Assert.Equal(2, std::count(theory.dataProvided.begin(), theory.dataProvided.end(), 0));
-    Assert.Equal(1, std::count(theory.dataProvided.begin(), theory.dataProvided.end(), 1));
-    Assert.Equal(1, std::count(theory.dataProvided.begin(), theory.dataProvided.end(), 2));
-    Assert.Equal(1, std::count(theory.dataProvided.begin(), theory.dataProvided.end(), 3));
+    Assert.Equal(2, std::count(dataProvided.begin(), dataProvided.end(), 0));
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 1));
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 2));
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 3));
 }
 
 FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
 {
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
-    const struct localTheory
-    {
-        localTheory()
-        {
-            Assert.Fail("Should not be instantiated.");
-        }
-
-        void operator()(int) const
-        {
-            Assert.Fail("Should not be run.");
-        }
-    };
-
-    auto doTheory = [](int x) { localTheory()(x); };
+    auto doTheory = [](int) { Assert.Fail("Should not be run."); };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider, "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__);
 

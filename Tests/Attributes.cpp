@@ -56,11 +56,11 @@ FACT(SkippedTestsShouldNotBeInstantiated)
         {
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &, int, std::chrono::milliseconds) override
+        virtual void ReportFinish(const xUnitpp::TestDetails &, int, xUnitpp::Duration) override
         {
         }
 
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, std::chrono::milliseconds) override 
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
         {
         }
     };
@@ -73,7 +73,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
 
     xUnitpp::TestRunner local(std::make_shared<EmptyReporter>());
     local.RunTests([](const xUnitpp::TestDetails &) { return true; },
-        collection.Facts(), collection.Theories(), std::chrono::milliseconds::zero(), 0);
+        collection.Facts(), collection.Theories(), xUnitpp::Duration::zero(), 0);
 }
 
 }

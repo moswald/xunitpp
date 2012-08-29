@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "xUnitTime.h"
 
 namespace xUnitpp
 {
@@ -20,7 +21,7 @@ class TestRunner
 public:
     TestRunner(std::shared_ptr<IOutput> testReporter);
     int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories,
-                 std::chrono::milliseconds maxTestRunTime, size_t maxConcurrent);
+                 xUnitpp::Duration maxTestRunTime, size_t maxConcurrent);
 
 private:
     class Impl;

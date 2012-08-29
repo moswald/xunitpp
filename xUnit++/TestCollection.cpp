@@ -1,3 +1,4 @@
+#include <chrono>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -7,6 +8,7 @@
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "xUnitTestRunner.h"
+#include "xUnitTime.h"
 
 LINK_MODULE(TestRunner)
 
@@ -38,7 +40,7 @@ TestCollection &TestCollection::Instance()
 TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
                                    const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line)
 {
-    collection.mFacts.emplace_back(Fact(fn, name, suite, attributes, std::chrono::milliseconds(milliseconds), filename, line));
+    collection.mFacts.emplace_back(Fact(fn, name, suite, attributes, std::chrono::duration_cast<xUnitpp::Duration>(std::chrono::milliseconds(milliseconds)), filename, line));
 }
 
 const std::vector<Fact> &TestCollection::Facts()

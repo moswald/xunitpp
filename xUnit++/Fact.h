@@ -14,7 +14,7 @@ class Fact
 {
 public:
     Fact(std::function<void()> fact, const std::string &name, const std::string &suite,
-         const AttributeCollection &attributes, std::chrono::milliseconds timeLimit,
+         const AttributeCollection &attributes, xUnitpp::Duration timeLimit,
          const std::string &filename, int line);
     Fact(const Fact &other);
     Fact(Fact &&other);
