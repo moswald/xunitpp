@@ -10,6 +10,7 @@ General
 unit test the lib - started
 create lib/include structure
 ensure gcc/linux support
+some duplicated code, search for FileAndLine (and others, but I forget which ones right now)
 
 
 Stretch
