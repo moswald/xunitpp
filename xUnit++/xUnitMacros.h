@@ -4,6 +4,7 @@
 #include <tuple>
 #include <vector>
 #include "Attributes.h"
+#include "LineInfo.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "Suite.h"
@@ -69,5 +70,7 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define THEORY_PROVIDER_END \
     }
+
+#define LI xUnitpp::LineInfo(__FILE__, __LINE__)
 
 #endif

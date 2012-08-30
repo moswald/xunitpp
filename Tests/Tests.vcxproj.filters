@@ -19,5 +19,6 @@
     <ClCompile Include="Assert.True.cpp" />
     <ClCompile Include="Attributes.cpp" />
     <ClCompile Include="Theory.cpp" />
+    <ClCompile Include="LineInfo.cpp" />
   </ItemGroup>
 </Project>
