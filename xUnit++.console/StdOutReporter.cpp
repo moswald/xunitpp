@@ -2,12 +2,16 @@
 #include <chrono>
 #include <cstdio>
 #include <iostream>
+#include "LineInfo.h"
 #include "TestDetails.h"
 
 namespace
 {
-    std::string FileAndLine(const std::string &file, int line)
+    std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo lineInfo)
     {
+        auto file = lineInfo.file.empty() ? td.Filename : lineInfo.file;
+        auto line = lineInfo.file.empty() ? td.Line : lineInfo.line;
+
         return file + "(" + std::to_string(line) + ")";
     }
 
@@ -41,15 +45,15 @@ void StdOutReporter::ReportStart(const TestDetails &testDetails, int dataIndex)
     }
 }
 
-void StdOutReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg)
+void StdOutReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg, const LineInfo &lineInfo)
 {
-    std::cout << (FileAndLine(testDetails.Filename, testDetails.Line) +
+    std::cout << (FileAndLine(testDetails, lineInfo) +
         ": error in " + NameAndDataIndex(testDetails.Name, dataIndex) + ": " + msg + "\n");
 }
 
 void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
-    std::cout << (FileAndLine(testDetails.Filename, testDetails.Line) +
+    std::cout << (FileAndLine(testDetails, LineInfo::empty()) +
         ": skipping " + testDetails.Name + ": " + reason + "\n");
 }
 

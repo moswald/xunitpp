@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 #include <type_traits>
+#include "LineInfo.h"
 
 namespace xUnitpp
 {
@@ -15,7 +16,13 @@ class xUnitAssert : public std::exception
 
 public:
     xUnitAssert(const std::string &call, const std::string &userMsg, const std::string &customMsg,
-                const std::string &expected, const std::string &actual);
+                const std::string &expected, const std::string &actual, const LineInfo &lineInfo);
+    xUnitAssert(const xUnitAssert &other);
+
+    const LineInfo &LineInfo() const;
+
+private:
+    xUnitpp::LineInfo lineInfo;
 };
 
 const class Assert
@@ -23,8 +30,8 @@ const class Assert
 private:
     static double round(double value, size_t precision);
 
-    template<typename T0>
-    static std::string RangeToString(const T0 &begin, const T0 &end)
+    template<typename T>
+    static std::string RangeToString(const T &begin, const T &end)
     {
         std::string result = "[ ";
 
@@ -54,219 +61,336 @@ private:
     };
 
 public:
-    template<typename T0, typename T1, typename TComparer>
-    void Equal(T0 t0, T1 t1, TComparer comparer, const std::string &msg = "") const
+    template<typename TExpected, typename TActual, typename TComparer>
+    void Equal(TExpected expected, TActual actual, TComparer comparer, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         using namespace std;
 
-        if (!comparer(t0, t1))
+        if (!comparer(expected, actual))
         {
-            throw xUnitAssert("Equal", msg, "", to_string(t0), to_string(t1));
+            throw xUnitAssert("Equal", msg, "", to_string(expected), to_string(actual), lineInfo);
         }
     }
 
-    template<typename T0, typename T1>
-    void Equal(T0 t0, T1 t1, const std::string &msg = "") const
+    template<typename TExpected, typename TActual, typename TComparer>
+    void Equal(TExpected expected, TActual actual, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        Equal(t0, t1, [](T0 t0, T1 t1) { return t0 == t1; }, msg);
+        Equal(expected, actual, comparer, "", lineInfo);
     }
 
-    void Equal(float expected, float actual, int precision, const std::string &msg = "") const;
-    void Equal(double expected, double actual, int precision, const std::string &msg = "") const;
-
-    template<typename TSeq0, typename TSeq1, typename TComparer>
-    void Equal(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, TComparer comparer, const std::string &msg = "") const
+    template<typename TExpected, typename TActual>
+    void Equal(TExpected expected, TActual actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        auto cur0 = begin0;
-        auto cur1 = begin1;
+        Equal(expected, actual, [](TExpected expected, TActual actual) { return expected == actual; }, msg, lineInfo);
+    }
+
+    template<typename TExpected, typename TActual>
+    void Equal(TExpected expected, TActual actual, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Equal(expected, actual, std::string(""), lineInfo);
+    }
+
+    void Equal(const char *expected, const char *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(const char *expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void Equal(const std::string &expected, const char *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(const std::string &expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void Equal(const std::string &expected, const std::string &actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(const std::string &expected, const std::string &actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void Equal(float expected, float actual, int precision, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(float expected, float actual, int precision, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(double expected, double actual, int precision, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Equal(double expected, double actual, int precision, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    template<typename TExpected, typename TActual, typename TComparer>
+    void Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        auto expected = expectedBegin;
+        auto actual = actualBegin;
 
         size_t index = 0;
-        while (cur0 != end0 && cur1 != end1)
+        while (expected != expectedEnd && actual != actualEnd)
         {
-            if (!comparer(*cur0, *cur1))
+            if (!comparer(*expected, *actual))
             {
                 break;
             }
 
-            ++cur0;
-            ++cur1;
+            ++expected;
+            ++actual;
             ++index;
         }
 
-        if (cur0 != end0 || cur1 != end1)
+        if (expected != expectedEnd || actual != actualEnd)
         {
             throw xUnitAssert("Equal", msg,
                 "Sequence unequal at location " + std::to_string(index) + ".",
-                RangeToString(begin0, end0),
-                RangeToString(begin1, end1));
+                RangeToString(expectedBegin, expectedEnd),
+                RangeToString(actualBegin, actualEnd),
+                lineInfo);
         }
     }
 
-    template<typename TSeq0, typename TSeq1>
-    void Equal(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, const std::string &msg = "") const
+    template<typename TExpected, typename TActual, typename TComparer>
+    void Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        Equal(begin0, end0, begin1, end1, [](decltype(*begin0) a, decltype(*begin1) b) { return a == b; }, msg);
+        Equal(expectedBegin, expectedEnd, actualBegin, actualEnd, comparer, "", lineInfo);
     }
 
-    template<typename T0, typename T1, typename TComparer>
-    void NotEqual(T0 t0, T1 t1, TComparer comparer, const std::string &msg = "") const
+    template<typename TExpected, typename TActual>
+    void Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (comparer(t0, t1))
+        Equal(expectedBegin, expectedEnd, actualBegin, actualEnd, [](decltype(*expectedBegin) a, decltype(*actualBegin) b) { return a == b; }, msg, lineInfo);
+    }
+
+    template<typename TExpected, typename TActual>
+    void Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Equal(expectedBegin, expectedEnd, actualBegin, actualEnd, std::string(""), lineInfo);
+    }
+
+    template<typename TExpected, typename TActual, typename TComparer>
+    void NotEqual(TExpected expected, TActual actual, TComparer comparer, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (comparer(expected, actual))
         {
-            throw xUnitAssert("NotEqual", msg, "", "", "");
+            throw xUnitAssert("NotEqual", msg, "", "", "", lineInfo);
         }
     }
 
-    template<typename T0, typename T1>
-    void NotEqual(T0 t0, T1 t1, const std::string &msg = "") const
+    template<typename TExpected, typename TActual, typename TComparer>
+    void NotEqual(TExpected expected, TActual actual, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        NotEqual(t0, t1, [](T0 t0, T1 t1) { return t0 == t1; }, msg);
+        NotEqual(expected, actual, comparer, "", lineInfo);
     }
 
-    template<typename TSeq0, typename TSeq1, typename TComparer>
-    void NotEqual(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, TComparer comparer, const std::string &msg = "") const
+    template<typename TExpected, typename TActual>
+    void NotEqual(TExpected expected, TActual actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        auto cur0 = begin0;
-        auto cur1 = begin1;
+        NotEqual(expected, actual, [](TExpected expected, TActual actual) { return expected == actual; }, msg, lineInfo);
+    }
 
-        while (cur0 != end0 && cur1 != end1)
+    template<typename TExpected, typename TActual>
+    void NotEqual(TExpected expected, TActual actual, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotEqual(expected, actual, std::string(""), lineInfo);
+    }
+
+    template<typename TExpected, typename TActual, typename TComparer>
+    void NotEqual(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        auto expected = expectedBegin;
+        auto actual = actualBegin;
+
+        while (expected != expectedEnd && actual != actualEnd)
         {
-            if (!comparer(*cur0, *cur1))
+            if (!comparer(*expected, *actual))
             {
                 return;
             }
 
-            ++cur0;
-            ++cur1;
+            ++expected;
+            ++actual;
         }
 
-        if (cur0 == end0 && cur1 == end1)
+        if (expected == expectedEnd && actual == actualEnd)
         {
-            throw xUnitAssert("NotEqual", msg, "", "", "");
+            throw xUnitAssert("NotEqual", msg, "", "", "", lineInfo);
         }
     }
 
-    template<typename TSeq0, typename TSeq1>
-    void NotEqual(const TSeq0 &begin0, const TSeq0 &end0, const TSeq1 &begin1, const TSeq1 &end1, const std::string &msg = "") const
+    template<typename TExpected, typename TActual, typename TComparer>
+    void NotEqual(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        NotEqual(begin0, end0, begin1, end1, [](decltype(*begin0) a, decltype(*begin1) b) { return a == b; }, msg);
+        NotEqual(expectedBegin, expectedEnd, actualBegin, actualEnd, comparer, "", lineInfo);
+    }
+
+    template<typename TExpected, typename TActual>
+    void NotEqual(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotEqual(expectedBegin, expectedEnd, actualBegin, actualEnd, [](decltype(*expectedBegin) a, decltype(*actualBegin) b) { return a == b; }, msg, lineInfo);
+    }
+
+    template<typename TExpected, typename TActual>
+    void NotEqual(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotEqual(expectedBegin, expectedEnd, actualBegin, actualEnd, std::string(""), lineInfo);
     }
 
     template<typename TFunc>
-    void DoesNotThrow(TFunc &&fn, const std::string &msg = "") const
+    void DoesNotThrow(TFunc &&fn, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         try
         {
             fn();
         }
-        catch (std::exception &e)
+        catch (const std::exception &e)
         {
-            throw xUnitAssert("DoesNotThrow", msg, "", "(no exception)", e.what());
+            throw xUnitAssert("DoesNotThrow", msg, "", "(no exception)", e.what(), lineInfo);
         }
         catch (...)
         {
-            throw xUnitAssert("DoesNotThrow", msg, "", "(no exception)", "Crash: unknown exception.");
+            throw xUnitAssert("DoesNotThrow", msg, "", "(no exception)", "Crash: unknown exception.", lineInfo);
         }
     }
 
+    template<typename TFunc>
+    void DoesNotThrow(TFunc &&fn, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        DoesNotThrow(fn, "", lineInfo);
+    }
+
     template<typename TException, typename TFunc>
-    TException Throws(TFunc &&fn, const std::string &msg = "") const
+    TException Throws(TFunc &&fn, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         try
         {
             fn();
         }
-        catch (TException e)
+        catch (const TException &e)
         {
             return e;
         }
         catch (const std::exception &e)
         {
-            throw xUnitAssert("Throws", msg, "", typeid(TException).name(), e.what());
+            throw xUnitAssert("Throws", msg, "", typeid(TException).name(), e.what(), lineInfo);
         }
         catch (...)
         {
-            throw xUnitAssert("Throws", msg, "", typeid(TException).name(), "Crash: unknown exception.");
+            throw xUnitAssert("Throws", msg, "", typeid(TException).name(), "Crash: unknown exception.", lineInfo);
         }
 
-        throw xUnitAssert("Throws", msg, "", typeid(TException).name(), "No exception.");
+        throw xUnitAssert("Throws", msg, "", typeid(TException).name(), "No exception.", lineInfo);
     }
 
-    void Fail(const std::string &msg = "") const;
+    template<typename TException, typename TFunc>
+    TException Throws(TFunc &&fn, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        return Throws<TException>(fn, "", lineInfo);
+    }
 
-    void False(bool b, const std::string &msg = "") const;
+    void Fail(const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Fail(const LineInfo &lineInfo = LineInfo::empty()) const;
 
-    void True(bool b, const std::string &msg = "") const;
+    void False(bool b, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void False(bool b, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void True(bool b, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void True(bool b, const LineInfo &lineInfo = LineInfo::empty()) const;
 
     template<typename TSequence>
-    typename std::enable_if<has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const std::string &msg = "") const
+    typename std::enable_if<has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         if (!sequence.empty())
         {
-            throw xUnitAssert("Empty", msg, "", "", "");
+            throw xUnitAssert("Empty", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename TSequence>
-    typename std::enable_if<!has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const std::string &msg = "") const
+    typename std::enable_if<has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Empty(sequence, "", lineInfo);
+    }
+
+    template<typename TSequence>
+    typename std::enable_if<!has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         using namespace std;
     
         if (begin(sequence) != end(sequence))
         {
-            throw xUnitAssert("Empty", msg, "", "", "");
+            throw xUnitAssert("Empty", msg, "", "", "", lineInfo);
         }
     }
 
+    template<typename TSequence>
+    typename std::enable_if<!has_empty<TSequence>::value>::type Empty(const TSequence &sequence, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Empty(sequence, "", lineInfo);
+    }
+
     template<typename TSequence, typename TPredicate>
-    void DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg = "") const
+    void DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         using namespace std;
 
         auto found = find_if(begin(sequence), end(sequence), predicate);
         if (found != end(sequence))
         {
-            throw xUnitAssert("DoesNotContain", msg, "Found: matching value at position " + to_string(distance(begin(sequence), found)) + ".", "", "");
+            throw xUnitAssert("DoesNotContain", msg, "Found: matching value at position " + to_string(distance(begin(sequence), found)) + ".", "", "", lineInfo);
         }
     }
 
-    template<typename TSequence, typename T>
-    void DoesNotContain(const TSequence &sequence, T value, const std::string &msg = "") const
+    template<typename TSequence, typename TPredicate>
+    void DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        DoesNotContainPred(sequence, [&value](const T& actual) { return actual == value; }, msg);
+        DoesNotContainPred(sequence, predicate, "", lineInfo);
     }
 
-    void DoesNotContain(const char *actualString, const char *value, const std::string &msg = "") const;
+    template<typename TSequence, typename T>
+    void DoesNotContain(const TSequence &sequence, T value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        DoesNotContainPred(sequence, [&value](const T& actual) { return actual == value; }, msg, lineInfo);
+    }
 
-    void DoesNotContain(const std::string &actualString, const char *value, const std::string &msg = "") const;
+    template<typename TSequence, typename T>
+    void DoesNotContain(const TSequence &sequence, T value, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        DoesNotContain(sequence, value, "", lineInfo);
+    }
 
-    void DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
+    void DoesNotContain(const char *actualString, const char *value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void DoesNotContain(const char *actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void DoesNotContain(const std::string &actualString, const char *value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void DoesNotContain(const std::string &actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void DoesNotContain(const std::string &actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
 
     template<typename TSequence, typename TPredicate>
-    void ContainsPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg = "") const
+    void ContainsPred(const TSequence &sequence, TPredicate &&predicate, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         using namespace std;
 
         if (find_if(begin(sequence), end(sequence), predicate) == end(sequence))
         {
-            throw xUnitAssert("Contains", msg, "", "", "");
+            throw xUnitAssert("Contains", msg, "", "", "", lineInfo);
         }
     }
 
-    template<typename TSequence, typename T>
-    void Contains(const TSequence &sequence, T value, const std::string &msg = "") const
+    template<typename TSequence, typename TPredicate>
+    void ContainsPred(const TSequence &sequence, TPredicate &&predicate, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        ContainsPred(sequence, [&value](const T &actual) { return actual == value; }, msg); 
+        ContainsPred(sequence, predicate, "", lineInfo);
     }
 
-    void Contains(const char *actualString, const char *value, const std::string &msg = "") const;
+    template<typename TSequence, typename T>
+    void Contains(const TSequence &sequence, T value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        ContainsPred(sequence, [&value](const T &actual) { return actual == value; }, msg, lineInfo); 
+    }
 
-    void Contains(const std::string &actualString, const char *value, const std::string &msg = "") const;
+    template<typename TSequence, typename T>
+    void Contains(const TSequence &sequence, T value, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Contains(sequence, value, "", lineInfo);
+    }
 
-    void Contains(const std::string &actualString, const std::string &value, const std::string &msg = "") const;
+    void Contains(const char *actualString, const char *value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Contains(const char *actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void Contains(const std::string &actualString, const char *value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Contains(const std::string &actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+
+    void Contains(const std::string &actualString, const std::string &value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const;
+    void Contains(const std::string &actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
 
     template<typename TActual, typename TRange>
-    void InRange(TActual actual, TRange min, TRange max, const std::string &msg = "") const
+    void InRange(TActual actual, TRange min, TRange max, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         if (min >= max)
         {
@@ -275,12 +399,18 @@ public:
 
         if (actual < min || actual >= max)
         {
-            throw xUnitAssert("InRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual));
+            throw xUnitAssert("InRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual), lineInfo);
         }
     }
 
     template<typename TActual, typename TRange>
-    void NotInRange(TActual actual, TRange min, TRange max, const std::string &msg = "") const
+    void InRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        InRange(actual, min, max, "", lineInfo);
+    }
+
+    template<typename TActual, typename TRange>
+    void NotInRange(TActual actual, TRange min, TRange max, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         if (min >= max)
         {
@@ -289,71 +419,134 @@ public:
 
         if (actual >= min && actual < max)
         {
-            throw xUnitAssert("NotInRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual));
+            throw xUnitAssert("NotInRange", msg, "", "[" + std::to_string(min) + " - " + std::to_string(max) + ")", std::to_string(actual), lineInfo);
         }
     }
 
+    template<typename TActual, typename TRange>
+    void NotInRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotInRange(actual, min, max, "", lineInfo);
+    }
+
     template<typename T>
-    void NotNull(const T &value, const std::string &msg = "") const
+    void NotNull(const T &value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         if (value == nullptr)
         {
-            throw xUnitAssert("NotNull", msg, "", "", "");
+            throw xUnitAssert("NotNull", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void Null(const T &value, const std::string &msg = "") const
+    void NotNull(const T &value, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotNull(value, "", lineInfo);
+    }
+
+    template<typename T>
+    void Null(const T &value, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         if (value != nullptr)
         {
-            throw xUnitAssert("Null", msg, "", "", "");
+            throw xUnitAssert("Null", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void NotSame(const T &t0, const T &t1, const std::string &msg = "") const
+    void Null(const T &value, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (&t0 == &t1)
+        Null(value, "", lineInfo);
+    }
+
+    template<typename T>
+    void NotSame(const T &expected, const T &actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (&expected == &actual)
         {
-            throw xUnitAssert("NotSame", msg, "", "", "");
+            throw xUnitAssert("NotSame", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void NotSame(const T *t0, const T *t1, const std::string &msg = "") const
+    void NotSame(const T &expected, const T &actual, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (t0 == t1)
+        NotSame(expected, actual, "", lineInfo);
+    }
+
+    template<typename T>
+    void NotSame(const T *expected, const T *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (expected == actual)
         {
-            throw xUnitAssert("NotSame", msg, "", "", "");
+            throw xUnitAssert("NotSame", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void Same(const T &t0, const T &t1, const std::string &msg = "") const
+    void NotSame(T *expected, T *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (&t0 != &t1)
+        if (expected == actual)
         {
-            throw xUnitAssert("Same", msg, "", "", "");
+            throw xUnitAssert("NotSame", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void Same(T *t0, T *t1, const std::string &msg = "") const
+    void NotSame(T *expected, T *actual, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (t0 != t1)
+        NotSame(expected, actual, "", lineInfo);
+    }
+
+    template<typename T>
+    void NotSame(const T *expected, const T *actual, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        NotSame(expected, actual, "", lineInfo);
+    }
+
+    template<typename T>
+    void Same(const T &expected, const T &actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (&expected != &actual)
         {
-            throw xUnitAssert("Same", msg, "", "", "");
+            throw xUnitAssert("Same", msg, "", "", "", lineInfo);
         }
     }
 
     template<typename T>
-    void Same(const T *t0, const T *t1, const std::string &msg = "") const
+    void Same(const T &expected, const T &actual, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        if (t0 != t1)
+        Same(expected, actual, "", lineInfo);
+    }
+
+    template<typename T>
+    void Same(T *expected, T *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (expected != actual)
         {
-            throw xUnitAssert("Same", msg, "", "", "");
+            throw xUnitAssert("Same", msg, "", "", "", lineInfo);
         }
+    }
+
+    template<typename T>
+    void Same(T *expected, T *actual, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Same(expected, actual, "", lineInfo);
+    }
+
+    template<typename T>
+    void Same(const T *expected, const T *actual, const std::string &msg, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (expected != actual)
+        {
+            throw xUnitAssert("Same", msg, "", "", "", lineInfo);
+        }
+    }
+
+    template<typename T>
+    void Same(const T *expected, const T *actual, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        Same(expected, actual, "", lineInfo);
     }
 } Assert;
 

@@ -1,6 +1,8 @@
 Visual Studio 2012 notes
 ------------------------
 implement ITestDiscoverer and ITestExecutor
+create vsix for test runners
+need msbuild test runner
 
 
 General
@@ -13,8 +15,5 @@ ensure gcc/linux support
 Stretch
 -----
 custom xUnitAsserts per assert (revisit unit tests at that point)
-consider doing LINEINFO the way VS2012 does
-support wstring - what does that mean?
-    - as an assert call paarameter?
-    - define std::tstring and add yet another set of compile targets?
+support wstring as an assert call parameter
 create NuGet package/template (NuGet does not support C++ projects, yet)

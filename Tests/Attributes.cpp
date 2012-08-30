@@ -48,7 +48,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
         {
         }
 
-        virtual void ReportFailure(const xUnitpp::TestDetails &, int, const std::string &) override
+        virtual void ReportFailure(const xUnitpp::TestDetails &, int, const std::string &, const xUnitpp::LineInfo &) override
         {
         }
 

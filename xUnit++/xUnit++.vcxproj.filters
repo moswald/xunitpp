@@ -7,6 +7,7 @@
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="TestDetails.cpp" />
     <ClCompile Include="xUnitTestRunner.cpp" />
+    <ClCompile Include="LineInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fact.h" />
@@ -24,5 +25,6 @@
     <ClInclude Include="IOutput.h" />
     <ClInclude Include="ForceLinkModuleMacros.h" />
     <ClInclude Include="ExportApi.h" />
+    <ClInclude Include="LineInfo.h" />
   </ItemGroup>
 </Project>

@@ -288,7 +288,7 @@ void XmlReporter::ReportStart(const TestDetails &testDetails, int dataIndex)
     suiteResults[testDetails.Suite].testResults.insert(std::make_pair(TestName(testDetails.Name, dataIndex), TestResult(testDetails)));
 }
 
-void XmlReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg)
+void XmlReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg, const LineInfo &)
 {
     std::string testName = TestName(testDetails.Name, dataIndex);
     suiteResults[testDetails.Suite].failures++;

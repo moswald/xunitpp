@@ -161,10 +161,10 @@ public:
         mTestReporter.ReportStart(details, dataIndex);
     }
 
-    void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message)
+    void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message, const LineInfo &lineInfo)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        mTestReporter.ReportFailure(details, dataIndex, message);
+        mTestReporter.ReportFailure(details, dataIndex, message, lineInfo);
     }
 
     void OnTestSkip(const TestDetails &details, const std::string &reason)
@@ -288,14 +288,18 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                             testStart = Clock::now();
                             test.test();
                         }
-                        catch (std::exception &e)
+                        catch (const xUnitAssert &e)
                         {
-                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what());
+                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what(), e.LineInfo());
+                        }
+                        catch (const std::exception &e)
+                        {
+                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what(), LineInfo::empty());
                             ++failedTests;
                         }
                         catch (...)
                         {
-                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Unknown exception caught: test has crashed");
+                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Unknown exception caught: test has crashed", LineInfo::empty());
                             ++failedTests;
                         }
 
@@ -337,7 +341,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
 
                     if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(ToMilliseconds(testTimeLimit).count()) + " milliseconds.");
+                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
                         mImpl->OnTestFinish(test.testDetails, test.dataIndex, testTimeLimit);
                         ++failedTests;
                     }

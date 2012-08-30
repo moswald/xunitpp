@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fact.cpp" />
+    <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="TestCollection.cpp" />
     <ClCompile Include="TestDetails.cpp" />
     <ClCompile Include="Theory.cpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="Fact.h" />
     <ClInclude Include="ForceLinkModuleMacros.h" />
     <ClInclude Include="IOutput.h" />
+    <ClInclude Include="LineInfo.h" />
     <ClInclude Include="Suite.h" />
     <ClInclude Include="TestCollection.h" />
     <ClInclude Include=".\xUnitMacros.h" />
