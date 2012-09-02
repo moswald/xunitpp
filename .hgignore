@@ -11,7 +11,7 @@
 ##########
 
 # ignore output files
-\b(bin|int|ipch)\b
+\b(bin|int|ipch|TestResults)\b
 
 # ignore Visual Studio config files
 .suo$
