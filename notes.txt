@@ -1,16 +1,15 @@
 Visual Studio 2012 notes
 ------------------------
-implement ITestDiscoverer and ITestExecutor
 create vsix for test runners
 need msbuild test runner
-
+EnumerateAllTests needs to include individual theory instances
+    - maybe refactor TestCollection to contain just "facts" consisting of Facts and each Theory instance?
 
 General
 -------
 unit test the lib - started
 create lib/include structure
 ensure gcc/linux support
-some duplicated code, search for FileAndLine (and others, but I forget which ones right now)
 
 
 Stretch

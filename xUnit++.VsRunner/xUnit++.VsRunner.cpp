@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xUnit++.VsRunner.h"
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
@@ -18,6 +19,109 @@ using namespace msclr::interop;
 
 namespace
 {
+    ref struct ManagedReporter
+    {
+        ManagedReporter(ITestExecutionRecorder ^recorder, const std::vector<gcroot<TestCase ^>> &testCases)
+            : recorder(recorder)
+        {
+            for (auto &test : testCases)
+            {
+                this->testCases.Add(test->FullyQualifiedName, test);
+            }
+        }
+
+        void ReportStart(const xUnitpp::TestDetails &td, int)
+        {
+            auto name = marshal_as<String ^>(td.Name);
+            recorder->RecordStart(testCases[name]);
+
+            auto result = gcnew TestResult(testCases[name]);
+            result->ComputerName = Environment::MachineName;
+            result->DisplayName = name;
+            result->Outcome = TestOutcome::None;
+
+            testResults.Add(name, result);
+        }
+
+        void ReportFailure(const xUnitpp::TestDetails &td, int, const std::string &msg, const xUnitpp::LineInfo &)
+        {
+            auto result = testResults[marshal_as<String ^>(td.Name)];
+            result->Outcome = TestOutcome::Failed;
+            result->ErrorMessage = marshal_as<String ^>(msg);
+        }
+
+        void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
+        {
+            auto testCase = testCases[marshal_as<String ^>(td.Name)];
+            auto result = gcnew TestResult(testCase);
+            result->ComputerName = Environment::MachineName;
+            result->DisplayName = marshal_as<String ^>(td.Name);
+            result->Duration = TimeSpan::FromSeconds(0);
+            result->Outcome = TestOutcome::Skipped;
+            recorder->RecordEnd(testCase, result->Outcome);
+            recorder->RecordResult(result);
+        }
+
+        void ReportFinish(const xUnitpp::TestDetails &td, int, xUnitpp::Duration timeTaken)
+        {
+            auto result = testResults[marshal_as<String ^>(td.Name)];
+            result->Duration = TimeSpan::FromSeconds(xUnitpp::ToSeconds(timeTaken).count());
+
+            if (result->Outcome == TestOutcome::None)
+            {
+                result->Outcome = TestOutcome::Passed;
+            }
+
+            recorder->RecordEnd(testCases[marshal_as<String ^>(td.Name)], result->Outcome);
+            recorder->RecordResult(result);
+        }
+
+        void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration)
+        {
+        }
+
+    private:
+        ITestExecutionRecorder ^recorder;
+        Dictionary<String ^, TestCase ^> testCases;
+        Dictionary<String ^, TestResult ^> testResults;
+    };
+
+    struct NativeReporter : xUnitpp::IOutput
+    {
+        NativeReporter(ITestExecutionRecorder ^recorder, const std::vector<gcroot<TestCase ^>> &testCases)
+            : reporter(gcnew ManagedReporter(recorder, testCases))
+        {
+        }
+
+        virtual void ReportStart(const xUnitpp::TestDetails &td, int dataIndex) override
+        {
+            reporter->ReportStart(td, dataIndex);
+        }
+
+        virtual void ReportFailure(const xUnitpp::TestDetails &testDetails, int dataIndex, const std::string &msg, const xUnitpp::LineInfo &lineInfo) override
+        {
+            reporter->ReportFailure(testDetails, dataIndex, msg, lineInfo);
+        }
+
+        virtual void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason) override
+        {
+            reporter->ReportSkip(testDetails, reason);
+        }
+
+        virtual void ReportFinish(const xUnitpp::TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken) override
+        {
+            reporter->ReportFinish(testDetails, dataIndex, timeTaken);
+        }
+
+        virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime) override
+        {
+            reporter->ReportAllTestsComplete(testCount, skipped, failureCount, totalTime);
+        }
+
+    private:
+        gcroot<ManagedReporter ^> reporter;
+    };
+
     class TestAssembly
     {
     private:
@@ -77,17 +181,22 @@ namespace
 
         xUnitpp::EnumerateTestDetails EnumerateTestDetails;
 
-        void AddFilteredTestId(int id)
+        void AddTestCase(TestCase ^test)
         {
-            testIds.push_back(id);
+            tests.push_back(gcroot<TestCase ^>(test));
         }
 
-        void RunFilteredTests(xUnitpp::IOutput &reporter, bool &cancelled)
+        void RunFilteredTests(ITestExecutionRecorder ^recorder, bool &cancelled)
         {
+            NativeReporter reporter(recorder, tests);
             FilteredTestsRunner(0, reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
-                    return std::find(testIds.begin(), testIds.end(), testDetails.Id) != testIds.end() && !cancelled;
+                    return !cancelled && std::find_if(tests.begin(), tests.end(),
+                        [&](gcroot<TestCase ^> test)
+                        {
+                            return marshal_as<std::string>(test->DisplayName) == testDetails.Name;
+                        }) != tests.end();
                 });
         }
 
@@ -95,7 +204,7 @@ namespace
         xUnitpp::FilteredTestsRunner FilteredTestsRunner;
         std::string tempFile;
         HMODULE module;
-        std::vector<int> testIds;
+        std::vector<gcroot<TestCase ^>> tests;
     };
 
     IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^source, Uri ^_uri)
@@ -110,107 +219,16 @@ namespace
             assembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
                 {
                     TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.Name.c_str()), uri, marshal_as<String ^>(name));
-                    testCase->LocalExtensionData = td.Id;
+                    testCase->CodeFilePath = marshal_as<String ^>(td.Filename);
+                    testCase->DisplayName = marshal_as<String ^>(td.Name);
+                    testCase->LineNumber = td.Line;
+
                     list->Add(testCase);
                 });
         }
 
         return result;
     }
-
-    ref struct ManagedReporter
-    {
-        ManagedReporter(IMessageLogger ^logger)
-            : logger(logger)
-        {
-        }
-
-        void ReportStart(const xUnitpp::TestDetails &, int)
-        {
-        }
-
-        void ReportFailure(const xUnitpp::TestDetails &testDetails, int dataIndex, const std::string &msg, const xUnitpp::LineInfo &lineInfo)
-        {
-            logger->SendMessage(TestMessageLevel::Error,
-                marshal_as<String ^>(FileAndLine(testDetails, lineInfo) + ": error in " +
-                    NameAndDataIndex(testDetails.Name, dataIndex) + ": " + msg  + "."));
-        }
-
-        void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason)
-        {
-            logger->SendMessage(TestMessageLevel::Warning,
-                marshal_as<String ^>(FileAndLine(testDetails, xUnitpp::LineInfo::empty()) +
-                    ": skipping " + testDetails.Name + ": " + reason + "."));
-        }
-
-        void ReportFinish(const xUnitpp::TestDetails &, int, xUnitpp::Duration)
-        {
-        }
-
-        void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration)
-        {
-        }
-
-    private:
-        std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo &lineInfo)
-        {
-            auto file = lineInfo.file.empty() ? td.Filename : lineInfo.file;
-            auto line = lineInfo.file.empty() ? td.Line : lineInfo.line;
-
-            return file + "(" + std::to_string(line) + ")";
-        }
-
-        std::string NameAndDataIndex(const std::string &name, int dataIndex)
-        {
-            if (dataIndex < 0)
-            {
-                return name;
-            }
-            else
-            {
-                return name + "(" + std::to_string(dataIndex) +")";
-            }
-        }
-
-    private:
-        IMessageLogger ^logger;
-    };
-
-    struct NativeReporter : xUnitpp::IOutput
-    {
-        NativeReporter(IMessageLogger ^ logger)
-            : reporter(gcnew ManagedReporter(logger))
-        {
-        }
-
-        virtual void ReportStart(const xUnitpp::TestDetails &td, int dataIndex) override
-        {
-            reporter->ReportStart(td, dataIndex);
-        }
-
-        virtual void ReportFailure(const xUnitpp::TestDetails &testDetails, int dataIndex, const std::string &msg, const xUnitpp::LineInfo &lineInfo) override
-        {
-            reporter->ReportFailure(testDetails, dataIndex, msg, lineInfo);
-        }
-
-        virtual void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason) override
-        {
-            reporter->ReportSkip(testDetails, reason);
-        }
-
-        virtual void ReportFinish(const xUnitpp::TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken) override
-        {
-            reporter->ReportFinish(testDetails, dataIndex, timeTaken);
-        }
-
-        virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime) override
-        {
-            reporter->ReportAllTestsComplete(testCount, skipped, failureCount, totalTime);
-        }
-
-    private:
-        gcroot<ManagedReporter ^> reporter;
-    };
 }
 
 namespace xUnitpp { namespace VsRunner
@@ -258,7 +276,7 @@ void VsRunner::Cancel()
     mCancelled = true;
 }
 
-bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, IMessageLogger ^logger)
+bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, ITestExecutionRecorder ^recorder)
 {
     std::map<std::string, std::shared_ptr<TestAssembly>> assemblies;
 
@@ -273,7 +291,7 @@ bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, IMessageLogger ^logger)
             }
             else
             {
-                logger->SendMessage(TestMessageLevel::Warning,
+                recorder->SendMessage(TestMessageLevel::Warning,
                     String::Format("Failed to reload assembly {0} during test run.", test->Source));
             }
         }
@@ -281,16 +299,15 @@ bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, IMessageLogger ^logger)
         auto it = assemblies.find(source);
         if (it != assemblies.end())
         {
-            it->second->AddFilteredTestId((int)test->LocalExtensionData);
+            it->second->AddTestCase(test);
         }
     }
 
-    auto reporter = NativeReporter(logger);
     for (auto it = assemblies.begin(); it != assemblies.end() && !mCancelled; ++it)
     {
         auto &assembly = it->second;
         pin_ptr<bool> cancelled(&mCancelled);
-        assembly->RunFilteredTests(reporter, *cancelled);
+        assembly->RunFilteredTests(recorder, *cancelled);
     }
 
     return mCancelled;
