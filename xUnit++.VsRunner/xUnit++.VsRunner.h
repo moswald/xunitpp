@@ -27,7 +27,7 @@ namespace xUnitpp { namespace VsRunner
         virtual void Cancel();
 
     private:
-        bool RunTests(G::IEnumerable<OM::TestCase ^> ^tests, L::IMessageLogger ^logger);
+        bool RunTests(G::IEnumerable<OM::TestCase ^> ^tests, A::ITestExecutionRecorder ^recorder);
 
     private:
         System::Uri ^mUri;
