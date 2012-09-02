@@ -8,14 +8,11 @@
 #include <stdexcept>
 #include <vector>
 #include "Fact.h"
-#include "ForceLinkModuleMacros.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"
 #include "xUnitTime.h"
-
-ENABLE_MODULE_LINK(TestRunner)
 
 namespace
 {
@@ -142,10 +139,6 @@ private:
 
 namespace xUnitpp
 {
-
-IOutput::~IOutput()
-{
-}
 
 class TestRunner::Impl
 {
