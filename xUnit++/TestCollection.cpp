@@ -4,13 +4,10 @@
 #include <vector>
 #include "ExportApi.h"
 #include "Fact.h"
-#include "ForceLinkModuleMacros.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "xUnitTestRunner.h"
 #include "xUnitTime.h"
-
-LINK_MODULE(TestRunner)
 
 namespace
 {
@@ -30,6 +27,10 @@ namespace
 
 namespace xUnitpp
 {
+
+IOutput::~IOutput()
+{
+}
 
 TestCollection &TestCollection::Instance()
 {
