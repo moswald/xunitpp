@@ -222,13 +222,12 @@ VsRunner::VsRunner()
 {
 }
 
-void VsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^logger, ITestCaseDiscoverySink ^discoverySink)
+void VsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^, ITestCaseDiscoverySink ^discoverySink)
 {
     for each (String ^source in sources)
     {
         for each (TestCase ^test in SingleSourceTestCases(source, mUri))
         {
-            logger->SendMessage(TestMessageLevel::Informational, String::Format("sending {0}", test->FullyQualifiedName));
             discoverySink->SendTestCase(test);
         }
     }
