@@ -11,17 +11,16 @@
 namespace xUnitpp
 {
 
-class Fact;
 struct IOutput;
 struct TestDetails;
-class Theory;
+class xUnitTest;
 
 class TestRunner
 {
 public:
     TestRunner(IOutput &testReporter);
-    int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories,
-                 xUnitpp::Duration maxTestRunTime, size_t maxConcurrent);
+    int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests,
+                 Time::Duration maxTestRunTime, size_t maxConcurrent);
 
 private:
     class Impl;

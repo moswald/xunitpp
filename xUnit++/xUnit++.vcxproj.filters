@@ -1,21 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Fact.cpp" />
     <ClCompile Include="xUnitAssert.cpp" />
     <ClCompile Include="TestCollection.cpp" />
-    <ClCompile Include="Theory.cpp" />
     <ClCompile Include="TestDetails.cpp" />
     <ClCompile Include="xUnitTestRunner.cpp" />
     <ClCompile Include="LineInfo.cpp" />
+    <ClCompile Include="xUnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Fact.h" />
     <ClInclude Include="xUnitAssert.h" />
     <ClInclude Include="TestCollection.h" />
     <ClInclude Include="Suite.h" />
     <ClInclude Include=".\xUnitMacros.h" />
-    <ClInclude Include="Theory.h" />
     <ClInclude Include="TestDetails.h" />
     <ClInclude Include="xUnitTime.h" />
     <ClInclude Include="xUnit++.h" />
@@ -26,5 +23,6 @@
     <ClInclude Include="ForceLinkModuleMacros.h" />
     <ClInclude Include="ExportApi.h" />
     <ClInclude Include="LineInfo.h" />
+    <ClInclude Include="xUnitTest.h" />
   </ItemGroup>
 </Project>

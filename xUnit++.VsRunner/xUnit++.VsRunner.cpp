@@ -30,7 +30,7 @@ namespace
             }
         }
 
-        void ReportStart(const xUnitpp::TestDetails &td, int)
+        void ReportStart(const xUnitpp::TestDetails &td)
         {
             auto name = marshal_as<String ^>(td.Name);
             recorder->RecordStart(testCases[name]);
@@ -43,7 +43,7 @@ namespace
             testResults.Add(name, result);
         }
 
-        void ReportFailure(const xUnitpp::TestDetails &td, int, const std::string &msg, const xUnitpp::LineInfo &)
+        void ReportFailure(const xUnitpp::TestDetails &td, const std::string &msg, const xUnitpp::LineInfo &)
         {
             auto result = testResults[marshal_as<String ^>(td.Name)];
             result->Outcome = TestOutcome::Failed;
@@ -62,10 +62,10 @@ namespace
             recorder->RecordResult(result);
         }
 
-        void ReportFinish(const xUnitpp::TestDetails &td, int, xUnitpp::Duration timeTaken)
+        void ReportFinish(const xUnitpp::TestDetails &td, xUnitpp::Time::Duration timeTaken)
         {
             auto result = testResults[marshal_as<String ^>(td.Name)];
-            result->Duration = TimeSpan::FromSeconds(xUnitpp::ToSeconds(timeTaken).count());
+            result->Duration = TimeSpan::FromSeconds(xUnitpp::Time::ToSeconds(timeTaken).count());
 
             if (result->Outcome == TestOutcome::None)
             {
@@ -76,7 +76,7 @@ namespace
             recorder->RecordResult(result);
         }
 
-        void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration)
+        void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration)
         {
         }
 
@@ -93,14 +93,14 @@ namespace
         {
         }
 
-        virtual void ReportStart(const xUnitpp::TestDetails &td, int dataIndex) override
+        virtual void ReportStart(const xUnitpp::TestDetails &td) override
         {
-            reporter->ReportStart(td, dataIndex);
+            reporter->ReportStart(td);
         }
 
-        virtual void ReportFailure(const xUnitpp::TestDetails &testDetails, int dataIndex, const std::string &msg, const xUnitpp::LineInfo &lineInfo) override
+        virtual void ReportFailure(const xUnitpp::TestDetails &testDetails, const std::string &msg, const xUnitpp::LineInfo &lineInfo) override
         {
-            reporter->ReportFailure(testDetails, dataIndex, msg, lineInfo);
+            reporter->ReportFailure(testDetails, msg, lineInfo);
         }
 
         virtual void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason) override
@@ -108,12 +108,12 @@ namespace
             reporter->ReportSkip(testDetails, reason);
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken) override
+        virtual void ReportFinish(const xUnitpp::TestDetails &testDetails, xUnitpp::Time::Duration timeTaken) override
         {
-            reporter->ReportFinish(testDetails, dataIndex, timeTaken);
+            reporter->ReportFinish(testDetails, timeTaken);
         }
 
-        virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime) override
+        virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Time::Duration totalTime) override
         {
             reporter->ReportAllTestsComplete(testCount, skipped, failureCount, totalTime);
         }
