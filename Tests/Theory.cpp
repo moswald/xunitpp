@@ -177,4 +177,16 @@ THEORY(TheoriesCanAcceptComplexObjects, (const std::string &, const std::vector<
     // just existing is good enough
 }
 
+THEORY(TheoriesCanAcceptLambdas, (int, int),
+    ([]() -> std::vector<std::tuple<int, int>>
+    {
+        std::vector<std::tuple<int, int>> data;
+        data.push_back(std::make_tuple(0, 0));
+        return data;
+    })
+)
+{
+    // just existing is good enough
+}
+
 }
