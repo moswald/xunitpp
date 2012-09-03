@@ -26,13 +26,15 @@ namespace
         {
             for (auto &test : testCases)
             {
-                this->testCases.Add(test->FullyQualifiedName, test);
+                if (!this->testCases.ContainsKey(test->DisplayName))
+                this->testCases.Add(test->DisplayName, test);
             }
         }
 
         void ReportStart(const xUnitpp::TestDetails &td)
         {
-            auto name = marshal_as<String ^>(td.Name);
+            auto key = marshal_as<String ^>(td.Name);
+            auto name = marshal_as<String ^>(td.ShortName);
             recorder->RecordStart(testCases[name]);
 
             auto result = gcnew TestResult(testCases[name]);
@@ -40,7 +42,7 @@ namespace
             result->DisplayName = name;
             result->Outcome = TestOutcome::None;
 
-            testResults.Add(name, result);
+            testResults.Add(key, result);
         }
 
         void ReportFailure(const xUnitpp::TestDetails &td, const std::string &msg, const xUnitpp::LineInfo &)
@@ -52,10 +54,10 @@ namespace
 
         void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
         {
-            auto testCase = testCases[marshal_as<String ^>(td.Name)];
+            auto testCase = testCases[marshal_as<String ^>(td.ShortName)];
             auto result = gcnew TestResult(testCase);
             result->ComputerName = Environment::MachineName;
-            result->DisplayName = marshal_as<String ^>(td.Name);
+            result->DisplayName = marshal_as<String ^>(td.ShortName);
             result->Duration = TimeSpan::FromSeconds(0);
             result->Outcome = TestOutcome::Skipped;
             recorder->RecordEnd(testCase, result->Outcome);
@@ -72,7 +74,7 @@ namespace
                 result->Outcome = TestOutcome::Passed;
             }
 
-            recorder->RecordEnd(testCases[marshal_as<String ^>(td.Name)], result->Outcome);
+            recorder->RecordEnd(testCases[marshal_as<String ^>(td.ShortName)], result->Outcome);
             recorder->RecordResult(result);
         }
 
@@ -195,7 +197,7 @@ namespace
                     return !cancelled && std::find_if(tests.begin(), tests.end(),
                         [&](gcroot<TestCase ^> test)
                         {
-                            return marshal_as<std::string>(test->DisplayName) == testDetails.Name;
+                            return marshal_as<std::string>(test->DisplayName) == testDetails.ShortName;
                         }) != tests.end();
                 });
         }
@@ -207,27 +209,30 @@ namespace
         std::vector<gcroot<TestCase ^>> tests;
     };
 
-    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^source, Uri ^_uri)
+    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^_source, Uri ^_uri)
     {
-        auto result = gcnew List<TestCase ^>();
+        auto result = gcnew Dictionary<String ^, TestCase ^>();
 
-        auto name = marshal_as<std::string>(source);
-        if (auto assembly = TestAssembly(name))
+        auto source = marshal_as<std::string>(_source);
+        if (auto assembly = TestAssembly(source))
         {
             auto uri = gcroot<Uri ^>(_uri);
-            auto list = gcroot<List<TestCase ^> ^>(result);
+            auto dict = gcroot<Dictionary<String ^, TestCase ^> ^>(result);
             assembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
                 {
-                    TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.Name.c_str()), uri, marshal_as<String ^>(name));
-                    testCase->CodeFilePath = marshal_as<String ^>(td.Filename);
-                    testCase->DisplayName = marshal_as<String ^>(td.Name);
-                    testCase->LineNumber = td.Line;
+                    if (!dict->ContainsKey(marshal_as<String ^>(td.ShortName)))
+                    {
+                        TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.ShortName), uri, marshal_as<String ^>(source));
+                        testCase->DisplayName = marshal_as<String ^>(td.ShortName);
+                        testCase->CodeFilePath = marshal_as<String ^>(td.Filename);
+                        testCase->LineNumber = td.Line;
 
-                    list->Add(testCase);
+                        dict->Add(marshal_as<String ^>(td.ShortName), testCase);
+                    }
                 });
         }
 
-        return result;
+        return result->Values;
     }
 }
 

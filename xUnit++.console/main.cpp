@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         }
     }
 
-    int failures = 0;
+    int totalFailures = 0;
 
     for (const auto &lib : options.libraries)
     {
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
                 onList(td);
             });
 
-        if (!options.list)
+        if (!activeTestIds.empty())
         {
             std::sort(activeTestIds.begin(), activeTestIds.end());
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
             std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
                 (xUnitpp::IOutput *)new xUnitpp::StdOutReporter(options.verbose, options.veryVerbose) :
                 (xUnitpp::IOutput *)new xUnitpp::XmlReporter(options.xmlOutput));
-            failures += filteredTestRunner(options.timeLimit, *reporter,
+            totalFailures += filteredTestRunner(options.timeLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);
@@ -152,5 +152,5 @@ int main(int argc, char **argv)
         }
     }
 
-    return failures;
+    return totalFailures;
 }

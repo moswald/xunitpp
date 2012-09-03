@@ -148,7 +148,7 @@ THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
-        if (test.TestDetails().Name == "TheoriesCanHaveAttributes")
+        if (test.TestDetails().ShortName == "TheoriesCanHaveAttributes")
         {
             auto it = test.TestDetails().Attributes.find("Cats");
             Assert.True(it != test.TestDetails().Attributes.end());
