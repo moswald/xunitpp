@@ -16,7 +16,7 @@ struct TestDetails
 {
     TestDetails();
     TestDetails(const std::string &name, const std::string &suite,
-        const AttributeCollection &attributes, xUnitpp::Duration timeLimit,
+        const AttributeCollection &attributes, Time::Duration timeLimit,
         const std::string &filename, int line);
     TestDetails(const TestDetails &other);
     TestDetails(TestDetails &&other);
@@ -27,7 +27,7 @@ struct TestDetails
     std::string Name;
     std::string Suite;
     AttributeCollection Attributes;
-    xUnitpp::Duration TimeLimit;
+    Time::Duration TimeLimit;
     std::string Filename;
     int Line;
 };

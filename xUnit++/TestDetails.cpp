@@ -19,7 +19,7 @@ TestDetails::TestDetails()
 }
 
 TestDetails::TestDetails(const std::string &name, const std::string &suite, const AttributeCollection &attributes,
-                         xUnitpp::Duration timeLimit, const std::string &filename, int line)
+                         Time::Duration timeLimit, const std::string &filename, int line)
     : Id(NextId())
     , Name(name)
     , Suite(suite)

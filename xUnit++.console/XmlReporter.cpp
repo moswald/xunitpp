@@ -28,7 +28,7 @@ namespace
             Skipped
         } status;
 
-        xUnitpp::Duration time;
+        xUnitpp::Time::Duration time;
         std::string message;
     };
 }
@@ -57,28 +57,16 @@ struct xUnitpp::XmlReporter::SuiteResult
 
 namespace
 {
-    std::string TestName(const std::string &name, int dataIndex)
-    {
-        if (dataIndex < 0)
-        {
-            return name;
-        }
-        else
-        {
-            return name + "(" + std::to_string(dataIndex) +")";
-        }
-    }
-
     float SuiteTime(const xUnitpp::XmlReporter::SuiteResult &suiteResult)
     {
-        xUnitpp::Duration timeTaken = xUnitpp::Duration::zero();
+        xUnitpp::Time::Duration timeTaken = xUnitpp::Time::Duration::zero();
 
         for (const auto &test : suiteResult.testResults)
         {
             timeTaken += test.second.time;
         }
 
-        return xUnitpp::ToSeconds(timeTaken).count();
+        return xUnitpp::Time::ToSeconds(timeTaken).count();
     }
 
     void ReplaceChar(std::string &str, char c, const std::string &replacement)
@@ -127,13 +115,13 @@ namespace
             " ?>\n";
     }
 
-    std::string XmlBeginResults(size_t tests, size_t failures, xUnitpp::Duration totalTime)
+    std::string XmlBeginResults(size_t tests, size_t failures, xUnitpp::Time::Duration totalTime)
     {
         return
             "<testsuites" +
                 XmlAttribute("tests", tests) +
                 XmlAttribute("failures", failures) +
-                XmlAttribute("time", xUnitpp::ToSeconds(totalTime).count()) +
+                XmlAttribute("time", xUnitpp::Time::ToSeconds(totalTime).count()) +
             ">\n";
     }
 
@@ -165,7 +153,7 @@ namespace
         return std::string("      ") +
             "<testcase" +
                 XmlAttribute("name", testName) +
-                XmlAttribute("time", xUnitpp::ToSeconds(test.time).count());
+                XmlAttribute("time", xUnitpp::Time::ToSeconds(test.time).count());
     }
 
     std::string XmlEndTest(bool singleTag)
@@ -213,7 +201,7 @@ XmlReporter::XmlReporter(const std::string &filename)
 {
 }
 
-void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, xUnitpp::Duration totalTime)
+void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, Time::Duration totalTime)
 {
     auto report = [&](std::ostream &stream)
         {
@@ -277,7 +265,7 @@ void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failur
     }
 }
 
-void XmlReporter::ReportStart(const TestDetails &testDetails, int dataIndex)
+void XmlReporter::ReportStart(const TestDetails &testDetails)
 {
     if (suiteResults.find(testDetails.Suite) == suiteResults.end())
     {
@@ -285,29 +273,27 @@ void XmlReporter::ReportStart(const TestDetails &testDetails, int dataIndex)
     }
 
     suiteResults[testDetails.Suite].tests++;
-    suiteResults[testDetails.Suite].testResults.insert(std::make_pair(TestName(testDetails.Name, dataIndex), TestResult(testDetails)));
+    suiteResults[testDetails.Suite].testResults.insert(std::make_pair(testDetails.Name, TestResult(testDetails)));
 }
 
-void XmlReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg, const LineInfo &)
+void XmlReporter::ReportFailure(const TestDetails &testDetails, const std::string &msg, const LineInfo &)
 {
-    std::string testName = TestName(testDetails.Name, dataIndex);
     suiteResults[testDetails.Suite].failures++;
-    suiteResults[testDetails.Suite].testResults[testName].message = msg;
-    suiteResults[testDetails.Suite].testResults[testName].status = TestResult::Failure;
+    suiteResults[testDetails.Suite].testResults[testDetails.Name].message = msg;
+    suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Failure;
 }
 
 void XmlReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
-    ReportStart(testDetails, -1);
+    ReportStart(testDetails);
     suiteResults[testDetails.Suite].skipped++;
     suiteResults[testDetails.Suite].testResults[testDetails.Name].message = reason;
     suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Skipped;
 }
 
-void XmlReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken)
+void XmlReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
 {
-    std::string testName = TestName(testDetails.Name, dataIndex);
-    suiteResults[testDetails.Suite].testResults[testName].time = timeTaken;
+    suiteResults[testDetails.Suite].testResults[testDetails.Name].time = timeTaken;
 }
 
 }

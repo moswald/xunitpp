@@ -5,8 +5,7 @@
 #include <functional>
 #include <map>
 #include <vector>
-#include "Fact.h"
-#include "Theory.h"
+#include "xUnitTest.h"
 
 namespace xUnitpp
 {
@@ -70,26 +69,25 @@ public:
         Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
             const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line)
         {
-            std::vector<std::function<void()>> theorySet;
-
+            int id = 1;
             for (auto t : theoryData())
             {
-                theorySet.emplace_back(TheoryHelper(theory, std::move(t)));
-            }
+                // !!! someday, I'd like to embed the actual parameter values, rather than the theory data index
+                // not sure how feasible that is in C++, since it's lacking the type reflection of C# :(
+                auto theoryName = name + "(" + std::to_string(id++) + ")";
 
-            collection.mTheories.emplace_back(
-                Theory(theorySet, name, suite, attributes, std::chrono::duration_cast<xUnitpp::Duration>(std::chrono::milliseconds(milliseconds)), filename, line));
+                collection.mTests.emplace_back(xUnitTest(TheoryHelper(theory, std::move(t)), theoryName, suite,
+                        attributes, Time::ToDuration(std::chrono::milliseconds(milliseconds)), filename, line));
+            }
         }
     };
 
     static TestCollection &Instance();
 
-    const std::vector<Fact> &Facts();
-    const std::vector<Theory> &Theories();
+    const std::vector<xUnitTest> &Tests();
 
 private:
-    std::vector<Fact> mFacts;
-    std::vector<Theory> mTheories;
+    std::vector<xUnitTest> mTests;
 };
 
 }

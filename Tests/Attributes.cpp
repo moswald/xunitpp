@@ -1,4 +1,3 @@
-#include "Fact.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "xUnitTestRunner.h"
@@ -12,12 +11,12 @@ SUITE(Attributes)
 ATTRIBUTES(TestWithAttributes, ("Cats", "Meow"))
 FACT(TestWithAttributes)
 {
-    for (const auto &fact : xUnitpp::TestCollection::Instance().Facts())
+    for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
-        if (fact.TestDetails().Name == "TestWithAttributes")
+        if (test.TestDetails().Name == "TestWithAttributes")
         {
-            auto it = fact.TestDetails().Attributes.find("Cats");
-            Assert.True(it != fact.TestDetails().Attributes.end());
+            auto it = test.TestDetails().Attributes.find("Cats");
+            Assert.True(it != test.TestDetails().Attributes.end());
             Assert.True(it->second == "Meow");
             return;
         }
@@ -44,11 +43,11 @@ FACT(SkippedTestsShouldNotBeInstantiated)
 
     struct : xUnitpp::IOutput
     {
-        virtual void ReportStart(const xUnitpp::TestDetails &, int) override
+        virtual void ReportStart(const xUnitpp::TestDetails &) override
         {
         }
 
-        virtual void ReportFailure(const xUnitpp::TestDetails &, int, const std::string &, const xUnitpp::LineInfo &) override
+        virtual void ReportFailure(const xUnitpp::TestDetails &, const std::string &, const xUnitpp::LineInfo &) override
         {
         }
 
@@ -56,11 +55,11 @@ FACT(SkippedTestsShouldNotBeInstantiated)
         {
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &, int, xUnitpp::Duration) override
+        virtual void ReportFinish(const xUnitpp::TestDetails &, xUnitpp::Time::Duration) override
         {
         }
 
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override 
         {
         }
     } emptyReporter;
@@ -73,7 +72,7 @@ FACT(SkippedTestsShouldNotBeInstantiated)
 
     xUnitpp::TestRunner local(emptyReporter);
     local.RunTests([](const xUnitpp::TestDetails &) { return true; },
-        collection.Facts(), collection.Theories(), xUnitpp::Duration::zero(), 0);
+        collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }
 
 }

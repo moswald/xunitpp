@@ -1,7 +1,10 @@
 #include <algorithm>
-#include "Fact.h"
+#include <string>
+#include <tuple>
+#include <vector>
 #include "IOutput.h"
 #include "xUnitTestRunner.h"
+#include "xUnitTime.h"
 #include "xUnit++.h"
 
 using xUnitpp::Assert;
@@ -19,11 +22,11 @@ struct TheoryFixture
 private:
     struct : xUnitpp::IOutput
     {
-        virtual void ReportStart(const xUnitpp::TestDetails &, int) override
+        virtual void ReportStart(const xUnitpp::TestDetails &) override
         {
         }
 
-        virtual void ReportFailure(const xUnitpp::TestDetails &, int, const std::string &, const xUnitpp::LineInfo &) override
+        virtual void ReportFailure(const xUnitpp::TestDetails &, const std::string &, const xUnitpp::LineInfo &) override
         {
         }
 
@@ -31,11 +34,11 @@ private:
         {
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &, int, xUnitpp::Duration) override
+        virtual void ReportFinish(const xUnitpp::TestDetails &, xUnitpp::Time::Duration) override
         {
         }
 
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Duration) override 
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override 
         {
         }
     } emptyReporter;
@@ -55,7 +58,7 @@ public:
     void Run()
     {
         localRunner.RunTests([](const xUnitpp::TestDetails &) { return true; },
-            collection.Facts(), collection.Theories(), xUnitpp::Duration::zero(), 0);
+            collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
     }
 
     template<typename TTheoryData>
@@ -143,18 +146,35 @@ FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
 ATTRIBUTES(TheoriesCanHaveAttributes, ("Cats", "Meow"))
 THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
 {
-    for (const auto &theory : xUnitpp::TestCollection::Instance().Theories())
+    for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
-        if (theory.TestDetails().Name == "TheoriesCanHaveAttributes")
+        if (test.TestDetails().Name == "TheoriesCanHaveAttributes")
         {
-            auto it = theory.TestDetails().Attributes.find("Cats");
-            Assert.True(it != theory.TestDetails().Attributes.end());
+            auto it = test.TestDetails().Attributes.find("Cats");
+            Assert.True(it != test.TestDetails().Attributes.end());
             Assert.True(it->second == "Meow");
             return;
         }
     }
 
     Assert.Fail("Could not find self in test list.");
+}
+
+std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> ComplexProvider()
+{
+    std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> result;
+
+    std::vector<std::tuple<int, std::string>> internal_vector;
+    internal_vector.push_back(std::make_tuple(0, std::string("xyz")));
+
+    result.push_back(std::make_tuple(std::string("abcd"), internal_vector));
+
+    return result;
+}
+
+THEORY(TheoriesCanAcceptComplexObjects, (const std::string &, const std::vector<std::tuple<int, std::string>> &), ComplexProvider)
+{
+    // just existing is good enough
 }
 
 }

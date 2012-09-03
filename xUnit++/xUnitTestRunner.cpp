@@ -7,7 +7,6 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
-#include "Fact.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
@@ -19,120 +18,39 @@ namespace
 
 extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, xUnitpp::IOutput &testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
 {
-    return xUnitpp::TestRunner(testReporter)
-        .RunTests(filter, xUnitpp::TestCollection::Instance().Facts(), xUnitpp::TestCollection::Instance().Theories(),
-                  std::chrono::duration_cast<xUnitpp::Duration>(std::chrono::milliseconds(timeLimit)), 0);
+    return xUnitpp::TestRunner(testReporter).RunTests(filter,
+        xUnitpp::TestCollection::Instance().Tests(), xUnitpp::Time::ToDuration(std::chrono::milliseconds(timeLimit)), 0);
 }
 
 class ActiveTests
 {
 public:
-    struct TestInstance
+
+    ActiveTests(std::function<bool(const xUnitpp::TestDetails &)> filter, const std::vector<xUnitpp::xUnitTest> &tests)
     {
-        TestInstance(const xUnitpp::TestDetails &testDetails, int id, int groupId, int groupSize, std::function<void()> test)
-            : testDetails(testDetails)
-            , id(id)
-            , dataIndex(-1)
-            , groupId(groupId)
-            , groupSize(groupSize)
-            , test(test)
+        for (auto &test : tests)
         {
-        }
-
-        TestInstance(const xUnitpp::TestDetails &testDetails, int id, int dataIndex, int groupId, int groupSize, std::function<void()> test)
-            : testDetails(testDetails)
-            , id(id)
-            , dataIndex(dataIndex)
-            , groupId(groupId)
-            , groupSize(groupSize)
-            , test(test)
-        {
-        }
-
-        TestInstance(const TestInstance &other)
-            : testDetails(other.testDetails)
-            , id(other.id)
-            , dataIndex(other.dataIndex)
-            , groupId(other.groupId)
-            , groupSize(other.groupSize)
-            , test(other.test)
-        {
-        }
-
-        TestInstance(TestInstance &&other)
-        {
-            swap(*this, other);
-        }
-
-        TestInstance &operator =(TestInstance other)
-        {
-            swap(*this, other);
-            return *this;
-        }
-
-        friend void swap(TestInstance &ti0, TestInstance &ti1)
-        {
-            using std::swap;
-
-            swap(ti0.testDetails, ti1.testDetails);
-            swap(ti0.id, ti1.id);
-            swap(ti0.dataIndex, ti1.dataIndex);
-            swap(ti0.groupId, ti1.groupId);
-            swap(ti0.groupSize, ti1.groupSize);
-            swap(ti0.test, ti1.test);
-        }
-
-        xUnitpp::TestDetails testDetails;
-
-        int id;
-        int dataIndex;
-        int groupId;
-        int groupSize;
-
-        std::function<void()> test;
-    };
-
-    ActiveTests(std::function<bool(const xUnitpp::TestDetails &)> filter, const std::vector<xUnitpp::Fact> &facts, const std::vector<xUnitpp::Theory> &theories)
-    {
-        size_t id = 0;
-        size_t groupId = 0;
-
-        for (auto &fact : facts)
-        {
-            if (filter(fact.TestDetails()))
+            if (filter(test.TestDetails()))
             {
-                mTests.emplace_back(TestInstance(fact.TestDetails(), ++id, ++groupId, 1, fact.Test()));
-            }
-        }
-
-        for (auto &theorySet : theories)
-        {
-            if (filter(theorySet.TestDetails()))
-            {
-                ++groupId;
-                size_t dataIndex = 0;
-                for (auto &theory : theorySet.Theories())
-                {
-                    mTests.emplace_back(TestInstance(theorySet.TestDetails(), ++id, dataIndex++, groupId, theorySet.Theories().size(), theory));
-                }
+                mTests.push_back(test);
             }
         }
 
         std::shuffle(mTests.begin(), mTests.end(), std::default_random_engine(std::random_device()()));
     }
 
-    std::vector<TestInstance>::iterator begin()
+    std::vector<xUnitpp::xUnitTest>::iterator begin()
     {
         return mTests.begin();
     }
 
-    std::vector<TestInstance>::iterator end()
+    std::vector<xUnitpp::xUnitTest>::iterator end()
     {
         return mTests.end();
     }
 
 private:
-    std::vector<TestInstance> mTests;
+    std::vector<xUnitpp::xUnitTest> mTests;
 };
 
 }
@@ -148,16 +66,16 @@ public:
     {
     }
 
-    void OnTestStart(const TestDetails &details, int dataIndex)
+    void OnTestStart(const TestDetails &details)
     {
         std::lock_guard<std::mutex> guard(mStartMtx);
-        mTestReporter.ReportStart(details, dataIndex);
+        mTestReporter.ReportStart(details);
     }
 
-    void OnTestFailure(const TestDetails &details, int dataIndex, const std::string &message, const LineInfo &lineInfo)
+    void OnTestFailure(const TestDetails &details, const std::string &message, const LineInfo &lineInfo)
     {
         std::lock_guard<std::mutex> guard(mFailureMtx);
-        mTestReporter.ReportFailure(details, dataIndex, message, lineInfo);
+        mTestReporter.ReportFailure(details, message, lineInfo);
     }
 
     void OnTestSkip(const TestDetails &details, const std::string &reason)
@@ -165,14 +83,14 @@ public:
         mTestReporter.ReportSkip(details, reason);
     }
 
-    void OnTestFinish(const TestDetails &details, int dataIndex, xUnitpp::Duration time)
+    void OnTestFinish(const TestDetails &details, Time::Duration time)
     {
         std::lock_guard<std::mutex> guard(mFinishMtx);
-        mTestReporter.ReportFinish(details, dataIndex, time);
+        mTestReporter.ReportFinish(details, time);
     }
 
 
-    void OnAllTestsComplete(int total, int skipped, int failed, xUnitpp::Duration totalTime)
+    void OnAllTestsComplete(int total, int skipped, int failed, Time::Duration totalTime)
     {
         mTestReporter.ReportAllTestsComplete(total, skipped, failed, totalTime);
     }
@@ -194,11 +112,9 @@ TestRunner::TestRunner(IOutput &testReporter)
 {
 }
 
-int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<Fact> &facts, const std::vector<Theory> &theories, xUnitpp::Duration maxTestRunTime, size_t maxConcurrent)
+int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
-
-    ActiveTests activeTests(filter, facts, theories);
 
     if (maxConcurrent == 0)
     {
@@ -238,15 +154,18 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
     std::atomic<int> failedTests = 0;
     int skippedTests = 0;
 
+    std::vector<xUnitTest> activeTests;
+    std::copy_if(tests.begin(), tests.end(), std::back_inserter(activeTests), [&filter](const xUnitTest &test) { return filter(test.TestDetails()); });
+
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
     {
         {
-            auto skip = test.testDetails.Attributes.find("Skip");
-            if (skip != test.testDetails.Attributes.end())
+            auto skip = test.TestDetails().Attributes.find("Skip");
+            if (skip != test.TestDetails().Attributes.end())
             {
                 skippedTests++;
-                mImpl->OnTestSkip(test.testDetails, skip->second);
+                mImpl->OnTestSkip(test.TestDetails(), skip->second);
                 continue;
             }
         }
@@ -271,52 +190,52 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                     ThreadCounter &tc;
                 } counterGuard(threadCounter);
 
-                auto actualTest = [&](bool reportEnd) -> TimeStamp
+                auto actualTest = [&](bool reportEnd) -> Time::TimeStamp
                     {
-                        TimeStamp testStart;
+                        Time::TimeStamp testStart;
                         try
                         {
-                            mImpl->OnTestStart(test.testDetails, test.dataIndex);
+                            mImpl->OnTestStart(test.TestDetails());
 
-                            testStart = Clock::now();
-                            test.test();
+                            testStart = Time::Clock::now();
+                            test.Run();
                         }
                         catch (const xUnitAssert &e)
                         {
-                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what(), e.LineInfo());
+                            mImpl->OnTestFailure(test.TestDetails(), e.what(), e.LineInfo());
                         }
                         catch (const std::exception &e)
                         {
-                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, e.what(), LineInfo::empty());
+                            mImpl->OnTestFailure(test.TestDetails(), e.what(), LineInfo::empty());
                             ++failedTests;
                         }
                         catch (...)
                         {
-                            mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Unknown exception caught: test has crashed", LineInfo::empty());
+                            mImpl->OnTestFailure(test.TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
                             ++failedTests;
                         }
 
                         if (reportEnd)
                         {
-                            mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - testStart));
+                            mImpl->OnTestFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
                         }
 
                         return testStart;
                     };
 
-                auto testTimeLimit = test.testDetails.TimeLimit;
-                if (testTimeLimit < xUnitpp::Duration::zero())
+                auto testTimeLimit = test.TestDetails().TimeLimit;
+                if (testTimeLimit < Time::Duration::zero())
                 {
                     testTimeLimit = maxTestRunTime;
                 }
 
-                if (testTimeLimit > xUnitpp::Duration::zero())
+                if (testTimeLimit > Time::Duration::zero())
                 {
                     //
                     // note that forcing a test to run in under a certain amount of time is inherently fragile
                     // there's no guarantee that a thread, once started, actually gets `maxTestRunTime` nanoseconds of CPU
 
-                    TimeStamp testStart;
+                    Time::TimeStamp testStart;
 
                     std::mutex m;
                     std::unique_lock<std::mutex> gate(m);
@@ -334,13 +253,13 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
 
                     if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.testDetails, test.dataIndex, "Test failed to complete within " + std::to_string(ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
-                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, testTimeLimit);
+                        mImpl->OnTestFailure(test.TestDetails(), "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
+                        mImpl->OnTestFinish(test.TestDetails(), testTimeLimit);
                         ++failedTests;
                     }
                     else
                     {
-                        mImpl->OnTestFinish(test.testDetails, test.dataIndex, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - testStart));
+                        mImpl->OnTestFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
                     }
                 }
                 else
@@ -355,7 +274,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
         test.get();
     }
     
-    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, std::chrono::duration_cast<xUnitpp::Duration>(Clock::now() - timeStart));
+    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
 
     return -failedTests;
 }

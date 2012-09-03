@@ -37,18 +37,18 @@ StdOutReporter::StdOutReporter(bool verbose, bool veryVerbose)
 {
 }
 
-void StdOutReporter::ReportStart(const TestDetails &testDetails, int dataIndex)
+void StdOutReporter::ReportStart(const TestDetails &testDetails)
 {
     if (mVeryVerbose)
     {
-        std::cout << ("Starting test " + NameAndDataIndex(testDetails.Name, dataIndex) + ".\n");
+        std::cout << ("Starting test " + testDetails.Name + ".\n");
     }
 }
 
-void StdOutReporter::ReportFailure(const TestDetails &testDetails, int dataIndex, const std::string &msg, const LineInfo &lineInfo)
+void StdOutReporter::ReportFailure(const TestDetails &testDetails, const std::string &msg, const LineInfo &lineInfo)
 {
     std::cout << (FileAndLine(testDetails, lineInfo) +
-        ": error in " + NameAndDataIndex(testDetails.Name, dataIndex) + ": " + msg + "\n");
+        ": error in " + testDetails.Name+ ": " + msg + "\n");
 }
 
 void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
@@ -57,16 +57,16 @@ void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::strin
         ": skipping " + testDetails.Name + ": " + reason + "\n");
 }
 
-void StdOutReporter::ReportFinish(const TestDetails &testDetails, int dataIndex, xUnitpp::Duration timeTaken)
+void StdOutReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
 {
     if (mVerbose)
     {
-        auto ms = ToMilliseconds(timeTaken);
-        std::cout << (NameAndDataIndex(testDetails.Name, dataIndex) + ": Completed in " + (ms.count() == 0 ? (std::to_string(timeTaken.count()) + " nanoseconds.\n") : (std::to_string(ms.count()) + " milliseconds.\n")));
+        auto ms = Time::ToMilliseconds(timeTaken);
+        std::cout << (testDetails.Name + ": Completed in " + (ms.count() == 0 ? (std::to_string(timeTaken.count()) + " nanoseconds.\n") : (std::to_string(ms.count()) + " milliseconds.\n")));
     }
 }
 
-void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Duration totalTime)
+void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime)
 {
     std::string total = std::to_string(testCount) + " tests, ";
     std::string failures = std::to_string(failureCount) + " failed, ";
@@ -91,11 +91,11 @@ void StdOutReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, si
 
     header = "Test time: ";
 
-    auto ms = ToMilliseconds(totalTime);
+    auto ms = Time::ToMilliseconds(totalTime);
 
     if (ms.count() > 500)
     {
-        std::cout << (header + std::to_string(ToSeconds(totalTime).count()) + " seconds.\n");
+        std::cout << (header + std::to_string(Time::ToSeconds(totalTime).count()) + " seconds.\n");
     }
     else
     {
