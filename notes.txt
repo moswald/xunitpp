@@ -2,8 +2,7 @@ Visual Studio 2012 notes
 ------------------------
 create vsix for test runners
 need msbuild test runner
-EnumerateAllTests needs to include individual theory instances
-    - maybe refactor TestCollection to contain just "facts" consisting of Facts and each Theory instance?
+
 
 General
 -------

@@ -25,6 +25,7 @@ struct TestDetails
 
     int Id;
     std::string Name;
+    std::string ShortName;
     std::string Suite;
     AttributeCollection Attributes;
     Time::Duration TimeLimit;
