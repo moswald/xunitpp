@@ -23,6 +23,7 @@ namespace CommandLine
         std::vector<std::string> libraries;
         std::string xmlOutput;
         int timeLimit;
+        int threadLimit;
     };
 
     std::string Parse(int argc, char **argv, Options &options);

@@ -58,6 +58,7 @@ namespace CommandLine
         , veryVerbose(false)
         , list(false)
         , timeLimit(0)
+        , threadLimit(0)
     {
     }
 
@@ -137,6 +138,13 @@ namespace CommandLine
                         return opt + " expects a following timelimit specified in milliseconds." + Usage(exe());
                     }
                 }
+                else if (opt == "-c" || opt == "--concurrent")
+                {
+                    if (arguments.empty() || !GetInt(arguments, options.threadLimit))
+                    {
+                        return opt + " expects a following test limit count." + Usage(exe());
+                    }
+                }
                 else
                 {
                     return "Unrecognized option " + opt + "." + Usage(exe());
@@ -170,6 +178,7 @@ namespace CommandLine
             "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with matching <name=value> attribute(s)\n"
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
+            "  -c --concurrent <max ttests>   : Set maximum number of concurrent tests\n"
             "\n"
             "Tests are selected with an OR operation for inclusive attributes.\n"
             "Tests are excluded with an AND operation for exclusive attributes.\n"

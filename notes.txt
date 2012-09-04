@@ -4,8 +4,9 @@ finish unit testing the lib
 	- ensure tests are actually ran
 	- ensure output formats
 create lib/include structure
-check Release builds for warnings
+check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
+filter by regex/substring matching on tests/suites(/attributes)
 
 
 Visual Studio 2012 notes
@@ -23,7 +24,11 @@ for shared/dynamic libs, see:
 
 Stretch
 -----
+non-fatal asserts
+would be nice to have some logging support (Log::Information("msg"))
+gtest has nice per-assert messages: Assert.Equal(a, b) << "msg"
 msbuild test runner
+GUI runner (windows only?)
 custom xUnitAsserts per assert (revisit unit tests at that point)
 support wstring as an assert call parameter
 create NuGet package/template (NuGet does not support C++ projects, yet)
