@@ -17,15 +17,16 @@ namespace
             callback(test.TestDetails());
         }
     }
+
+    extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, xUnitpp::IOutput &testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
+    {
+        return xUnitpp::TestRunner(testReporter).RunTests(filter,
+            xUnitpp::TestCollection::Instance().Tests(), xUnitpp::Time::ToDuration(std::chrono::milliseconds(timeLimit)), 0);
+    }
 }
 
 namespace xUnitpp
 {
-
-// this has to go somewhere... :)
-IOutput::~IOutput()
-{
-}
 
 TestCollection &TestCollection::Instance()
 {
