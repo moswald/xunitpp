@@ -4,6 +4,8 @@ finish unit testing the lib
 	- ensure tests are actually ran
 	- ensure output formats
 create lib/include structure
+check Release builds for warnings
+can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
 
 
 Visual Studio 2012 notes
