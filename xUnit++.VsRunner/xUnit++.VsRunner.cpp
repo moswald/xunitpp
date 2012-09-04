@@ -191,7 +191,7 @@ namespace
         void RunFilteredTests(ITestExecutionRecorder ^recorder, bool &cancelled)
         {
             NativeReporter reporter(recorder, tests);
-            FilteredTestsRunner(0, reporter,
+            FilteredTestsRunner(0, 0, reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return !cancelled && std::find_if(tests.begin(), tests.end(),

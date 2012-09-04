@@ -148,7 +148,7 @@ int main(int argc, char **argv)
             std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
                 (xUnitpp::IOutput *)new xUnitpp::StdOutReporter(options.verbose, options.veryVerbose) :
                 (xUnitpp::IOutput *)new xUnitpp::XmlReporter(options.xmlOutput));
-            totalFailures += filteredTestRunner(options.timeLimit, *reporter,
+            totalFailures += filteredTestRunner(options.timeLimit, options.threadLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);
