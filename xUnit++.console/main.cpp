@@ -24,6 +24,7 @@ int main(int argc, char **argv)
     }
 
     int totalFailures = 0;
+    bool forcedFailure = false;
 
     for (const auto &lib : options.libraries)
     {
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
         if (testlib == nullptr)
         {
             std::cerr << "unable to load " << lib << std::endl;
+            forcedFailure = true;
             continue;
         }
 
@@ -40,6 +42,7 @@ int main(int argc, char **argv)
         if (!enumerateTests)
         {
             std::cerr << "unable to load EnumerateTestDetails" << std::endl;
+            forcedFailure = true;
             continue;
         }
 
@@ -138,6 +141,7 @@ int main(int argc, char **argv)
             if (!filteredTestRunner)
             {
                 std::cerr << "unable to get FilteredTestsRunner" << std::endl;
+                forcedFailure = true;
                 continue;
             }
 
@@ -152,5 +156,5 @@ int main(int argc, char **argv)
         }
     }
 
-    return totalFailures;
+    return forcedFailure ? 1 : totalFailures;
 }
