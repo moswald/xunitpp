@@ -7,6 +7,7 @@
     <ClCompile Include="xUnitTestRunner.cpp" />
     <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="xUnitTest.cpp" />
+    <ClCompile Include="IOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnitAssert.h" />
