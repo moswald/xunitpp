@@ -73,16 +73,6 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, -1, __VA_ARGS__)
 
-#define THEORY_PROVIDER(DataProvider, ...) \
-    std::vector<std::tuple<__VA_ARGS__>> DataProvider() \
-    { \
-        std::vector<std::tuple<__VA_ARGS__>> data;
-
-#define THEORY_DATA(...) data.emplace_back(std::make_tuple(__VA_ARGS__));
-
-#define THEORY_PROVIDER_END \
-    }
-
 #define LI xUnitpp::LineInfo(__FILE__, __LINE__)
 
 #endif
