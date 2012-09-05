@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xUnit++", "xUnit++\xUnit++.vcxproj", "{25DF3961-F288-4A96-AE6B-A4950A00AB8E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{2276DFCF-ABEA-44FA-9821-2F9F5B891CFF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "Tests\UnitTests\UnitTests.vcxproj", "{2276DFCF-ABEA-44FA-9821-2F9F5B891CFF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{25DF3961-F288-4A96-AE6B-A4950A00AB8E} = {25DF3961-F288-4A96-AE6B-A4950A00AB8E}
 	EndProjectSection
@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xUnit++.console", "xUnit++.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xUnit++.VsRunner", "xUnit++.VsRunner\xUnit++.VsRunner.vcxproj", "{7048C76A-27E7-4385-BCF1-BB9E718E99F8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BareTests", "BareTests\BareTests.vcxproj", "{EDEB02E2-F389-4CBF-AE7D-3041A934F86B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BareTests", "Tests\BareTests\BareTests.vcxproj", "{EDEB02E2-F389-4CBF-AE7D-3041A934F86B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2F1709B8-9F5A-4625-9404-C348298181B7} = {2F1709B8-9F5A-4625-9404-C348298181B7}
 	EndProjectSection

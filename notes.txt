@@ -28,7 +28,7 @@ non-fatal asserts
 would be nice to have some logging support (Log::Information("msg"))
 gtest has nice per-assert messages: Assert.Equal(a, b) << "msg"
 msbuild test runner
-GUI runner (windows only?)
+GUI runner (windows only, or go QT?)
 custom xUnitAsserts per assert (revisit unit tests at that point)
-support wstring as an assert call parameter
+support wstring as an assert call parameter/output
 create NuGet package/template (NuGet does not support C++ projects, yet)
