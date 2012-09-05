@@ -19,30 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="IOutput.cpp" />
-    <ClCompile Include="LineInfo.cpp" />
-    <ClCompile Include="TestCollection.cpp" />
-    <ClCompile Include="TestDetails.cpp" />
-    <ClCompile Include="xUnitAssert.cpp" />
-    <ClCompile Include="xUnitTest.cpp" />
-    <ClCompile Include="xUnitTestRunner.cpp" />
+    <ClCompile Include="src/IOutput.cpp" />
+    <ClCompile Include="src/LineInfo.cpp" />
+    <ClCompile Include="src/TestCollection.cpp" />
+    <ClCompile Include="src/TestDetails.cpp" />
+    <ClCompile Include="src/xUnitAssert.cpp" />
+    <ClCompile Include="src/xUnitTest.cpp" />
+    <ClCompile Include="src/xUnitTestRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Attributes.h" />
-    <ClInclude Include="ExportApi.h" />
-    <ClInclude Include="ForceLinkModuleMacros.h" />
-    <ClInclude Include="IOutput.h" />
-    <ClInclude Include="LineInfo.h" />
-    <ClInclude Include="Suite.h" />
-    <ClInclude Include="TestCollection.h" />
-    <ClInclude Include=".\xUnitMacros.h" />
-    <ClInclude Include="TestDetails.h" />
-    <ClInclude Include="xUnit++.h" />
-    <ClInclude Include="xUnitAssert.h" />
-    <ClInclude Include="xUnitMacroHelpers.h" />
-    <ClInclude Include="xUnitTest.h" />
-    <ClInclude Include="xUnitTestRunner.h" />
-    <ClInclude Include="xUnitTime.h" />
+    <ClInclude Include="xUnit++/Attributes.h" />
+    <ClInclude Include="xUnit++/ExportApi.h" />
+    <ClInclude Include="xUnit++/ForceLinkModuleMacros.h" />
+    <ClInclude Include="xUnit++/IOutput.h" />
+    <ClInclude Include="xUnit++/LineInfo.h" />
+    <ClInclude Include="xUnit++/Suite.h" />
+    <ClInclude Include="xUnit++/TestCollection.h" />
+    <ClInclude Include="xUnit++/xUnitMacros.h" />
+    <ClInclude Include="xUnit++/TestDetails.h" />
+    <ClInclude Include="xUnit++/xUnit++.h" />
+    <ClInclude Include="xUnit++/xUnitAssert.h" />
+    <ClInclude Include="xUnit++/xUnitMacroHelpers.h" />
+    <ClInclude Include="xUnit++/xUnitTest.h" />
+    <ClInclude Include="xUnit++/xUnitTestRunner.h" />
+    <ClInclude Include="xUnit++/xUnitTime.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
@@ -107,12 +107,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Lib />
+    <ClCompile>
+      <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,10 +4,10 @@
 #include <tuple>
 #include <vector>
 #include <Windows.h>
+#include "xUnit++/ExportApi.h"
+#include "xUnit++/TestDetails.h"
 #include "CommandLine.h"
-#include "ExportApi.h"
 #include "StdOutReporter.h"
-#include "TestDetails.h"
 #include "XmlReporter.h"
 
 int main(int argc, char **argv)

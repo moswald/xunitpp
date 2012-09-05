@@ -2,8 +2,8 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include "TestDetails.h"
-#include "xUnitTime.h"
+#include "xUnit++/TestDetails.h"
+#include "xUnit++/xUnitTime.h"
 
 namespace
 {
