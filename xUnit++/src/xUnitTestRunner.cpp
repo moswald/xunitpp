@@ -13,42 +13,6 @@
 #include "xUnitAssert.h"
 #include "xUnitTime.h"
 
-namespace
-{
-
-class ActiveTests
-{
-public:
-
-    ActiveTests(std::function<bool(const xUnitpp::TestDetails &)> filter, const std::vector<xUnitpp::xUnitTest> &tests)
-    {
-        for (auto &test : tests)
-        {
-            if (filter(test.TestDetails()))
-            {
-                mTests.push_back(test);
-            }
-        }
-
-        std::shuffle(mTests.begin(), mTests.end(), std::default_random_engine(std::random_device()()));
-    }
-
-    std::vector<xUnitpp::xUnitTest>::iterator begin()
-    {
-        return mTests.begin();
-    }
-
-    std::vector<xUnitpp::xUnitTest>::iterator end()
-    {
-        return mTests.end();
-    }
-
-private:
-    std::vector<xUnitpp::xUnitTest> mTests;
-};
-
-}
-
 namespace xUnitpp
 {
 
