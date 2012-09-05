@@ -189,22 +189,23 @@ DATA_THEORY(TheoriesCanAcceptLambdas, (int, int),
     // just existing is good enough
 }
 
-THEORY(TestingSuccessfulInlineTheory, (int, const std::string &),
+THEORY(TestingSuccessfulInlineTheory, (int x, const std::string &str),
     std::make_tuple(0, ""),
     std::make_tuple(0, ""),
     std::make_tuple(0, ""),
     std::make_tuple(0, ""))
 {
-    // just existing is good enough
+    Assert.Equal(0, x);
+    Assert.Empty(str);
 }
 
-THEORY(TestingFailingfulInlineTheory, (int, const std::string &),
-    std::make_tuple(0, ""),
-    std::make_tuple(1, ""),
-    std::make_tuple(1, ""),
-    std::make_tuple(1, ""))
+THEORY(TestingFailingInlineTheory, (int, const std::string &str),
+    std::make_tuple(1, "a"),
+    std::make_tuple(1, "b"),
+    std::make_tuple(1, "c"),
+    std::make_tuple(1, "d"))
 {
-    // just existing is good enough
+    Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Empty(str); });
 }
 
 }
