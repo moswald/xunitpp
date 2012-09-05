@@ -161,6 +161,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                         catch (const xUnitAssert &e)
                         {
                             mImpl->OnTestFailure(test.TestDetails(), e.what(), e.LineInfo());
+                            ++failedTests;
                         }
                         catch (const std::exception &e)
                         {

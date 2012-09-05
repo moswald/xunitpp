@@ -3,9 +3,9 @@ General
 finish unit testing the lib
 	- ensure tests are actually ran
 	- ensure output formats
+    - ensure all failing assert types actually increment count of failed tests
 check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
-inline theories
 
 
 Visual Studio 2012 notes
