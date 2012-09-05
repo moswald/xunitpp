@@ -104,6 +104,15 @@ namespace CommandLine
 
                     options.suites.push_back(TakeFront(arguments));
                 }
+                else if (opt == "-n" || opt == "--name")
+                {
+                    if (arguments.empty())
+                    {
+                        return opt + " expects a following test name argument." + Usage(exe());
+                    }
+
+                    options.testNames.push_back(TakeFront(arguments));
+                }
                 else if (opt == "-i" || opt == "--include")
                 {
                     auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.inclusiveAttributes.emplace(kv); });
@@ -173,7 +182,8 @@ namespace CommandLine
             "  -v                             : Verbose mode: include successful test timing\n"
             "  -vv                            : Very verbose: write test start message\n"
             "  -l --list                      : Do not run tests, just list the ones that pass the filters\n"
-            "  -s --suite <SUITE>+            : Suite(s) of tests to run\n"
+            "  -s --suite <SUITE>+            : Suite(s) of tests to run (substring match)\n"
+            "  -n --name <TEST>+              : Test(s) to run (substring match)\n"
             "  -i --include <NAME=[VALUE]>+   : Include tests with matching <name=value> attribute(s)\n"
             "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with matching <name=value> attribute(s)\n"
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"

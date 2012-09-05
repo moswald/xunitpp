@@ -6,7 +6,7 @@ finish unit testing the lib
 create lib/include structure
 check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
-filter by regex/substring matching on tests/suites(/attributes)
+inline theories
 
 
 Visual Studio 2012 notes

@@ -71,7 +71,36 @@ int main(int argc, char **argv)
                 // if any suites are specified, a test has to belong to one of them to be run
                 if (!options.suites.empty())
                 {
-                    if (std::find(options.suites.begin(), options.suites.end(), td.Suite) == options.suites.end())
+                    bool included = false;
+                    for (const auto &suite : options.suites)
+                    {
+                        if (td.Suite.find(suite) != std::string::npos)
+                        {
+                            included = true;
+                            break;
+                        }
+                    }
+
+                    if (!included)
+                    {
+                        return;
+                    }
+                }
+
+                // check names
+                if (!options.testNames.empty())
+                {
+                    bool included = false;
+                    for (const auto &name : options.testNames)
+                    {
+                        if (td.ShortName.find(name) != std::string::npos)
+                        {
+                            included = true;
+                            break;
+                        }
+                    }
+
+                    if (!included)
                     {
                         return;
                     }

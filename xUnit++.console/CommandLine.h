@@ -18,6 +18,7 @@ namespace CommandLine
         bool veryVerbose;
         bool list;
         std::vector<std::string> suites;
+        std::vector<std::string> testNames;
         std::multimap<std::string, std::string> inclusiveAttributes;
         std::multimap<std::string, std::string> exclusiveAttributes;
         std::vector<std::string> libraries;
