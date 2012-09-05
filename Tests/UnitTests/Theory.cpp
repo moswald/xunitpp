@@ -144,7 +144,7 @@ FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
 }
 
 ATTRIBUTES(TheoriesCanHaveAttributes, ("Cats", "Meow"))
-THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
+DATA_THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
@@ -172,12 +172,12 @@ std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> 
     return result;
 }
 
-THEORY(TheoriesCanAcceptComplexObjects, (const std::string &, const std::vector<std::tuple<int, std::string>> &), ComplexProvider)
+DATA_THEORY(TheoriesCanAcceptComplexObjects, (const std::string &, const std::vector<std::tuple<int, std::string>> &), ComplexProvider)
 {
     // just existing is good enough
 }
 
-THEORY(TheoriesCanAcceptLambdas, (int, int),
+DATA_THEORY(TheoriesCanAcceptLambdas, (int, int),
     ([]() -> std::vector<std::tuple<int, int>>
     {
         std::vector<std::tuple<int, int>> data;
@@ -185,6 +185,24 @@ THEORY(TheoriesCanAcceptLambdas, (int, int),
         return data;
     })
 )
+{
+    // just existing is good enough
+}
+
+THEORY(TestingSuccessfulInlineTheory, (int, const std::string &),
+    std::make_tuple(0, ""),
+    std::make_tuple(0, ""),
+    std::make_tuple(0, ""),
+    std::make_tuple(0, ""))
+{
+    // just existing is good enough
+}
+
+THEORY(TestingFailingfulInlineTheory, (int, const std::string &),
+    std::make_tuple(0, ""),
+    std::make_tuple(1, ""),
+    std::make_tuple(1, ""),
+    std::make_tuple(1, ""))
 {
     // just existing is good enough
 }

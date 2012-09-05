@@ -54,12 +54,24 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define FACT(FactName) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, -1)
 
-#define TIMED_THEORY(TheoryName, params, DataProvider, timeout) \
-    void TheoryName params; \
-    namespace TheoryName ## _ns { xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); } \
-    void TheoryName params
+#define TIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) \
+    namespace TheoryName ## _ns { \
+        void TheoryName params; \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+    } \
+    void TheoryName ## _ns::TheoryName params
 
-#define THEORY(TheoryName, params, DataProvider) TIMED_THEORY(TheoryName, params, DataProvider, -1)
+#define DATA_THEORY(TheoryName, params, DataProvider) TIMED_DATA_THEORY(TheoryName, params, DataProvider, -1)
+
+#define TIMED_THEORY(TheoryName, params, timeout, ...) \
+    namespace TheoryName ## _ns { \
+        void TheoryName params; \
+        decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+    } \
+    void TheoryName ## _ns::TheoryName params
+
+#define THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, -1, __VA_ARGS__)
 
 #define THEORY_PROVIDER(DataProvider, ...) \
     std::vector<std::tuple<__VA_ARGS__>> DataProvider() \

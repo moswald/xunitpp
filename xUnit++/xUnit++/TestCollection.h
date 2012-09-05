@@ -10,6 +10,20 @@
 namespace xUnitpp
 {
 
+// !!!VS convert this to an initializer list when VS implements them
+template<typename TTuple>
+static std::function<std::vector<TTuple>()> TheoryData(int count, TTuple tuples[])
+{
+    std::vector<TTuple> data;
+
+    for (int i = 0; i != count; ++i)
+    {
+        data.emplace_back(tuples[i]);
+    }
+
+    return [=]() { return data; };
+}
+
 class TestCollection
 {
     friend class Register;

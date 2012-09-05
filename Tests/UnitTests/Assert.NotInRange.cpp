@@ -22,7 +22,7 @@ std::vector<std::tuple<int, int, int>> NotInRangeSuccessData()
     return data;
 }
 
-THEORY(NotInRangeSuccess, (int actual, int min, int max), NotInRangeSuccessData)
+DATA_THEORY(NotInRangeSuccess, (int actual, int min, int max), NotInRangeSuccessData)
 {
     Assert.NotInRange(actual, min, max);
 }
@@ -39,7 +39,7 @@ std::vector<std::tuple<int, int, int>> NotInRangeAssertsOnFailureData()
     return data;
 }
 
-THEORY(NotInRangeAssertsOnFailure, (int actual, int min, int max), NotInRangeAssertsOnFailureData)
+DATA_THEORY(NotInRangeAssertsOnFailure, (int actual, int min, int max), NotInRangeAssertsOnFailureData)
 {
     Assert.Throws<xUnitAssert>([=]() { Assert.NotInRange(actual, min, max); });
 }
