@@ -1,7 +1,7 @@
-#include "IOutput.h"
-#include "TestCollection.h"
-#include "xUnitTestRunner.h"
-#include "xUnit++.h"
+#include "xUnit++/IOutput.h"
+#include "xUnit++/TestCollection.h"
+#include "xUnit++/xUnitTestRunner.h"
+#include "xUnit++/xUnit++.h"
 
 using xUnitpp::Assert;
 

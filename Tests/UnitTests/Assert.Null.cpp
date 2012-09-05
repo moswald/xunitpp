@@ -1,5 +1,5 @@
 #include <memory>
-#include "xUnit++.h"
+#include "xUnit++/xUnit++.h"
 
 using xUnitpp::xUnitAssert;
 using xUnitpp::Assert;

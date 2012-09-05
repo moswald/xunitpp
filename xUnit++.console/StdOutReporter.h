@@ -1,7 +1,7 @@
 #ifndef STDOUTREPORTER_H_
 #define STDOUTREPORTER_H_
 
-#include "IOutput.h"
+#include "xUnit++/IOutput.h"
 
 namespace xUnitpp
 {

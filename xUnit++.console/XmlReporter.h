@@ -2,7 +2,7 @@
 #define XMLREPORTER_H_
 
 #include <map>
-#include "IOutput.h"
+#include "xUnit++/IOutput.h"
 
 namespace xUnitpp
 {

@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include "xUnit++.h"
+#include "xUnit++/xUnit++.h"
 
 using xUnitpp::xUnitAssert;
 using xUnitpp::Assert;

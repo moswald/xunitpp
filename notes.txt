@@ -3,7 +3,6 @@ General
 finish unit testing the lib
 	- ensure tests are actually ran
 	- ensure output formats
-create lib/include structure
 check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
 inline theories

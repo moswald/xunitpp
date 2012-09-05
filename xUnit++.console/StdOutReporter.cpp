@@ -2,8 +2,8 @@
 #include <chrono>
 #include <cstdio>
 #include <iostream>
-#include "LineInfo.h"
-#include "TestDetails.h"
+#include "xUnit++/LineInfo.h"
+#include "xUnit++/TestDetails.h"
 
 namespace
 {

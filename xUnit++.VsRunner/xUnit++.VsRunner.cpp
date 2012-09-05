@@ -5,10 +5,10 @@
 #include <memory>
 #include <vector>
 #include <msclr/marshal_cppstd.h>
-#include "ExportApi.h"
-#include "IOutput.h"
-#include "LineInfo.h"
-#include "TestDetails.h"
+#include "xUnit++/ExportApi.h"
+#include "xUnit++/IOutput.h"
+#include "xUnit++/LineInfo.h"
+#include "xUnit++/TestDetails.h"
 
 using namespace System;
 using namespace System::Collections::Generic;

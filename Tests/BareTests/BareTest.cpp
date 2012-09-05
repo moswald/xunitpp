@@ -1,4 +1,4 @@
-#include "xUnit++.h"
+#include "xUnit++/xUnit++.h"
 
 //
 // FilteredTestsRunner has a tendency to not get linked into the test dlls.

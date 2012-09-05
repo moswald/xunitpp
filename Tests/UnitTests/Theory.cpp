@@ -2,10 +2,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "IOutput.h"
-#include "xUnitTestRunner.h"
-#include "xUnitTime.h"
-#include "xUnit++.h"
+#include "xUnit++/IOutput.h"
+#include "xUnit++/xUnitTestRunner.h"
+#include "xUnit++/xUnitTime.h"
+#include "xUnit++/xUnit++.h"
 
 using xUnitpp::Assert;
 

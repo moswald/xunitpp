@@ -1,5 +1,5 @@
-#include "xUnit++.h"
-#include "IOutput.h"
+#include "xUnit++/IOutput.h"
+#include "xUnit++/xUnit++.h"
 
 using xUnitpp::Assert;
 
