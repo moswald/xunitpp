@@ -208,4 +208,16 @@ THEORY(TestingFailingInlineTheory, (int, const std::string &str),
     Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Empty(str); });
 }
 
+DATA_THEORY(TestingLambdasAsData, (std::function<void()> fn),
+([]()
+{
+    std::vector<std::tuple<std::function<void()>>> data;
+    data.emplace_back(std::make_tuple([]() { }));
+    return data;
+})
+)
+{
+    Assert.DoesNotThrow(fn);
+}
+
 }
