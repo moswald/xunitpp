@@ -55,6 +55,18 @@
 #define XU_A_4(a, b, c, d) \
     XU_A_1(a) \
     XU_A_3(b, c, d)
+#define XU_A_5(a, b, c, d, e) \
+    XU_A_1(a) \
+    XU_A_4(b, c, d, e)
+#define XU_A_6(a, b, c, d, e, f) \
+    XU_A_1(a) \
+    XU_A_5(b, c, d, e, f)
+#define XU_A_7(a, b, c, d, e, f, g) \
+    XU_A_1(a) \
+    XU_A_6(b, c, d, e, f, g)
+#define XU_A_8(a, b, c, d, e, f, g, h) \
+    XU_A_1(a) \
+    XU_A_7(b, c, d, e, f, g, h)
 #define XU_ATT(M, ...) M(__VA_ARGS__)
 #define XU_ATTRIBUTES(...) XU_ATT(XU_CAT(XU_A_, PP_NARGS(__VA_ARGS__)), __VA_ARGS__)
 
