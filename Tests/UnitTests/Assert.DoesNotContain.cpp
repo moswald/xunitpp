@@ -27,7 +27,7 @@ FACT(DoesNotContainForSequenceAppendsUserMessage)
     static const std::string msg = "xUnit++";
     std::vector<int> v(1, 0);
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(v, 0, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(v, 0) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
@@ -51,7 +51,7 @@ FACT(DoesNotContainForStringAppendsUserMessage)
     static const std::string msg = "xUnit++";
     std::string actual = "abcd";
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(actual, "ab", msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(actual, "ab") << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

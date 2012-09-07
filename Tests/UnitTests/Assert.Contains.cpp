@@ -27,7 +27,7 @@ FACT(ContainsForSequenceAppendsUserMessage)
     static const std::string msg = "xUnit++";
     std::vector<int> v;
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Contains(v, 0, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Contains(v, 0) << msg; });
     auto what = std::string(assert.what());
 
     Assert.NotEqual(std::string::npos, what.find(msg));
@@ -52,7 +52,7 @@ FACT(ContainsForStringAppendsUserMessage)
     static const std::string msg = "xUnit++";
     std::string actual = "abcd";
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Contains(actual, "xyz", msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Contains(actual, "xyz") << msg; });
     auto what = std::string(assert.what());
 
     Assert.NotEqual(std::string::npos, what.find(msg));

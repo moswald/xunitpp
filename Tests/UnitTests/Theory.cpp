@@ -136,7 +136,7 @@ FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
 {
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
-    auto doTheory = [](int) { Assert.Fail("Should not be run."); };
+    auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider, "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__);
 
@@ -157,7 +157,7 @@ DATA_THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
         }
     }
 
-    Assert.Fail("Could not find self in test list.");
+    Assert.Fail() << "Could not find self in test list.";
 }
 
 std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> ComplexProvider()

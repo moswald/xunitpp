@@ -30,7 +30,7 @@ FACT(AssertNotEqualAppendsUserMessage)
 {
     static const std::string msg = "custom message";
 
-    auto assert = Assert.Throws<xUnitAssert>([]() { Assert.NotEqual(0, 0, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([]() { Assert.NotEqual(0, 0) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

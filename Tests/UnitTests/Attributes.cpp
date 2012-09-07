@@ -22,7 +22,7 @@ FACT(TestWithAttributes)
         }
     }
 
-    Assert.Fail("Could not find self in test list.");
+    Assert.Fail() << "Could not find self in test list.";
 }
 
 FACT(SkippedTestsShouldNotBeInstantiated)
@@ -32,12 +32,12 @@ FACT(SkippedTestsShouldNotBeInstantiated)
     {
         SkippedTest()
         {
-            Assert.Fail("Should not be instantiated.");
+            Assert.Fail() << "Should not be instantiated.";
         }
     
         void RunTest()
         {
-            Assert.Fail("Should not be run.");
+            Assert.Fail() << "Should not be run.";
         }
     };
 

@@ -41,7 +41,7 @@ FACT(DoesNotThrowAppendsMessages)
 
     try
     {
-        Assert.DoesNotThrow([=]() { throw std::exception(exceptionMessage.c_str()); }, userMessage);
+        Assert.DoesNotThrow([=]() { throw std::exception(exceptionMessage.c_str()); }) << userMessage;
     }
     catch(const xUnitAssert &assert)
     {

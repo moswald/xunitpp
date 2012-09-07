@@ -42,7 +42,7 @@ FACT(NotSameAppendsUserMessage)
 
     int x;
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(x, x, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(x, x) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
