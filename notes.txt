@@ -25,7 +25,6 @@ Stretch
 -----
 non-fatal asserts
 would be nice to have some logging support (Log::Information("msg"))
-gtest has nice per-assert messages: Assert.Equal(a, b) << "msg"
 msbuild test runner
 GUI runner (windows only, or go QT?)
 custom xUnitAsserts per assert (revisit unit tests at that point)
