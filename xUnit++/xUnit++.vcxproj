@@ -109,6 +109,7 @@
     <Lib />
     <ClCompile>
       <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
