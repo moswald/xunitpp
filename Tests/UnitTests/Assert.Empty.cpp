@@ -86,7 +86,7 @@ FACT(EmptyAppendsUserMessage)
     v.push_back(0);
     v.push_back(1);
 
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Empty(v, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Empty(v) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

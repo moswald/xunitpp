@@ -40,7 +40,7 @@ FACT(NullAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
     int x;
-    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.Null(&x, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.Null(&x) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

@@ -48,7 +48,7 @@ FACT(NotInRangeAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
 
-    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.NotInRange(0, 0, 1, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.NotInRange(0, 0, 1) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

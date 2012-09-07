@@ -20,7 +20,7 @@ FACT(TrueAppendsCustomMessage)
 {
     static const std::string msg = "xUnit++";
 
-    auto assert = Assert.Throws<xUnitAssert>([]() { Assert.True(false, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([]() { Assert.True(false) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }

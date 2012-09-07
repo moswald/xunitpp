@@ -2,13 +2,18 @@
 
 namespace
 {
-    std::string AssembleWhat(const std::string &call, const std::string &userMsg, const std::string &customMsg,
+    std::string AssembleWhat(const std::string &call, const std::vector<std::string> &userMsg, const std::string &customMsg,
                              const std::string &expected, const std::string &actual)
     {
         std::string msg = "Assert." + call + "() failure";
         if (!userMsg.empty())
         {
-            msg += ": " + userMsg;
+            msg += ": ";
+            
+            for (const auto &s : userMsg)
+            {
+                msg += s;
+            }
 
             if (!customMsg.empty())
             {
@@ -38,22 +43,94 @@ namespace
 namespace xUnitpp
 {
 
-xUnitAssert::xUnitAssert(const std::string &call, const std::string &userMsg, const std::string &customMsg,
-                         const std::string &expected, const std::string &actual, const xUnitpp::LineInfo &lineInfo)
-    : base(AssembleWhat(call, userMsg, customMsg, expected, actual).c_str())
-    , lineInfo(lineInfo)
+const xUnitAssert &xUnitAssert::None()
+{
+    static xUnitAssert none("", LineInfo::empty());
+    return none;
+}
+
+xUnitAssert::xUnitAssert(const std::string &call, const xUnitpp::LineInfo &lineInfo)
+    : lineInfo(lineInfo)
+    , call(call + "() failure")
 {
 }
 
-xUnitAssert::xUnitAssert(const xUnitAssert &other)
-    : base(other.what())
-    , lineInfo(other.lineInfo)
+xUnitAssert &xUnitAssert::CustomMessage(const std::string &message)
 {
+    customMessage = message;
+    return *this;
+}
+
+xUnitAssert &xUnitAssert::Expected(const std::string &str)
+{
+    expected = str;
+    return *this;
+}
+
+xUnitAssert &xUnitAssert::Actual(const std::string &str)
+{
+    actual = str;
+    return *this;
 }
 
 const LineInfo &xUnitAssert::LineInfo() const
 {
     return lineInfo;
+}
+
+const char *xUnitAssert::what() const
+{
+    if (whatMessage.empty())
+    {
+        whatMessage = AssembleWhat(call, userMessage, customMessage, expected, actual);
+    }
+
+    return whatMessage.c_str();
+}
+
+xUnitFailure::xUnitFailure()
+    : assert(xUnitAssert::None())
+    , refCount(*(new int(0)))
+    , failed(false)
+{
+}
+
+xUnitFailure::xUnitFailure(xUnitAssert assert)
+    : assert(assert)
+    , refCount(*(new int(1)))
+    , failed(true)
+{
+}
+
+xUnitFailure::xUnitFailure(const xUnitFailure &other)
+    : assert(other.assert)
+    , refCount(other.refCount)
+    , failed(other.failed)
+{
+    refCount++;
+}
+
+xUnitFailure::~xUnitFailure()
+{
+    if (!--refCount)
+    {
+        delete &refCount;
+
+        if (failed)
+        {
+            throw assert;
+        }
+    } 
+}
+
+xUnitFailure xUnitFailure::None()
+{
+    return xUnitFailure();
+}
+
+xUnitFailure Assert::OnSuccess() const
+{
+    return xUnitFailure::None();
 }
 
 double Assert::round(double value, size_t precision)
@@ -68,163 +145,105 @@ double Assert::round(double value, size_t precision)
     }
 }
 
-void Assert::Equal(const std::string &expected, const std::string &actual, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::Equal(const std::string &expected, const std::string &actual, const LineInfo &lineInfo) const
 {
     if (expected != actual)
     {
-        throw xUnitAssert("Equal", msg, "", expected, actual, lineInfo);
+        return OnFailure(xUnitAssert(callPrefix + "Equal", lineInfo)
+            .Expected(expected)
+            .Actual(actual));
     }
+
+    return OnSuccess();
 }
 
-void Assert::Equal(const std::string &expected, const std::string &actual, const LineInfo &lineInfo) const
+xUnitFailure Assert::Equal(const char *expected, const char *actual, const LineInfo &lineInfo) const
 {
-    Equal(expected, actual, std::string(""), lineInfo);
+    return Equal(std::string(expected), std::string(actual), lineInfo);
 }
 
-void Assert::Equal(const char *expected, const char *actual, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::Equal(const std::string &expected, const char *actual, const LineInfo &lineInfo) const
 {
-    Equal(std::string(expected), std::string(actual), msg, lineInfo);
+    return Equal(expected, std::string(actual), lineInfo);
 }
 
-void Assert::Equal(const char *expected, const char *actual, const LineInfo &lineInfo) const
+xUnitFailure Assert::Equal(float expected, float actual, int precision, const LineInfo &lineInfo) const
 {
-    Equal(std::string(expected), std::string(actual), std::string(""), lineInfo);
+    return Equal((double)expected, (double)actual, precision, lineInfo);
 }
 
-void Assert::Equal(const std::string &expected, const char *actual, const std::string &msg, const LineInfo &lineInfo) const
-{
-    Equal(expected, std::string(actual), msg, lineInfo);
-}
-
-void Assert::Equal(const std::string &expected, const char *actual, const LineInfo &lineInfo) const
-{
-    Equal(expected, std::string(actual), std::string(""), lineInfo);
-}
-
-void Assert::Equal(float expected, float actual, int precision, const std::string &msg, const LineInfo &lineInfo) const
-{
-    Equal((double)expected, (double)actual, precision, msg, lineInfo);
-}
-
-void Assert::Equal(float expected, float actual, int precision, const LineInfo &lineInfo) const
-{
-    Equal(expected, actual, precision, "", lineInfo);
-}
-
-void Assert::Equal(double expected, double actual, int precision, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::Equal(double expected, double actual, int precision, const LineInfo &lineInfo) const
 {
     auto er = round(expected, precision);
     auto ar = round(actual, precision);
 
-    Equal(er, ar, [](double er, double ar) { return er == ar; }, msg, lineInfo);
+    return Equal(er, ar, [](double er, double ar) { return er == ar; }, lineInfo);
 }
 
-void Assert::Equal(double expected, double actual, int precision, const LineInfo &lineInfo) const
+xUnitFailure Assert::Fail(const LineInfo &lineInfo) const
 {
-    Equal(expected, actual, precision, "", lineInfo);
+    return OnFailure(xUnitAssert(callPrefix + "Fail", lineInfo));
 }
 
-void Assert::Fail(const std::string &msg, const LineInfo &lineInfo) const
-{
-    throw xUnitAssert("Fail", msg, "", "", "", lineInfo);
-}
-
-void Assert::Fail(const LineInfo &lineInfo) const
-{
-    Fail("", lineInfo);
-}
-
-void Assert::False(bool b, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::False(bool b, const LineInfo &lineInfo) const
 {
     if (b)
     {
-        throw xUnitAssert("False", msg, "", "false", "true", lineInfo);
+        return OnFailure(xUnitAssert(callPrefix + "False", lineInfo).Expected("false").Actual("true"));
     }
+
+    return OnSuccess();
 }
 
-void Assert::False(bool b, const LineInfo &lineInfo) const
-{
-    False(b, "", lineInfo);
-}
-
-void Assert::True(bool b, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::True(bool b, const LineInfo &lineInfo) const
 {
     if (!b)
     {
-        throw xUnitAssert("True", msg, "", "true", "false", lineInfo);
+        return OnFailure(xUnitAssert(callPrefix + "True", lineInfo).Expected("true").Actual("false"));
     }
+
+    return OnSuccess();
 }
 
-void Assert::True(bool b, const LineInfo &lineInfo) const
+xUnitFailure Assert::DoesNotContain(const char *actualString, const char *value, const LineInfo &lineInfo) const
 {
-    True(b, "", lineInfo);
+    return DoesNotContain(std::string(actualString), std::string(value), lineInfo);
 }
 
-void Assert::DoesNotContain(const char *actualString, const char *value, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::DoesNotContain(const std::string &actualString, const char *value, const LineInfo &lineInfo) const
 {
-    DoesNotContain(std::string(actualString), std::string(value), msg, lineInfo);
+    return DoesNotContain(actualString, std::string(value), lineInfo);
 }
 
-void Assert::DoesNotContain(const char *actualString, const char *value, const LineInfo &lineInfo) const
-{
-    DoesNotContain(actualString, value, "", lineInfo);
-}
-
-void Assert::DoesNotContain(const std::string &actualString, const char *value, const std::string &msg, const LineInfo &lineInfo) const
-{
-    DoesNotContain(actualString, std::string(value), msg, lineInfo);
-}
-
-void Assert::DoesNotContain(const std::string &actualString, const char *value, const LineInfo &lineInfo) const
-{
-    DoesNotContain(actualString, value, "", lineInfo);
-}
-
-void Assert::DoesNotContain(const std::string &actualString, const std::string &value, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::DoesNotContain(const std::string &actualString, const std::string &value, const LineInfo &lineInfo) const
 {
     auto found = actualString.find(value);
     if (found != std::string::npos)
     {
-        throw xUnitAssert("DoesNotContain", msg, "Found: \"" + value + "\" at position " + std::to_string(found) + ".", "", "", lineInfo);
+        return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo).CustomMessage("Found: \"" + value + "\" at position " + std::to_string(found) + "."));
     }
+
+    return OnSuccess();
 }
 
-void Assert::DoesNotContain(const std::string &actualString, const std::string &value, const LineInfo &lineInfo) const
+xUnitFailure Assert::Contains(const char *actualString, const char *value, const LineInfo &lineInfo) const
 {
-    DoesNotContain(actualString, value, "", lineInfo);
+    return Contains(std::string(actualString), std::string(value), lineInfo);
 }
 
-void Assert::Contains(const char *actualString, const char *value, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::Contains(const std::string &actualString, const char *value, const LineInfo &lineInfo) const
 {
-    Contains(std::string(actualString), std::string(value), msg, lineInfo);
+    return Contains(actualString, std::string(value), lineInfo);
 }
 
-void Assert::Contains(const char *actualString, const char *value, const LineInfo &lineInfo) const
-{
-    Contains(actualString, value, "", lineInfo);
-}
-
-void Assert::Contains(const std::string &actualString, const char *value, const std::string &msg, const LineInfo &lineInfo) const
-{
-    Contains(actualString, std::string(value), msg, lineInfo);
-}
-
-void Assert::Contains(const std::string &actualString, const char *value, const LineInfo &lineInfo) const
-{
-    Contains(actualString, value, "", lineInfo);
-}
-
-void Assert::Contains(const std::string &actualString, const std::string &value, const std::string &msg, const LineInfo &lineInfo) const
+xUnitFailure Assert::Contains(const std::string &actualString, const std::string &value, const LineInfo &lineInfo) const
 {
     if (actualString.find(value) == std::string::npos)
     {
-        throw xUnitAssert("Contains", msg, "", actualString, value, lineInfo);
+        return OnFailure(xUnitAssert(callPrefix + "Contains", lineInfo).Expected(actualString).Actual(value));
     }
-}
 
-void Assert::Contains(const std::string &actualString, const std::string &value, const LineInfo &lineInfo) const
-{
-    Contains(actualString, value, "", lineInfo);
+    return OnSuccess();
 }
 
 }

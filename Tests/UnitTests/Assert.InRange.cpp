@@ -48,7 +48,7 @@ FACT(InRangeAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
 
-    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.InRange(1, 0, 1, msg); });
+    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.InRange(1, 0, 1) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
