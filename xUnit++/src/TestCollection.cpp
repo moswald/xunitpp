@@ -35,9 +35,9 @@ TestCollection &TestCollection::Instance()
 }
 
 TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line)
+                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const Check &check)
 {
-    collection.mTests.emplace_back(xUnitTest(fn, name, suite, attributes, Time::ToDuration(std::chrono::milliseconds(milliseconds)), filename, line));
+    collection.mTests.emplace_back(xUnitTest(fn, name, suite, attributes, Time::ToDuration(std::chrono::milliseconds(milliseconds)), filename, line, check));
 }
 
 const std::vector<xUnitTest> &TestCollection::Tests()

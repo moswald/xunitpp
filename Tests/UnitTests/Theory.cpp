@@ -7,14 +7,13 @@
 #include "xUnit++/xUnitTime.h"
 #include "xUnit++/xUnit++.h"
 
-using xUnitpp::Assert;
 
 SUITE(Theory)
 {
 
 void TheoryUnderTest(int x)
 {
-    Assert.True(x == 0 || x == 1);
+    xUnitpp::Assert.True(x == 0 || x == 1);
 }
 
 struct TheoryFixture
@@ -52,7 +51,8 @@ public:
     template<typename TTheoryData>
     void Register(const std::string &name, TTheoryData &&theoryData)
     {
-        xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, theoryData, name, "Theory", attributes, -1, __FILE__, __LINE__);
+        xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, theoryData,
+            name, "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
     }
 
     void Run()
@@ -72,6 +72,7 @@ public:
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
     xUnitpp::TestRunner localRunner;
+    xUnitpp::Check localCheck;
 };
 
 std::vector<std::tuple<int>> RawFunctionProvider()
@@ -122,7 +123,8 @@ FACT_FIXTURE(TheoriesGetAllDataPassedToThem, TheoryFixture)
     dataProvided.reserve(5);
 
     auto doTheory = [&](int x) { dataProvided.push_back(x); };
-    xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider, "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__);
+    xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
 
     Run();
 
@@ -138,7 +140,8 @@ FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
 
     auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
-    xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider, "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__);
+    xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
 
     Run();
 }

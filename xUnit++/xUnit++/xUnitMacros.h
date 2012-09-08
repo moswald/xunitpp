@@ -8,6 +8,7 @@
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "Suite.h"
+#include "xUnitCheck.h"
 #include "xUnitMacroHelpers.h"
 
 #define ATTRIBUTES(TestName, ...) \
@@ -38,13 +39,17 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define TIMED_FACT_FIXTURE(FactName, FixtureType, timeout) \
     namespace FactName ## _ns { \
+        using xUnitpp::Assert; \
+        xUnitpp::Check Check; \
         class FactName ## _Fixture : public FixtureType \
         { \
         public: \
             void FactName(); \
         }; \
         void FactName ## _runner() { FactName ## _Fixture().FactName(); } \
-        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), &FactName ## _runner, #FactName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
+            &FactName ## _runner, #FactName, xUnitSuite::Name(), \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
     } \
     void FactName ## _ns::FactName ## _Fixture::FactName()
 
@@ -56,8 +61,12 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define TIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) \
     namespace TheoryName ## _ns { \
+        using xUnitpp::Assert; \
+        xUnitpp::Check Check; \
         void TheoryName params; \
-        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
+            TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
     } \
     void TheoryName ## _ns::TheoryName params
 
@@ -65,9 +74,13 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define TIMED_THEORY(TheoryName, params, timeout, ...) \
     namespace TheoryName ## _ns { \
+        using xUnitpp::Assert; \
+        xUnitpp::Check Check; \
         void TheoryName params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
-        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), TheoryName, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), #TheoryName, xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__); \
+        xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
+            TheoryName, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), #TheoryName, \
+            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
     } \
     void TheoryName ## _ns::TheoryName params
 

@@ -1,6 +1,11 @@
 #ifndef XUNITASSERT_H_
 #define XUNITASSERT_H_
 
+#if defined(_MSC_VER)
+#define _ALLOW_KEYWORD_MACROS
+#define noexcept(x)
+#endif
+
 #include <algorithm>
 #include <exception>
 #include <functional>
@@ -57,30 +62,27 @@ private:
     xUnitFailure();
 
 public:
-    xUnitFailure(xUnitAssert assert);
+    xUnitFailure(xUnitAssert assert, std::function<void(const xUnitAssert &)> onFailureComplete);
     xUnitFailure(const xUnitFailure &other);
-    ~xUnitFailure();
+    ~xUnitFailure() noexcept(false);
 
     static xUnitFailure None();
 
     template<typename T>
     xUnitFailure &operator <<(const T &value)
     {
-        if (failed)
-        {
-            assert.AppendUserMessage(value);
-        }
-
+        assert.AppendUserMessage(value);
         return *this;
     }
 
 private:
     xUnitFailure &operator =(xUnitFailure other);
 
-protected:
+private:
+    std::function<void(const xUnitAssert &)> OnFailureComplete;
+
     xUnitAssert assert;
     int &refCount;
-    bool failed;
 };
 
 class Assert
@@ -460,11 +462,8 @@ public:
         return OnSuccess();
     }
 
-    Assert(const std::string &callPrefix = "Assert.")
-        : callPrefix(callPrefix)
-        , OnFailure([](xUnitAssert assert) { return xUnitFailure(assert); })
-    {
-    }
+    Assert(const std::string &callPrefix = "Assert.",
+           std::function<xUnitFailure(xUnitAssert)> onFailure = [](xUnitAssert assert) { return xUnitFailure(assert, [](const xUnitAssert &assert) { throw assert; }); });
 };
 
 const class : public Assert
