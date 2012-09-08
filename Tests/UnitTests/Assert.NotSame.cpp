@@ -1,7 +1,6 @@
 #include "xUnit++/xUnit++.h"
 
 using xUnitpp::xUnitAssert;
-using xUnitpp::Assert;
 
 SUITE(AssertNotSame)
 {

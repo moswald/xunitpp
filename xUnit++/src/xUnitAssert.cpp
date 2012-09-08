@@ -5,7 +5,7 @@ namespace
     std::string AssembleWhat(const std::string &call, const std::vector<std::string> &userMsg, const std::string &customMsg,
                              const std::string &expected, const std::string &actual)
     {
-        std::string msg = "Assert." + call + "() failure";
+        std::string msg = call + "() failure";
         if (!userMsg.empty())
         {
             msg += ": ";
@@ -51,7 +51,7 @@ const xUnitAssert &xUnitAssert::None()
 
 xUnitAssert::xUnitAssert(const std::string &call, const xUnitpp::LineInfo &lineInfo)
     : lineInfo(lineInfo)
-    , call(call + "() failure")
+    , call(call)
 {
 }
 
@@ -89,23 +89,23 @@ const char *xUnitAssert::what() const
 }
 
 xUnitFailure::xUnitFailure()
-    : assert(xUnitAssert::None())
+    : OnFailureComplete([](const xUnitAssert &){})
+    , assert(xUnitAssert::None())
     , refCount(*(new int(0)))
-    , failed(false)
 {
 }
 
-xUnitFailure::xUnitFailure(xUnitAssert assert)
-    : assert(assert)
+xUnitFailure::xUnitFailure(xUnitAssert assert, std::function<void(const xUnitAssert &)> onFailureComplete)
+    : OnFailureComplete(onFailureComplete)
+    , assert(assert)
     , refCount(*(new int(1)))
-    , failed(true)
 {
 }
 
 xUnitFailure::xUnitFailure(const xUnitFailure &other)
-    : assert(other.assert)
+    : OnFailureComplete(other.OnFailureComplete)
+    , assert(other.assert)
     , refCount(other.refCount)
-    , failed(other.failed)
 {
     refCount++;
 }
@@ -116,10 +116,10 @@ xUnitFailure::~xUnitFailure()
     {
         delete &refCount;
 
-        if (failed)
-        {
-            throw assert;
-        }
+        // http://cpp-next.com/archive/2012/08/evil-or-just-misunderstood/
+        // http://akrzemi1.wordpress.com/2011/09/21/destructors-that-throw/
+        // throwing destructors aren't Evil, just misunderstood
+        OnFailureComplete(assert);
     } 
 }
 
@@ -244,6 +244,12 @@ xUnitFailure Assert::Contains(const std::string &actualString, const std::string
     }
 
     return OnSuccess();
+}
+
+Assert::Assert(const std::string &callPrefix, std::function<xUnitFailure(xUnitAssert)> onFailure)
+    : callPrefix(callPrefix)
+    , OnFailure(onFailure)
+{
 }
 
 }

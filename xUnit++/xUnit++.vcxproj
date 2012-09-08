@@ -26,6 +26,7 @@
     <ClCompile Include="src/xUnitAssert.cpp" />
     <ClCompile Include="src/xUnitTest.cpp" />
     <ClCompile Include="src/xUnitTestRunner.cpp" />
+    <ClCompile Include="src\xUnitCheck.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnit++/Attributes.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="xUnit++/xUnitTest.h" />
     <ClInclude Include="xUnit++/xUnitTestRunner.h" />
     <ClInclude Include="xUnit++/xUnitTime.h" />
+    <ClInclude Include="xUnit++\xUnitCheck.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>

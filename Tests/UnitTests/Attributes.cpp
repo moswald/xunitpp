@@ -3,7 +3,6 @@
 #include "xUnit++/xUnitTestRunner.h"
 #include "xUnit++/xUnit++.h"
 
-using xUnitpp::Assert;
 
 SUITE(Attributes)
 {
@@ -68,7 +67,9 @@ FACT(SkippedTestsShouldNotBeInstantiated)
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
     xUnitpp::TestCollection collection;
-    xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); }, "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__);
+    xUnitpp::Check check;
+    xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); },
+        "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__, check);
 
     xUnitpp::TestRunner local(emptyReporter);
     local.RunTests([](const xUnitpp::TestDetails &) { return true; },

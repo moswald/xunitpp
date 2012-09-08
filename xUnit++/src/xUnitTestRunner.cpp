@@ -150,7 +150,21 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
 
                 auto actualTest = [&](bool reportEnd) -> Time::TimeStamp
                     {
+                        bool failed = false;
                         Time::TimeStamp testStart;
+
+                        auto CheckNonFatalErrors = [&]()
+                        {
+                            if (!failed && !test.NonFatalFailures().empty())
+                            {
+                                failed = true;
+                                for (const auto &assert : test.NonFatalFailures())
+                                {
+                                    mImpl->OnTestFailure(test.TestDetails(), assert.what(), assert.LineInfo());
+                                }
+                            }
+                        };
+                        
                         try
                         {
                             mImpl->OnTestStart(test.TestDetails());
@@ -160,17 +174,27 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                         }
                         catch (const xUnitAssert &e)
                         {
+                            CheckNonFatalErrors();
                             mImpl->OnTestFailure(test.TestDetails(), e.what(), e.LineInfo());
-                            ++failedTests;
+                            failed = true;
                         }
                         catch (const std::exception &e)
                         {
+                            CheckNonFatalErrors();
                             mImpl->OnTestFailure(test.TestDetails(), e.what(), LineInfo::empty());
-                            ++failedTests;
+                            failed = true;
                         }
                         catch (...)
                         {
+                            CheckNonFatalErrors();
                             mImpl->OnTestFailure(test.TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
+                            failed = true;
+                        }
+
+                        CheckNonFatalErrors();
+
+                        if (failed)
+                        {
                             ++failedTests;
                         }
 

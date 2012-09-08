@@ -23,8 +23,7 @@ for shared/dynamic libs, see:
 
 Stretch
 -----
-non-fatal asserts
-would be nice to have some logging support (Log::Information("msg"))
+would be nice to have some logging support (Log::Information("msg")) (see how Check was implemented)
 msbuild test runner
 GUI runner (windows only, or go QT?)
 custom xUnitAsserts per assert (revisit unit tests at that point)

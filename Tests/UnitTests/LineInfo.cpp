@@ -1,7 +1,6 @@
 #include "xUnit++/IOutput.h"
 #include "xUnit++/xUnit++.h"
 
-using xUnitpp::Assert;
 
 SUITE(LineInfo)
 {
@@ -50,7 +49,10 @@ FACT(LineInfoOverridesDefaultTestLineInfo)
 
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    xUnitpp::TestCollection::Register reg(collection, test, "LineInfoOverridesDefaultTestLineInfo", "LineInfo", attributes, -1, __FILE__, __LINE__);
+    xUnitpp::Check localCheck;
+    xUnitpp::TestCollection::Register reg(collection, test,
+        "LineInfoOverridesDefaultTestLineInfo", "LineInfo", attributes,
+        -1, __FILE__, __LINE__, localCheck);
 
 
 }

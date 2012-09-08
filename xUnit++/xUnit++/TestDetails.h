@@ -2,14 +2,17 @@
 #define TESTDETAILS_H_
 
 #include <chrono>
+#include <functional>
 #include <map>
 #include <string>
 #include <tuple>
+#include <vector>
 #include "xUnitTime.h"
 
 namespace xUnitpp
 {
 
+class xUnitAssert;
 typedef std::multimap<std::string, std::string> AttributeCollection;
 
 struct TestDetails
