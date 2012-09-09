@@ -1,16 +1,21 @@
 General
 -------
 finish unit testing the lib
-	- ensure tests are actually ran
-	- ensure output formats
+    - ensure tests are actually ran
+    - ensure output formats
     - ensure all failing assert types actually increment count of failed tests
+    - include new Check asserts
 check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
+redo include/lib structure, output locations for each project
+vsix project needs embedded eula and license
+need license for whole project
+clean up the Runner project (many unneeded files)
 
 
 Visual Studio 2012 notes
 ------------------------
-create vsix for test runners
+test adapter only runs first (?) assembly containing tests
 
 
 Linux notes
