@@ -262,7 +262,7 @@ void VsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IFramewor
 
     for each (String ^source in sources)
     {
-        if (!RunTests(SingleSourceTestCases(source, mUri), framework))
+        if (RunTests(SingleSourceTestCases(source, mUri), framework))
         {
             // cancelled
             break;

@@ -13,11 +13,6 @@ need license for whole project
 clean up the Runner project (many unneeded files)
 
 
-Visual Studio 2012 notes
-------------------------
-test adapter only runs first (?) assembly containing tests
-
-
 Linux notes
 -----------
 for shared/dynamic libs, see:
