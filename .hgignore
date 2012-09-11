@@ -11,12 +11,4 @@
 ##########
 
 # ignore output files
-\b(bin|int|ipch|TestResults|obj)\b
-
-# ignore Visual Studio config files
-.suo$
-.user$
-.sdf$
-
-# ignore resharper
-_ReSharper.
+(bin/|int/|ipch/|TestResults/|/obj/|.suo$|.user$|.sdf$|_ReSharper./)
