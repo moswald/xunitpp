@@ -52,24 +52,28 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\.build\output.props" />
+      <Import Project="..\..\.build\tests_output.props" />
     <Import Project="..\..\.build\build.props" />
     <Import Project="..\..\.build\debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\.build\output.props" />
+      <Import Project="..\..\.build\tests_output.props" />
     <Import Project="..\..\.build\build.props" />
     <Import Project="..\..\.build\debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\.build\output.props" />
+      <Import Project="..\..\.build\tests_output.props" />
     <Import Project="..\..\.build\build.props" />
     <Import Project="..\..\.build\release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\.build\output.props" />
+      <Import Project="..\..\.build\tests_output.props" />
     <Import Project="..\..\.build\build.props" />
     <Import Project="..\..\.build\release.props" />
   </ImportGroup>

@@ -5,9 +5,10 @@ finish unit testing the lib
     - ensure output formats
     - ensure all failing assert types actually increment count of failed tests
     - include new Check asserts
+    - several tests (look at Theory.cpp) do not actually assert anything happened
 check Release builds for warnings (and failing tests)
-can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa?)
-redo include/lib structure, output locations for each project
+can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa? (and what about x64?)
+redo include structure
 vsix project needs embedded eula and license
 need license for whole project
 clean up the Runner project (many unneeded files)
