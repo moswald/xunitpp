@@ -1,0 +1,20 @@
+Import("env")
+
+debugTag = ""
+
+debug = env['debug']
+
+if debug == True:
+    debugTag = ".Debug"
+
+outputDir = "#bin/"
+intDir = "#int/"
+
+def getTargetFile(projectName):
+    return outputDir + projectName + '/' + projectName + debugTag
+
+def getIntDir(projectName):
+    return intDir + projectName + ('/debug/' if debug != 0 else '/release/')
+
+env['getTargetFile'] = getTargetFile
+env['getIntDir'] = getIntDir

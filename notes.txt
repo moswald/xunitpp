@@ -22,6 +22,11 @@ for shared/dynamic libs, see:
 	http://www.techytalk.info/c-cplusplus-library-programming-on-linux-part-three-dynamic-libraries-using-posix-api/
 
 
+Wiki
+----
+update install/build stuff: paths have changed
+
+
 Stretch
 -----
 would be nice to have some logging support (Log::Information("msg")) (see how Check was implemented)

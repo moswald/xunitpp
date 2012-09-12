@@ -1,0 +1,12 @@
+Import('env')
+
+targetFile = env['getTargetFile']('xUnit++.console')
+intDir = env['getIntDir']('xUnit++.console')
+
+local = env.Clone()
+local.VariantDir(intDir, './', duplicate = 0)
+local.Append(CPPPATH = ['../xUnit++'])
+
+target = local.Program(targetFile + '.exe', Glob(intDir + '*.cpp'), LIBS = env['xUnit'])
+
+Return('target')

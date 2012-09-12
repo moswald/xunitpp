@@ -11,4 +11,4 @@
 ##########
 
 # ignore output files
-(bin/|int/|ipch/|TestResults/|/obj/|.suo$|.user$|.sdf$|_ReSharper./)
+(bin/|int/|ipch/|TestResults/|/obj/|.suo$|.user$|.sdf$|_ReSharper./|.dblite$)
