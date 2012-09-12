@@ -1,0 +1,6 @@
+Import('env')
+
+if env['windows'] == True:
+    SConscript('msvc.sconscript', exports = 'env')
+
+env.Append(CCFLAGS = [ '/W4', '/WX-' ])

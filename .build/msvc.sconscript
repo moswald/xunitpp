@@ -1,0 +1,8 @@
+Import('env')
+
+env.Append(CCFLAGS = [ '/EHsc' ])
+
+if env['debug'] == True:
+    env.Append(CCFLAGS = [ '/MDd' ])
+else:
+    env.Append(CCFLAGS = [ '/MD' ])

@@ -1,0 +1,6 @@
+Import("env")
+
+copy = env.Clone()
+copy.Append(CPPDEFINES = ['DEBUG', '_DEBUG'])
+
+Return("copy")
