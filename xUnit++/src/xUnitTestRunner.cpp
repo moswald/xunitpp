@@ -257,7 +257,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
         test.get();
     }
     
-    mImpl->OnAllTestsComplete(futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
+    mImpl->OnAllTestsComplete((int)futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
 
     return -failedTests;
 }
