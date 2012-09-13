@@ -2,6 +2,7 @@ General
 -------
 finish unit testing the lib
     - ensure tests are actually ran
+        - will require new project
     - ensure output formats
     - ensure all failing assert types actually increment count of failed tests
     - include new Check asserts
@@ -11,7 +12,6 @@ can runner be made configuration agnostic? (ie, can debug runner load release te
 redo include structure
 vsix project needs embedded eula and license
 need license for whole project
-clean up the Runner project (many unneeded files)
 
 
 Linux notes
