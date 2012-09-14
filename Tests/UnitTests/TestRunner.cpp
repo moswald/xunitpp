@@ -145,13 +145,13 @@ FACT_FIXTURE(TestFinishIsReported, TestRunnerFixture)
 
 FACT_FIXTURE(TestFinishIncludesCorrectTime, TestRunnerFixture)
 {
-    auto test = SleepyTest();
+    auto test = SleepyTest(30);
 
     tests.push_back(TestFactory(test, testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
 
-    auto min = test.duration - Time::ToMilliseconds(10);
-    auto max = test.duration + Time::ToMilliseconds(10);
+    auto min = test.duration - Time::ToMilliseconds(5);
+    auto max = test.duration + Time::ToMilliseconds(5);
 
     Assert.InRange(Time::ToMilliseconds(std::get<1>(output.finishedTests[0])).count(), min.count(), max.count());
 }
