@@ -58,9 +58,13 @@ namespace xUnitpp { struct NoFixture {}; }
     } \
     void FactName ## _ns::FactName ## _Fixture::FactName()
 
+#define UNTIMED_FACT_FIXTURE(FactName, FixtureType) TIMED_FACT_FIXTURE(FactName, FixtureType, 0)
+
 #define FACT_FIXTURE(FactName, FixtureType) TIMED_FACT_FIXTURE(FactName, FixtureType, -1)
 
 #define TIMED_FACT(FactName, timeout) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, timeout)
+
+#define UNTIMED_FACT(FactName) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, 0)
 
 #define FACT(FactName) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, -1)
 
@@ -76,6 +80,8 @@ namespace xUnitpp { struct NoFixture {}; }
     } \
     void TheoryName ## _ns::TheoryName params
 
+#define UNTIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) TIMED_DATA_THEORY(TheoryName, params, DataProvider, 0)
+
 #define DATA_THEORY(TheoryName, params, DataProvider) TIMED_DATA_THEORY(TheoryName, params, DataProvider, -1)
 
 #define TIMED_THEORY(TheoryName, params, timeout, ...) \
@@ -90,6 +96,8 @@ namespace xUnitpp { struct NoFixture {}; }
             xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
     void TheoryName ## _ns::TheoryName params
+
+#define UNTIMED_THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, 0, __VA_ARGS__)
 
 #define THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, -1, __VA_ARGS__)
 
