@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <mutex>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -115,22 +116,19 @@ FACT_FIXTURE(TheoriesAcceptFunctors, TheoryFixture)
 
 FACT_FIXTURE(TheoriesGetAllDataPassedToThem, TheoryFixture)
 {
+    std::mutex lock;
     std::vector<int> dataProvided;
 
-    // !!! this line appears to fix a somewhat random buffer overrun bug
-    // I am not sure why. Investigate later.
-    dataProvided.reserve(5);
-
-    auto doTheory = [&](int x) { dataProvided.push_back(x); };
+    auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
         "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
 
     Run();
 
-    Assert.Equal(2, std::count(dataProvided.begin(), dataProvided.end(), 0));
-    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 1));
-    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 2));
-    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 3));
+    Assert.Equal(2, std::count(dataProvided.begin(), dataProvided.end(), 0), LI);
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 1), LI);
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 2), LI);
+    Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 3), LI);
 }
 
 FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
