@@ -143,19 +143,6 @@ FACT_FIXTURE(TestFinishIsReported, TestRunnerFixture)
     Assert.Equal("finished", std::get<0>(output.finishedTests[0]).Name);
 }
 
-FACT_FIXTURE(TestFinishIncludesCorrectTime, TestRunnerFixture)
-{
-    auto test = SleepyTest(30);
-
-    tests.push_back(TestFactory(test, testCheck));
-    RunTests(output, &Filter::AllTests, tests, duration, 0);
-
-    auto min = test.duration - Time::ToMilliseconds(5);
-    auto max = test.duration + Time::ToMilliseconds(5);
-
-    Assert.InRange(Time::ToMilliseconds(std::get<1>(output.finishedTests[0])).count(), min.count(), max.count());
-}
-
 FACT_FIXTURE(NoTestsAreFailuresWhenNoTestsRun, TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck).Name("not run"));
@@ -290,27 +277,6 @@ FACT_FIXTURE(FilteredTestsDoNotRun, TestRunnerFixture)
     RunTests(output, &Filter::NoTests, tests, duration, 0);
 
     Assert.Equal(0U, output.summaryCount);
-}
-
-ATTRIBUTES(TestOrderIsRandomized, ("Skip", "Threading issues preventing me from tracking down why this *doesn't* fail right now."))
-UNTIMED_FACT_FIXTURE(TestOrderIsRandomized, TestRunnerFixture)
-{
-    // the best I can do here is have 10 tests run, and hope that I don't run into the same 10
-    // values back-to-back
-    int originalOrder[10];
-    for (int i = 0; i != 10; ++i)
-    {
-        originalOrder[i] = i;
-        tests.push_back(TestFactory(EmptyTest(), testCheck).TestLine(i));
-    }
-
-    RunTests(output, &Filter::AllTests, tests, duration, 1);
-
-    Assert.NotEqual(std::begin(originalOrder), std::end(originalOrder), output.orderedTestList.begin(), output.orderedTestList.end(),
-        [](int a, const xUnitpp::TestDetails &b)
-        {
-            return a == b.Line;
-        });
 }
 
 }
