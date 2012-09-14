@@ -186,8 +186,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
     std::vector<xUnitTest> activeTests;
     std::copy_if(tests.begin(), tests.end(), std::back_inserter(activeTests), [&filter](const xUnitTest &test) { return filter(test.TestDetails()); });
 
-    // leaving commented out until I can figure out why the test doesn't fail
-    //std::random_shuffle(activeTests.begin(), activeTests.end());
+    std::random_shuffle(activeTests.begin(), activeTests.end());
 
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
