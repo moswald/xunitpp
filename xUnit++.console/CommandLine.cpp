@@ -188,7 +188,7 @@ namespace CommandLine
             "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with matching <name=value> attribute(s)\n"
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
-            "  -c --concurrent <max ttests>   : Set maximum number of concurrent tests\n"
+            "  -c --concurrent <max tests>    : Set maximum number of concurrent tests\n"
             "\n"
             "Tests are selected with an OR operation for inclusive attributes.\n"
             "Tests are excluded with an AND operation for exclusive attributes.\n"
