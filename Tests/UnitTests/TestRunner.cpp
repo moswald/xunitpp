@@ -150,10 +150,10 @@ FACT_FIXTURE(TestFinishIncludesCorrectTime, TestRunnerFixture)
     tests.push_back(TestFactory(test, testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
 
-    auto min = Time::ToDuration(test.duration) - Time::ToDuration(Time::ToMilliseconds(5));
-    auto max = Time::ToDuration(test.duration) + Time::ToDuration(Time::ToMilliseconds(5));
+    auto min = test.duration - Time::ToMilliseconds(10);
+    auto max = test.duration + Time::ToMilliseconds(10);
 
-    Assert.InRange(std::get<1>(output.finishedTests[0]).count(), min.count(), max.count());
+    Assert.InRange(Time::ToMilliseconds(std::get<1>(output.finishedTests[0])).count(), min.count(), max.count());
 }
 
 FACT_FIXTURE(NoTestsAreFailuresWhenNoTestsRun, TestRunnerFixture)
@@ -222,11 +222,10 @@ FACT_FIXTURE(FailedTestsAreReported, TestRunnerFixture)
 
 FACT_FIXTURE(FailuresAreReported, TestRunnerFixture)
 {
-    tests.push_back(TestFactory(FailingTest(), testCheck));
     tests.push_back(TestFactory([=]() { testCheck->Fail(); testCheck->Fail(); }, testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
 
-    Assert.Equal(3U, output.failures.size());
+    Assert.Equal(2U, output.failures.size());
 }
 
 FACT_FIXTURE(SkippedTestsAreReported, TestRunnerFixture)
@@ -241,7 +240,7 @@ FACT_FIXTURE(SkippedTestsAreReported, TestRunnerFixture)
     Assert.Equal(1U, output.summarySkipped);
 }
 
-TIMED_FACT_FIXTURE(SlowTestsPassHighTimeThreshold, TestRunnerFixture, 0)
+UNTIMED_FACT_FIXTURE(SlowTestsPassHighTimeThreshold, TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(200)), 0);
@@ -250,7 +249,7 @@ TIMED_FACT_FIXTURE(SlowTestsPassHighTimeThreshold, TestRunnerFixture, 0)
     Assert.Equal(0U, output.summaryFailed);
 }
 
-TIMED_FACT_FIXTURE(SlowTestsFailLowTimeThreshold, TestRunnerFixture, 0)
+UNTIMED_FACT_FIXTURE(SlowTestsFailLowTimeThreshold, TestRunnerFixture)
 {
     SleepyTest sleepyTest;
     tests.push_back(TestFactory(sleepyTest, testCheck));
@@ -260,7 +259,7 @@ TIMED_FACT_FIXTURE(SlowTestsFailLowTimeThreshold, TestRunnerFixture, 0)
     Assert.Equal(1U, output.summaryFailed);
 }
 
-TIMED_FACT_FIXTURE(SlowTestFailsBecauseOfTimeLimitReportsReason, TestRunnerFixture, 0)
+UNTIMED_FACT_FIXTURE(SlowTestFailsBecauseOfTimeLimitReportsReason, TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(1)), 0);
@@ -270,7 +269,7 @@ TIMED_FACT_FIXTURE(SlowTestFailsBecauseOfTimeLimitReportsReason, TestRunnerFixtu
     Assert.Contains(std::get<1>(output.failures[0]), "1 milliseconds.");
 }
 
-TIMED_FACT_FIXTURE(SlowTestWithTimeExemptionPasses, TestRunnerFixture, 0)
+UNTIMED_FACT_FIXTURE(SlowTestWithTimeExemptionPasses, TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck).Duration(Time::ToDuration(Time::ToMilliseconds(0))));
 
@@ -294,7 +293,7 @@ FACT_FIXTURE(FilteredTestsDoNotRun, TestRunnerFixture)
 }
 
 ATTRIBUTES(TestOrderIsRandomized, ("Skip", "Threading issues preventing me from tracking down why this *doesn't* fail right now."))
-TIMED_FACT_FIXTURE(TestOrderIsRandomized, TestRunnerFixture, 0)
+UNTIMED_FACT_FIXTURE(TestOrderIsRandomized, TestRunnerFixture)
 {
     // the best I can do here is have 10 tests run, and hope that I don't run into the same 10
     // values back-to-back
