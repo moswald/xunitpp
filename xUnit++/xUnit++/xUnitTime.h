@@ -16,15 +16,30 @@ inline std::chrono::milliseconds ToMilliseconds(Duration time)
     return std::chrono::duration_cast<std::chrono::milliseconds>(time);
 }
 
+inline std::chrono::milliseconds ToMilliseconds(int ms)
+{
+    return std::chrono::milliseconds(ms);
+}
+
 inline Seconds ToSeconds(Duration time)
 {
     return std::chrono::duration_cast<Seconds>(time);
+}
+
+inline Seconds ToSeconds(int ms)
+{
+    return Seconds(ms);
 }
 
 template<typename TDuration>
 inline Duration ToDuration(TDuration time)
 {
     return std::chrono::duration_cast<Duration>(time);
+}
+
+inline Duration ToDuration(int ns)
+{
+    return Duration(ns);
 }
 
 }}
