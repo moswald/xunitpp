@@ -162,6 +162,11 @@ xUnitFailure Assert::Equal(const char *expected, const char *actual, const LineI
     return Equal(std::string(expected), std::string(actual), lineInfo);
 }
 
+xUnitFailure Assert::Equal(const char *expected, const std::string &actual, const LineInfo &lineInfo) const
+{
+    return Equal(std::string(expected), actual, lineInfo);
+}
+
 xUnitFailure Assert::Equal(const std::string &expected, const char *actual, const LineInfo &lineInfo) const
 {
     return Equal(expected, std::string(actual), lineInfo);
@@ -210,6 +215,11 @@ xUnitFailure Assert::DoesNotContain(const char *actualString, const char *value,
     return DoesNotContain(std::string(actualString), std::string(value), lineInfo);
 }
 
+xUnitFailure Assert::DoesNotContain(const char *actualString, const std::string &value, const LineInfo &lineInfo) const
+{
+    return DoesNotContain(std::string(actualString), value, lineInfo);
+}
+
 xUnitFailure Assert::DoesNotContain(const std::string &actualString, const char *value, const LineInfo &lineInfo) const
 {
     return DoesNotContain(actualString, std::string(value), lineInfo);
@@ -227,6 +237,11 @@ xUnitFailure Assert::DoesNotContain(const std::string &actualString, const std::
 }
 
 xUnitFailure Assert::Contains(const char *actualString, const char *value, const LineInfo &lineInfo) const
+{
+    return Contains(std::string(actualString), std::string(value), lineInfo);
+}
+
+xUnitFailure Assert::Contains(const char *actualString, const std::string &value, const LineInfo &lineInfo) const
 {
     return Contains(std::string(actualString), std::string(value), lineInfo);
 }

@@ -146,6 +146,7 @@ public:
     }
 
     xUnitFailure Equal(const char *expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure Equal(const char *expected, const std::string &actual, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure Equal(const std::string &expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure Equal(const std::string &expected, const std::string &actual, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure Equal(float expected, float actual, int precision, const LineInfo &lineInfo = LineInfo::empty()) const;
@@ -311,6 +312,7 @@ public:
     }
 
     xUnitFailure DoesNotContain(const char *actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure DoesNotContain(const char *actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure DoesNotContain(const std::string &actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure DoesNotContain(const std::string &actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
 
@@ -334,6 +336,7 @@ public:
     }
 
     xUnitFailure Contains(const char *actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure Contains(const char *actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure Contains(const std::string &actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
     xUnitFailure Contains(const std::string &actualString, const std::string &value, const LineInfo &lineInfo = LineInfo::empty()) const;
 
