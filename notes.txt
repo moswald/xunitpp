@@ -1,12 +1,8 @@
 General
 -------
 finish unit testing the lib
-    - ensure tests are actually ran
-        - will require new project
     - ensure output formats
     - several tests (look at Theory.cpp) do not actually assert anything happened
-check Release builds for warnings (and failing tests)
-can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa? (and what about x64?)
 redo include structure
 vsix project needs embedded eula and license
 need license for whole project

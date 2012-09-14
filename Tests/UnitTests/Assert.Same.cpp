@@ -47,7 +47,10 @@ FACT(SameAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
 
-    auto assert = Assert.Throws<xUnitAssert>([]() { Assert.Same(0, 1) << msg; });
+    int x = 0;
+    int y = 0;
+
+    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.Same(x, y) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
