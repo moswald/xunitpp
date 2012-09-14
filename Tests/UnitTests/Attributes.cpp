@@ -67,12 +67,11 @@ FACT(SkippedTestsShouldNotBeInstantiated)
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
     xUnitpp::TestCollection collection;
-    xUnitpp::Check check;
+    auto check = std::make_shared<xUnitpp::Check>();
     xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); },
         "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__, check);
 
-    xUnitpp::TestRunner local(emptyReporter);
-    local.RunTests([](const xUnitpp::TestDetails &) { return true; },
+    xUnitpp::RunTests(emptyReporter, [](const xUnitpp::TestDetails &) { return true; },
         collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }
 

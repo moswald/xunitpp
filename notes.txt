@@ -4,8 +4,6 @@ finish unit testing the lib
     - ensure tests are actually ran
         - will require new project
     - ensure output formats
-    - ensure all failing assert types actually increment count of failed tests
-    - include new Check asserts
     - several tests (look at Theory.cpp) do not actually assert anything happened
 check Release builds for warnings (and failing tests)
 can runner be made configuration agnostic? (ie, can debug runner load release tests, and vice versa? (and what about x64?)

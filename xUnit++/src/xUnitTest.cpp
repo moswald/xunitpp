@@ -6,10 +6,10 @@ namespace xUnitpp
 
 xUnitTest::xUnitTest(std::function<void()> test, const std::string &name, const std::string &suite,
                      const AttributeCollection &attributes, Time::Duration timeLimit,
-                     const std::string &filename, int line, const Check &check)
+                     const std::string &filename, int line, std::shared_ptr<Check> check)
     : mTest(test)
     , mTestDetails(name, suite, attributes, timeLimit, filename, line)
-    , mCheck(std::cref(check))
+    , mCheck(check)
 {
 }
 
@@ -21,7 +21,6 @@ xUnitTest::xUnitTest(const xUnitTest &other)
 }
 
 xUnitTest::xUnitTest(xUnitTest &&other)
-    : mCheck(other.mCheck)
 {
     swap(*this, other);
 }
@@ -53,7 +52,7 @@ void xUnitTest::Run()
 
 const std::vector<xUnitAssert> &xUnitTest::NonFatalFailures() const
 {
-    return mCheck.get().Failures();
+    return mCheck->Failures();
 }
 
 }

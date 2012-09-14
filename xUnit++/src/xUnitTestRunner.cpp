@@ -13,64 +13,133 @@
 #include "xUnitAssert.h"
 #include "xUnitTime.h"
 
+#include <iostream>
+
+namespace
+{
+
+class SharedOutput : public xUnitpp::IOutput
+{
+public:
+    SharedOutput(xUnitpp::IOutput &testReporter)
+        : mOutput(testReporter)
+    {
+    }
+
+    virtual void ReportStart(const xUnitpp::TestDetails &details) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        mOutput.get().ReportStart(details);
+    }
+
+    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override 
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        mOutput.get().ReportFailure(details, message, lineInfo);
+    }
+
+    virtual void ReportSkip(const xUnitpp::TestDetails &details, const std::string &reason) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        mOutput.get().ReportSkip(details, reason);
+    }
+
+    virtual void ReportFinish(const xUnitpp::TestDetails &details, xUnitpp::Time::Duration time) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        mOutput.get().ReportFinish(details, time);
+    }
+
+    virtual void ReportAllTestsComplete(size_t total, size_t skipped, size_t failed, xUnitpp::Time::Duration totalTime) override
+    {
+        mOutput.get().ReportAllTestsComplete(total, skipped, failed, totalTime);
+    }
+
+private:
+    SharedOutput(const SharedOutput &);
+    SharedOutput &operator =(SharedOutput);
+
+private:
+    std::mutex mLock;
+    std::reference_wrapper<xUnitpp::IOutput> mOutput;
+};
+
+class AttachedOutput : public xUnitpp::IOutput
+{
+public:
+    AttachedOutput(SharedOutput &output)
+        : mAttached(true)
+        , mOutput(std::ref(output))
+    {
+    }
+
+    void Detach()
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        mAttached = false;
+    }
+
+    virtual void ReportStart(const xUnitpp::TestDetails &details) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+
+        if (mAttached)
+        {
+            mOutput.get().ReportStart(details);
+        }
+    }
+
+    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override 
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+
+        if (mAttached)
+        {
+            mOutput.get().ReportFailure(details, message, lineInfo);
+        }
+    }
+
+    virtual void ReportSkip(const xUnitpp::TestDetails &details, const std::string &reason) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+
+        if (mAttached)
+        {
+            mOutput.get().ReportSkip(details, reason);
+        }
+    }
+
+    virtual void ReportFinish(const xUnitpp::TestDetails &details, xUnitpp::Time::Duration time) override
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+
+        if (mAttached)
+        {
+            mOutput.get().ReportFinish(details, time);
+        }
+    }
+
+    virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override
+    {
+        throw std::logic_error("No one holding an AttachedOutput object should be calling ReportAllTestsComplete.");
+    }
+
+private:
+    AttachedOutput(const AttachedOutput &);
+    AttachedOutput &operator =(AttachedOutput);
+
+private:
+    std::mutex mLock;
+    bool mAttached;
+    std::reference_wrapper<SharedOutput> mOutput;
+};
+
+}
+
 namespace xUnitpp
 {
 
-class TestRunner::Impl
-{
-public:
-    Impl(IOutput &testReporter)
-        : mTestReporter(testReporter)
-    {
-    }
-
-    void OnTestStart(const TestDetails &details)
-    {
-        std::lock_guard<std::mutex> guard(mStartMtx);
-        mTestReporter.ReportStart(details);
-    }
-
-    void OnTestFailure(const TestDetails &details, const std::string &message, const LineInfo &lineInfo)
-    {
-        std::lock_guard<std::mutex> guard(mFailureMtx);
-        mTestReporter.ReportFailure(details, message, lineInfo);
-    }
-
-    void OnTestSkip(const TestDetails &details, const std::string &reason)
-    {
-        mTestReporter.ReportSkip(details, reason);
-    }
-
-    void OnTestFinish(const TestDetails &details, Time::Duration time)
-    {
-        std::lock_guard<std::mutex> guard(mFinishMtx);
-        mTestReporter.ReportFinish(details, time);
-    }
-
-
-    void OnAllTestsComplete(int total, int skipped, int failed, Time::Duration totalTime)
-    {
-        mTestReporter.ReportAllTestsComplete(total, skipped, failed, totalTime);
-    }
-
-private:
-    Impl(const Impl &);
-    Impl &operator=(Impl);
-
-private:
-    IOutput &mTestReporter;
-
-    std::mutex mStartMtx;
-    std::mutex mFailureMtx;
-    std::mutex mFinishMtx;
-};
-
-TestRunner::TestRunner(IOutput &testReporter)
-    : mImpl(new Impl(testReporter))
-{
-}
-
-int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
+int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
@@ -112,8 +181,13 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
     std::atomic<int> failedTests = 0;
     int skippedTests = 0;
 
+    SharedOutput sharedOutput(output);
+
     std::vector<xUnitTest> activeTests;
     std::copy_if(tests.begin(), tests.end(), std::back_inserter(activeTests), [&filter](const xUnitTest &test) { return filter(test.TestDetails()); });
+
+    // leaving commented out until I can figure out why the test doesn't fail
+    //std::random_shuffle(activeTests.begin(), activeTests.end());
 
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
@@ -123,7 +197,7 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
             if (skip != test.TestDetails().Attributes.end())
             {
                 skippedTests++;
-                mImpl->OnTestSkip(test.TestDetails(), skip->second);
+                sharedOutput.ReportSkip(test.TestDetails(), skip->second);
                 continue;
             }
         }
@@ -148,62 +222,62 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                     ThreadCounter &tc;
                 } counterGuard(threadCounter);
 
-                auto actualTest = [&](bool reportEnd) -> Time::TimeStamp
+                //
+                // We are deliberately not capturing any values by reference, since the thread running this lambda may be detached
+                // and abandoned by a timed test. If that were to happen, variables on the stack would get destroyed out from underneath us.
+                // Instead, we're going to make copies that are guaranteed to outlive our method, and return the test status.
+                // If the running thread is still valid, it can manage updating the count of failed threads if necessary.
+                auto actualTest = [](bool reportEnd, xUnitTest runningTest, std::shared_ptr<AttachedOutput> output)-> std::tuple<Time::TimeStamp, bool>
                     {
                         bool failed = false;
                         Time::TimeStamp testStart;
 
                         auto CheckNonFatalErrors = [&]()
                         {
-                            if (!failed && !test.NonFatalFailures().empty())
+                            if (!failed && !runningTest.NonFatalFailures().empty())
                             {
                                 failed = true;
-                                for (const auto &assert : test.NonFatalFailures())
+                                for (auto &assert : runningTest.NonFatalFailures())
                                 {
-                                    mImpl->OnTestFailure(test.TestDetails(), assert.what(), assert.LineInfo());
+                                    output->ReportFailure(runningTest.TestDetails(), assert.what(), assert.LineInfo());
                                 }
                             }
                         };
                         
                         try
                         {
-                            mImpl->OnTestStart(test.TestDetails());
+                            output->ReportStart(runningTest.TestDetails());
 
                             testStart = Time::Clock::now();
-                            test.Run();
+                            runningTest.Run();
                         }
                         catch (const xUnitAssert &e)
                         {
                             CheckNonFatalErrors();
-                            mImpl->OnTestFailure(test.TestDetails(), e.what(), e.LineInfo());
+                            output->ReportFailure(runningTest.TestDetails(), e.what(), e.LineInfo());
                             failed = true;
                         }
                         catch (const std::exception &e)
                         {
                             CheckNonFatalErrors();
-                            mImpl->OnTestFailure(test.TestDetails(), e.what(), LineInfo::empty());
+                            output->ReportFailure(runningTest.TestDetails(), e.what(), LineInfo::empty());
                             failed = true;
                         }
                         catch (...)
                         {
                             CheckNonFatalErrors();
-                            mImpl->OnTestFailure(test.TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
+                            output->ReportFailure(runningTest.TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
                             failed = true;
                         }
 
                         CheckNonFatalErrors();
 
-                        if (failed)
-                        {
-                            ++failedTests;
-                        }
-
                         if (reportEnd)
                         {
-                            mImpl->OnTestFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
+                            output->ReportFinish(runningTest.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
                         }
 
-                        return testStart;
+                        return std::make_tuple(testStart, failed);
                     };
 
                 auto testTimeLimit = test.TestDetails().TimeLimit;
@@ -218,36 +292,51 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
                     // note that forcing a test to run in under a certain amount of time is inherently fragile
                     // there's no guarantee that a thread, once started, actually gets `maxTestRunTime` nanoseconds of CPU
 
-                    Time::TimeStamp testStart;
+                    auto m = std::make_shared<std::mutex>();
+                    std::unique_lock<std::mutex> gate(*m);
 
-                    std::mutex m;
-                    std::unique_lock<std::mutex> gate(m);
-
+                    auto attachedOutput = std::make_shared<AttachedOutput>(sharedOutput);
                     auto threadStarted = std::make_shared<std::condition_variable>();
-                    std::thread timedRunner([&, threadStarted]()
+                    auto testStart = std::make_shared<Time::TimeStamp>();
+                    auto failed = std::make_shared<bool>();
+                    std::thread timedRunner([=]()
                         {
-                            m.lock();
-                            m.unlock();
+                            m->lock();
+                            m->unlock();
 
-                            testStart = actualTest(false);
+                            auto result = actualTest(false, test, attachedOutput);
+                            *testStart = std::get<0>(result);
+                            *failed = std::get<1>(result);
+
                             threadStarted->notify_all();
                         });
                     timedRunner.detach();
 
                     if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
-                        mImpl->OnTestFailure(test.TestDetails(), "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
-                        mImpl->OnTestFinish(test.TestDetails(), testTimeLimit);
+                        attachedOutput->Detach();
+                        sharedOutput.ReportFailure(test.TestDetails(), "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
+                        sharedOutput.ReportFinish(test.TestDetails(), testTimeLimit);
                         ++failedTests;
                     }
                     else
                     {
-                        mImpl->OnTestFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
+                        if (*failed)
+                        {
+                            ++failedTests;
+                        }
+
+                        sharedOutput.ReportFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - *testStart));
                     }
                 }
                 else
                 {
-                    actualTest(true);
+                    auto result = actualTest(true, test, std::make_shared<AttachedOutput>(sharedOutput));
+
+                    if (std::get<1>(result))
+                    {
+                        ++failedTests;
+                    }
                 }
             }));
     }
@@ -257,9 +346,9 @@ int TestRunner::RunTests(std::function<bool(const TestDetails &)> filter, const 
         test.get();
     }
     
-    mImpl->OnAllTestsComplete((int)futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
+    sharedOutput.ReportAllTestsComplete((int)futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
 
-    return -failedTests;
+    return failedTests;
 }
 
 }

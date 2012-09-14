@@ -2,6 +2,7 @@
 #define XUNITTEST_H_
 
 #include <functional>
+#include <memory>
 #include <string>
 #include "TestDetails.h"
 #include "xUnitCheck.h"
@@ -14,7 +15,7 @@ class xUnitTest
 public:
     xUnitTest(std::function<void()> test, const std::string &name, const std::string &suite,
         const AttributeCollection &attributes, Time::Duration timeLimit,
-        const std::string &filename, int line, const Check &check);
+        const std::string &filename, int line, std::shared_ptr<Check> check);
     xUnitTest(const xUnitTest &other);
     xUnitTest(xUnitTest &&other);
     xUnitTest &operator =(xUnitTest other);
@@ -29,7 +30,7 @@ public:
 private:
     std::function<void()> mTest;
     xUnitpp::TestDetails mTestDetails;
-    std::reference_wrapper<const Check> mCheck;
+    std::shared_ptr<Check> mCheck;
 };
 
 }

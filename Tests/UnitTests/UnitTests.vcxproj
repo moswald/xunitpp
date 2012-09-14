@@ -128,13 +128,18 @@
     <ClCompile Include="Assert.Throws.cpp" />
     <ClCompile Include="Assert.True.cpp" />
     <ClCompile Include="Attributes.cpp" />
+    <ClCompile Include="Helpers\OutputRecord.cpp" />
     <ClCompile Include="LineInfo.cpp" />
+    <ClCompile Include="TestRunner.cpp" />
     <ClCompile Include="Theory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\xUnit++\xUnit++.vcxproj">
       <Project>{25df3961-f288-4a96-ae6b-a4950a00ab8e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Helpers\OutputRecord.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

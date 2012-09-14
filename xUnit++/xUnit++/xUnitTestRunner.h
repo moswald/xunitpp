@@ -15,17 +15,8 @@ struct IOutput;
 struct TestDetails;
 class xUnitTest;
 
-class TestRunner
-{
-public:
-    TestRunner(IOutput &testReporter);
-    int RunTests(std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests,
+int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests,
                  Time::Duration maxTestRunTime, size_t maxConcurrent);
-
-private:
-    class Impl;
-    std::shared_ptr<Impl> mImpl;
-};
 
 }
 
