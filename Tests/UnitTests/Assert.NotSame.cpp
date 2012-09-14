@@ -5,43 +5,43 @@ using xUnitpp::xUnitAssert;
 SUITE(AssertNotSame)
 {
 
-FACT(NotSameSuccess)
+struct NotSameFixture
 {
-    int x = 2;
-    int y = 2;
+    NotSameFixture()
+        : obj(2)
+        , different(3)
+    {
+    }
 
-    Assert.NotSame(x, y);
+    int obj;
+    int different;
+};
+
+FACT_FIXTURE(NotSameSuccess, NotSameFixture)
+{
+    Assert.NotSame(obj, different);
 }
 
-FACT(NotSameForPointersSuccess)
+FACT_FIXTURE(NotSameForPointersSuccess, NotSameFixture)
 {
-    int x = 2;
-    int y = 2;
-
-    Assert.NotSame(&x, &y);
+    Assert.NotSame(&obj, &different);
 }
 
-FACT(NotSameAssertsOnFailure)
+FACT_FIXTURE(NotSameAssertsOnFailure, NotSameFixture)
 {
-    int x;
-
-    Assert.Throws<xUnitAssert>([=]() { Assert.NotSame(x, x); });
+    Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(obj, obj); });
 }
 
-FACT(NotSameForPointersAssertsOnFailure)
+FACT_FIXTURE(NotSameForPointersAssertsOnFailure, NotSameFixture)
 {
-    int x;
-
-    Assert.Throws<xUnitAssert>([=]() { Assert.NotSame(&x, &x); });
+    Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(&obj, &obj); });
 }
 
-FACT(NotSameAppendsUserMessage)
+FACT_FIXTURE(NotSameAppendsUserMessage, NotSameFixture)
 {
     static const std::string msg = "xUnit++";
 
-    int x;
-
-    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(x, x) << msg; });
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(obj, obj) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
