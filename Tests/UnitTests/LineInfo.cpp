@@ -49,7 +49,7 @@ FACT(LineInfoOverridesDefaultTestLineInfo)
 
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    xUnitpp::Check localCheck;
+    auto localCheck = std::make_shared<xUnitpp::Check>();
     xUnitpp::TestCollection::Register reg(collection, test,
         "LineInfoOverridesDefaultTestLineInfo", "LineInfo", attributes,
         -1, __FILE__, __LINE__, localCheck);

@@ -14,6 +14,10 @@ public:
     Check();
 
 private:
+    Check(const Check &) /* = delete */;
+    Check(Check &&) /* = delete */;
+    Check &operator =(Check) /* = delete */;
+
     const std::vector<xUnitAssert> &Failures() const;
 
 private:

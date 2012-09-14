@@ -185,5 +185,5 @@ int main(int argc, char **argv)
         }
     }
 
-    return forcedFailure ? 1 : totalFailures;
+    return forcedFailure ? 1 : -totalFailures;
 }

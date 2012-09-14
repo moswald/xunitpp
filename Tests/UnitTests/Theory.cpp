@@ -44,7 +44,7 @@ private:
 
 public:
     TheoryFixture()
-        : localRunner(emptyReporter)
+        : localCheck(std::make_shared<xUnitpp::Check>())
     {
     }
 
@@ -57,7 +57,7 @@ public:
 
     void Run()
     {
-        localRunner.RunTests([](const xUnitpp::TestDetails &) { return true; },
+        RunTests(emptyReporter, [](const xUnitpp::TestDetails &) { return true; },
             collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
     }
 
@@ -71,8 +71,7 @@ public:
 
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    xUnitpp::TestRunner localRunner;
-    xUnitpp::Check localCheck;
+    std::shared_ptr<xUnitpp::Check> localCheck;
 };
 
 std::vector<std::tuple<int>> RawFunctionProvider()

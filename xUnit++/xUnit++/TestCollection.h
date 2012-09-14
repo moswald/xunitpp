@@ -79,11 +79,11 @@ public:
 
     public:
         Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const Check &check);
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check);
 
         template<typename TTheory, typename TTheoryData>
         Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const Check &check)
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check)
         {
             int id = 1;
             for (auto t : theoryData())
@@ -93,7 +93,7 @@ public:
                 auto theoryName = name + "(" + std::to_string(id++) + ")";
 
                 collection.mTests.emplace_back(xUnitTest(TheoryHelper(theory, std::move(t)), theoryName, suite,
-                        attributes, Time::ToDuration(std::chrono::milliseconds(milliseconds)), filename, line, check));
+                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, check));
             }
         }
     };

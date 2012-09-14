@@ -1,6 +1,7 @@
 #ifndef XUNITMACROS_H_
 #define XUNITMACROS_H_
 
+#include <memory>
 #include <tuple>
 #include <vector>
 #include "Attributes.h"
@@ -40,16 +41,20 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_FACT_FIXTURE(FactName, FixtureType, timeout) \
     namespace FactName ## _ns { \
         using xUnitpp::Assert; \
-        xUnitpp::Check Check; \
+        std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
         class FactName ## _Fixture : public FixtureType \
         { \
+            /* !!!VS fix when '= delete' is supported */ \
+            FactName ## _Fixture &operator =(FactName ## _Fixture) /* = delete */; \
         public: \
+            FactName ## _Fixture() : Check(*pCheck) { } \
             void FactName(); \
+            const xUnitpp::Check &Check; \
         }; \
         void FactName ## _runner() { FactName ## _Fixture().FactName(); } \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             &FactName ## _runner, #FactName, xUnitSuite::Name(), \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
     void FactName ## _ns::FactName ## _Fixture::FactName()
 
@@ -62,11 +67,12 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) \
     namespace TheoryName ## _ns { \
         using xUnitpp::Assert; \
-        xUnitpp::Check Check; \
+        std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
+        xUnitpp::Check &Check = *pCheck; \
         void TheoryName params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
     void TheoryName ## _ns::TheoryName params
 
@@ -75,12 +81,13 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_THEORY(TheoryName, params, timeout, ...) \
     namespace TheoryName ## _ns { \
         using xUnitpp::Assert; \
-        xUnitpp::Check Check; \
+        std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
+        xUnitpp::Check &Check = *pCheck; \
         void TheoryName params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             TheoryName, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), #TheoryName, \
-            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, Check); \
+            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
     void TheoryName ## _ns::TheoryName params
 

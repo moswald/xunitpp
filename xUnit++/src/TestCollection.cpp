@@ -20,8 +20,8 @@ namespace
 
     extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, int threadLimit, xUnitpp::IOutput &testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
     {
-        return xUnitpp::TestRunner(testReporter).RunTests(filter,
-            xUnitpp::TestCollection::Instance().Tests(), xUnitpp::Time::ToDuration(std::chrono::milliseconds(timeLimit)), threadLimit);
+        return xUnitpp::RunTests(testReporter, filter, xUnitpp::TestCollection::Instance().Tests(),
+            xUnitpp::Time::ToDuration(xUnitpp::Time::ToMilliseconds(timeLimit)), threadLimit);
     }
 }
 
@@ -35,9 +35,9 @@ TestCollection &TestCollection::Instance()
 }
 
 TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const Check &check)
+                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check)
 {
-    collection.mTests.emplace_back(xUnitTest(fn, name, suite, attributes, Time::ToDuration(std::chrono::milliseconds(milliseconds)), filename, line, check));
+    collection.mTests.emplace_back(xUnitTest(fn, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, check));
 }
 
 const std::vector<xUnitTest> &TestCollection::Tests()
