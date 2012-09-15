@@ -3,7 +3,6 @@ General
 finish unit testing the lib
     - ensure output formats
     - several tests (look at Theory.cpp) do not actually assert anything happened
-redo include structure
 vsix project needs embedded eula and license
 need license for whole project
 

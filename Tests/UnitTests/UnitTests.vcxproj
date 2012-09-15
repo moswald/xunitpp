@@ -131,6 +131,7 @@
     <ClCompile Include="Helpers\OutputRecord.cpp" />
     <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="TestRunner.cpp" />
+    <ClCompile Include="TestsCanOutputAnythingWithToString.cpp" />
     <ClCompile Include="Theory.cpp" />
   </ItemGroup>
   <ItemGroup>
