@@ -93,9 +93,10 @@ protected:
     template<typename T>
     static std::string RangeToString(const T &begin, const T &end)
     {
+        using std::to_string;
         std::string result = "[ ";
 
-        std::for_each(begin, end, [&result](decltype(*begin) val) { result += std::to_string(val) + ", "; });
+        std::for_each(begin, end, [&result](decltype(*begin) val) { result += to_string(val) + ", "; });
 
         result[result.size() - 2] = ' ';
         result[result.size() - 1] = ']';
@@ -293,13 +294,13 @@ public:
     template<typename TSequence, typename TPredicate>
     xUnitFailure DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using namespace std;
+        using std::to_string;
 
-        auto found = find_if(begin(sequence), end(sequence), predicate);
-        if (found != end(sequence))
+        auto found = std::find_if(std::begin(sequence), std::end(sequence), predicate);
+        if (found != std::end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo)
-                .CustomMessage("Found: matching value at position " + to_string(distance(begin(sequence), found)) + "."));
+                .CustomMessage("Found: matching value at position " + to_string(std::distance(std::begin(sequence), found)) + "."));
         }
 
         return OnSuccess();
@@ -343,16 +344,18 @@ public:
     template<typename TActual, typename TRange>
     xUnitFailure InRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
     {
+        using std::to_string;
+
         if (min >= max)
         {
-            throw std::invalid_argument("Assert.InRange argument error: min (" + std::to_string(min) + ") must be strictly less than max (" + std::to_string(max) + ").");
+            throw std::invalid_argument("Assert.InRange argument error: min (" + to_string(min) + ") must be strictly less than max (" + to_string(max) + ").");
         }
 
         if (actual < min || actual >= max)
         {
             return OnFailure(xUnitAssert(callPrefix + "InRange", lineInfo)
-                .Expected("[" + std::to_string(min) + " - " + std::to_string(max) + ")")
-                .Actual(std::to_string(actual)));
+                .Expected("[" + to_string(min) + " - " + to_string(max) + ")")
+                .Actual(to_string(actual)));
         }
 
         return OnSuccess();
@@ -361,16 +364,18 @@ public:
     template<typename TActual, typename TRange>
     xUnitFailure NotInRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
     {
+        using std::to_string;
+
         if (min >= max)
         {
-            throw std::invalid_argument("Assert.NotInRange argument error: min (" + std::to_string(min) + ") must be strictly less than max (" + std::to_string(max) + ").");
+            throw std::invalid_argument("Assert.NotInRange argument error: min (" + to_string(min) + ") must be strictly less than max (" + to_string(max) + ").");
         }
 
         if (actual >= min && actual < max)
         {
             return OnFailure(xUnitAssert(callPrefix + "NotInRange", lineInfo)
-                .Expected("[" + std::to_string(min) + " - " + std::to_string(max) + ")")
-                .Actual(std::to_string(actual)));
+                .Expected("[" + to_string(min) + " - " + to_string(max) + ")")
+                .Actual(to_string(actual)));
         }
 
         return OnSuccess();
