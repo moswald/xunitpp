@@ -5,6 +5,7 @@
         <DisplayName>xUnit++</DisplayName>
         <Description xml:space="preserve">xUnit++ Test Adapter for Visual Studio.</Description>
         <MoreInfo>https://bitbucket.org/moswald/xunit/wiki</MoreInfo>
+        <License>..\LICENSE</License>
         <GettingStartedGuide>https://bitbucket.org/moswald/xunit/wiki</GettingStartedGuide>
         <Tags>C++, Unit Testing, TDD, xUnit</Tags>
     </Metadata>
