@@ -13,33 +13,6 @@ xUnitTest::xUnitTest(std::function<void()> test, const std::string &name, const 
 {
 }
 
-xUnitTest::xUnitTest(const xUnitTest &other)
-    : mTest(other.mTest)
-    , mTestDetails(other.mTestDetails)
-    , mCheck(other.mCheck)
-{
-}
-
-xUnitTest::xUnitTest(xUnitTest &&other)
-{
-    swap(*this, other);
-}
-
-xUnitTest &xUnitTest::operator =(xUnitTest other)
-{
-    swap(*this, other);
-    return *this;
-}
-
-void swap(xUnitTest &a, xUnitTest &b)
-{
-    using std::swap;
-
-    swap(a.mTest, b.mTest);
-    swap(a.mTestDetails, b.mTestDetails);
-    swap(a.mCheck, b.mCheck);
-}
-
 const TestDetails &xUnitTest::TestDetails() const
 {
     return mTestDetails;

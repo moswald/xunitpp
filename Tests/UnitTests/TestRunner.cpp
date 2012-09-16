@@ -60,9 +60,9 @@ struct TestFactory
         return *this;
     }
 
-    operator xUnitTest() const
+    operator std::shared_ptr<xUnitTest>() const
     {
-        return xUnitTest(testFn, name, suite, attributes, timeLimit, file, line, check);
+        return std::make_shared<xUnitTest>(testFn, name, suite, attributes, timeLimit, file, line, check);
     }
 
 private:
@@ -84,7 +84,7 @@ struct TestRunnerFixture
     }
 
     std::shared_ptr<xUnitpp::Check> testCheck;
-    std::vector<xUnitTest> tests;
+    std::vector<std::shared_ptr<xUnitTest>> tests;
     Tests::OutputRecord output;
     Time::Duration duration;
 };

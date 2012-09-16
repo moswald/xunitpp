@@ -92,7 +92,7 @@ public:
                 // not sure how feasible that is in C++, since it's lacking the type reflection of C# :(
                 auto theoryName = name + "(" + std::to_string(id++) + ")";
 
-                collection.mTests.emplace_back(xUnitTest(TheoryHelper(theory, std::move(t)), theoryName, suite,
+                collection.mTests.emplace_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
                     attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, check));
             }
         }
@@ -100,10 +100,10 @@ public:
 
     static TestCollection &Instance();
 
-    const std::vector<xUnitTest> &Tests();
+    const std::vector<std::shared_ptr<xUnitTest>> &Tests();
 
 private:
-    std::vector<xUnitTest> mTests;
+    std::vector<std::shared_ptr<xUnitTest>> mTests;
 };
 
 }

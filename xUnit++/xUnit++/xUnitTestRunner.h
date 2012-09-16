@@ -15,8 +15,8 @@ struct IOutput;
 struct TestDetails;
 class xUnitTest;
 
-int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests,
-                 Time::Duration maxTestRunTime, size_t maxConcurrent);
+int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<std::shared_ptr<xUnitTest>> &tests,
+             Time::Duration maxTestRunTime, size_t maxConcurrent);
 
 }
 

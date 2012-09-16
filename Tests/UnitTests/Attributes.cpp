@@ -12,10 +12,10 @@ FACT(TestWithAttributes)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
-        if (test.TestDetails().Name == "TestWithAttributes")
+        if (test->TestDetails().Name == "TestWithAttributes")
         {
-            auto it = test.TestDetails().Attributes.find("Cats");
-            Assert.True(it != test.TestDetails().Attributes.end());
+            auto it = test->TestDetails().Attributes.find("Cats");
+            Assert.True(it != test->TestDetails().Attributes.end());
             Assert.True(it->second == "Meow");
             return;
         }
