@@ -139,7 +139,7 @@ private:
 namespace xUnitpp
 {
 
-int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<xUnitTest> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
+int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<std::shared_ptr<xUnitTest>> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = std::chrono::system_clock::now();
 
@@ -183,8 +183,8 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
 
     SharedOutput sharedOutput(output);
 
-    std::vector<xUnitTest> activeTests;
-    std::copy_if(tests.begin(), tests.end(), std::back_inserter(activeTests), [&filter](const xUnitTest &test) { return filter(test.TestDetails()); });
+    std::vector<std::shared_ptr<xUnitTest>> activeTests;
+    std::copy_if(tests.begin(), tests.end(), std::back_inserter(activeTests), [&filter](const std::shared_ptr<xUnitTest> &test) { return filter(test->TestDetails()); });
 
     std::random_shuffle(activeTests.begin(), activeTests.end());
 
@@ -192,11 +192,11 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
     for (auto &test : activeTests)
     {
         {
-            auto skip = test.TestDetails().Attributes.find("Skip");
-            if (skip != test.TestDetails().Attributes.end())
+            auto skip = test->TestDetails().Attributes.find("Skip");
+            if (skip != test->TestDetails().Attributes.end())
             {
                 skippedTests++;
-                sharedOutput.ReportSkip(test.TestDetails(), skip->second);
+                sharedOutput.ReportSkip(test->TestDetails(), skip->second);
                 continue;
             }
         }
@@ -226,46 +226,46 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                 // and abandoned by a timed test. If that were to happen, variables on the stack would get destroyed out from underneath us.
                 // Instead, we're going to make copies that are guaranteed to outlive our method, and return the test status.
                 // If the running thread is still valid, it can manage updating the count of failed threads if necessary.
-                auto actualTest = [](bool reportEnd, xUnitTest runningTest, std::shared_ptr<AttachedOutput> output)-> std::tuple<Time::TimeStamp, bool>
+                auto actualTest = [](bool reportEnd, std::shared_ptr<xUnitTest> runningTest, std::shared_ptr<AttachedOutput> output)-> std::tuple<Time::TimeStamp, bool>
                     {
                         bool failed = false;
                         Time::TimeStamp testStart;
 
                         auto CheckNonFatalErrors = [&]()
                         {
-                            if (!failed && !runningTest.NonFatalFailures().empty())
+                            if (!failed && !runningTest->NonFatalFailures().empty())
                             {
                                 failed = true;
-                                for (auto &assert : runningTest.NonFatalFailures())
+                                for (auto &assert : runningTest->NonFatalFailures())
                                 {
-                                    output->ReportFailure(runningTest.TestDetails(), assert.what(), assert.LineInfo());
+                                    output->ReportFailure(runningTest->TestDetails(), assert.what(), assert.LineInfo());
                                 }
                             }
                         };
 
                         try
                         {
-                            output->ReportStart(runningTest.TestDetails());
+                            output->ReportStart(runningTest->TestDetails());
 
                             testStart = Time::Clock::now();
-                            runningTest.Run();
+                            runningTest->Run();
                         }
                         catch (const xUnitAssert &e)
                         {
                             CheckNonFatalErrors();
-                            output->ReportFailure(runningTest.TestDetails(), e.what(), e.LineInfo());
+                            output->ReportFailure(runningTest->TestDetails(), e.what(), e.LineInfo());
                             failed = true;
                         }
                         catch (const std::exception &e)
                         {
                             CheckNonFatalErrors();
-                            output->ReportFailure(runningTest.TestDetails(), e.what(), LineInfo::empty());
+                            output->ReportFailure(runningTest->TestDetails(), e.what(), LineInfo::empty());
                             failed = true;
                         }
                         catch (...)
                         {
                             CheckNonFatalErrors();
-                            output->ReportFailure(runningTest.TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
+                            output->ReportFailure(runningTest->TestDetails(), "Unknown exception caught: test has crashed", LineInfo::empty());
                             failed = true;
                         }
 
@@ -273,13 +273,13 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
 
                         if (reportEnd)
                         {
-                            output->ReportFinish(runningTest.TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
+                            output->ReportFinish(runningTest->TestDetails(), Time::ToDuration(Time::Clock::now() - testStart));
                         }
 
                         return std::make_tuple(testStart, failed);
                     };
 
-                auto testTimeLimit = test.TestDetails().TimeLimit;
+                auto testTimeLimit = test->TestDetails().TimeLimit;
                 if (testTimeLimit < Time::Duration::zero())
                 {
                     testTimeLimit = maxTestRunTime;
@@ -314,8 +314,8 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                     if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
                         attachedOutput->Detach();
-                        sharedOutput.ReportFailure(test.TestDetails(), "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
-                        sharedOutput.ReportFinish(test.TestDetails(), testTimeLimit);
+                        sharedOutput.ReportFailure(test->TestDetails(), "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds.", LineInfo::empty());
+                        sharedOutput.ReportFinish(test->TestDetails(), testTimeLimit);
                         ++failedTests;
                     }
                     else
@@ -325,7 +325,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                             ++failedTests;
                         }
 
-                        sharedOutput.ReportFinish(test.TestDetails(), Time::ToDuration(Time::Clock::now() - *testStart));
+                        sharedOutput.ReportFinish(test->TestDetails(), Time::ToDuration(Time::Clock::now() - *testStart));
                     }
                 }
                 else
