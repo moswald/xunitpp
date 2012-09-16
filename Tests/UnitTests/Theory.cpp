@@ -38,7 +38,7 @@ private:
         {
         }
 
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override 
+        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override
         {
         }
     } emptyReporter;
@@ -208,8 +208,9 @@ THEORY(TestingFailingInlineTheory, (int, const std::string &str),
     Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Empty(str); });
 }
 
+#if defined(WIN32)
 DATA_THEORY(TestingLambdasAsData, (std::function<void()> fn),
-([]()
+([]() -> std::vector<std::tuple<std::function<void()>>>
 {
     std::vector<std::tuple<std::function<void()>>> data;
     data.emplace_back(std::make_tuple([]() { }));
@@ -219,5 +220,6 @@ DATA_THEORY(TestingLambdasAsData, (std::function<void()> fn),
 {
     Assert.DoesNotThrow(fn);
 }
+#endif
 
 }

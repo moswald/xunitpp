@@ -1,4 +1,5 @@
 #include "xUnit++/xUnit++.h"
+#include <stdexcept>
 
 using xUnitpp::xUnitAssert;
 
@@ -23,7 +24,7 @@ FACT(DoesNotThrowAssertsOnFailure)
 
     try
     {
-        Assert.DoesNotThrow([=]() { throw std::exception(msg.c_str()); });
+        Assert.DoesNotThrow([=]() { throw std::runtime_error(msg.c_str()); });
     }
     catch(const xUnitAssert &)
     {
@@ -40,7 +41,7 @@ FACT(DoesNotThrowAppendsMessages)
 
     try
     {
-        Assert.DoesNotThrow([=]() { throw std::exception(exceptionMessage.c_str()); }) << userMessage;
+        Assert.DoesNotThrow([=]() { throw std::runtime_error(exceptionMessage.c_str()); }) << userMessage;
     }
     catch(const xUnitAssert &assert)
     {

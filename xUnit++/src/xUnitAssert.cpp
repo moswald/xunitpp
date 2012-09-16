@@ -110,7 +110,7 @@ xUnitFailure::xUnitFailure(const xUnitFailure &other)
     refCount++;
 }
 
-xUnitFailure::~xUnitFailure()
+xUnitFailure::~xUnitFailure() noexcept(false)
 {
     if (!--refCount)
     {

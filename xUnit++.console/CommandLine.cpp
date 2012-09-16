@@ -1,4 +1,5 @@
 #include "CommandLine.h"
+#include <algorithm>
 #include <functional>
 #include <queue>
 #include <sstream>
@@ -124,7 +125,7 @@ namespace CommandLine
                 }
                 else if (opt == "-i" || opt == "--include")
                 {
-                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.inclusiveAttributes.emplace(kv); });
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.inclusiveAttributes.insert(kv); });
 
                     if (!error.empty())
                     {
@@ -133,7 +134,7 @@ namespace CommandLine
                 }
                 else if (opt == "-e" || opt == "--exclude")
                 {
-                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.exclusiveAttributes.emplace(kv); });
+                    auto error = EatKeyValuePairs(opt, arguments, [&](std::pair<std::string, std::string> &&kv) { options.exclusiveAttributes.insert(kv); });
 
                     if (!error.empty())
                     {
