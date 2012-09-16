@@ -7,6 +7,9 @@ local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
 local.Append(CPPPATH = ['../../xUnit++'])
 
-target = local.SharedLibrary(targetFile + '$SHLIBSUFFIX', Glob(intDir + '*.cpp'), LIBS = env['xUnit'])
+sources = Glob(intDir + '*.cpp')
+sources = sources + Glob(intDir + '/Helpers/*.cpp')
+
+target = local.SharedLibrary(targetFile + '$SHLIBSUFFIX', sources, LIBS = env['xUnit'])
 
 Return('target')

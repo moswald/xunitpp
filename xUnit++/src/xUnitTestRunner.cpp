@@ -32,7 +32,7 @@ public:
         mOutput.get().ReportStart(details);
     }
 
-    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override 
+    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override
     {
         std::lock_guard<std::mutex> guard(mLock);
         mOutput.get().ReportFailure(details, message, lineInfo);
@@ -89,7 +89,7 @@ public:
         }
     }
 
-    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override 
+    virtual void ReportFailure(const xUnitpp::TestDetails &details, const std::string &message, const xUnitpp::LineInfo &lineInfo) override
     {
         std::lock_guard<std::mutex> guard(mLock);
 

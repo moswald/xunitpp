@@ -45,7 +45,7 @@
 
 // attribute expansion helpers
 #define XU_A_1(a) \
-    attributes.emplace(std::make_pair a);
+    attributes.insert(std::make_pair a);
 #define XU_A_2(a, b) \
     XU_A_1(a) \
     XU_A_1(b)
