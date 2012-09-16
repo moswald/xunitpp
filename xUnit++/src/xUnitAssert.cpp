@@ -9,7 +9,7 @@ namespace
         if (!userMsg.empty())
         {
             msg += ": ";
-            
+
             for (const auto &s : userMsg)
             {
                 msg += s;
@@ -78,7 +78,7 @@ const LineInfo &xUnitAssert::LineInfo() const
     return lineInfo;
 }
 
-const char *xUnitAssert::what() const
+const char *xUnitAssert::what() const noexcept(true)
 {
     if (whatMessage.empty())
     {
@@ -120,7 +120,7 @@ xUnitFailure::~xUnitFailure()
         // http://akrzemi1.wordpress.com/2011/09/21/destructors-that-throw/
         // throwing destructors aren't Evil, just misunderstood
         OnFailureComplete(assert);
-    } 
+    }
 }
 
 xUnitFailure xUnitFailure::None()

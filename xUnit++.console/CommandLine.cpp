@@ -1,5 +1,4 @@
 #include "CommandLine.h"
-#include <filesystem>
 #include <functional>
 #include <queue>
 #include <sstream>
@@ -42,7 +41,7 @@ namespace
     bool GetInt(std::queue<std::string> &queue, int &value)
     {
         std::istringstream stream(TakeFront(queue));
-        
+
         stream >> value;
 
         return stream.failbit;
@@ -66,7 +65,17 @@ namespace CommandLine
     {
         auto exe = [=]()
         {
-            return std::tr2::sys::path(argv[0]).leaf();
+            std::string path = argv[0];
+            std::replace(path.begin(), path.end(), '\\', '/');
+
+            auto idx = path.find_last_of('/');
+
+            if (idx != std::string::npos)
+            {
+                return path.substr(idx + 1);
+            }
+
+            return path;
         };
 
         std::queue<std::string> arguments;

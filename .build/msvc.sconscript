@@ -1,5 +1,6 @@
 Import('env')
 
+copy.Append(CPPDEFINES = ['WIN32'])
 env.Append(CCFLAGS = [ '/EHsc' ])
 
 if env['debug'] == True:

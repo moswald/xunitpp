@@ -10,6 +10,7 @@
 #include <exception>
 #include <functional>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -43,7 +44,7 @@ public:
 
     static const xUnitAssert &None();
 
-    virtual const char *what() const override;
+    virtual const char *what() const noexcept(true) override;
 
 private:
     xUnitpp::LineInfo lineInfo;
@@ -282,7 +283,7 @@ public:
     typename std::enable_if<!has_empty<TSequence>::value, xUnitFailure>::type Empty(const TSequence &sequence, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         using namespace std;
-    
+
         if (begin(sequence) != end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "Empty", lineInfo));
@@ -333,7 +334,7 @@ public:
     template<typename TSequence, typename T>
     xUnitFailure Contains(const TSequence &sequence, T value, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        return ContainsPred(sequence, [&value](const T &actual) { return actual == value; }, lineInfo); 
+        return ContainsPred(sequence, [&value](const T &actual) { return actual == value; }, lineInfo);
     }
 
     xUnitFailure Contains(const char *actualString, const char *value, const LineInfo &lineInfo = LineInfo::empty()) const;
