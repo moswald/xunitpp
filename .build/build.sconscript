@@ -2,5 +2,7 @@ Import('env')
 
 if env['windows'] == True:
     SConscript('msvc.sconscript', exports = 'env')
-
-env.Append(CCFLAGS = [ '/W4', '/WX-' ])
+else:
+    env['CXX'] = 'g++-4.7'
+    #env.Append(CCFLAGS = [ '-Wall', '-Wextra', '-pedantic', '-fpermissive', '-std=c++11' ])
+    env.Append(CCFLAGS = [ '-fpermissive', '-w', '-std=c++11' ])

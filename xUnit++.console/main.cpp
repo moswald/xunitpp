@@ -3,12 +3,13 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include <Windows.h>
 #include "xUnit++/ExportApi.h"
 #include "xUnit++/TestDetails.h"
 #include "CommandLine.h"
 #include "StdOutReporter.h"
+#include "TestAssembly.h"
 #include "XmlReporter.h"
+
 
 int main(int argc, char **argv)
 {
@@ -28,20 +29,11 @@ int main(int argc, char **argv)
 
     for (const auto &lib : options.libraries)
     {
-        auto testlib = LoadLibrary(lib.c_str());
+        auto testAssembly = xUnitpp::TestAssembly(lib.c_str());
 
-        if (testlib == nullptr)
+        if (!testAssembly)
         {
-            std::cerr << "unable to load " << lib << std::endl;
-            forcedFailure = true;
-            continue;
-        }
-
-        xUnitpp::EnumerateTestDetails enumerateTests = (xUnitpp::EnumerateTestDetails)GetProcAddress(testlib, "EnumerateTestDetails");
-
-        if (!enumerateTests)
-        {
-            std::cerr << "unable to load EnumerateTestDetails" << std::endl;
+            std::cerr << "Unable to load " << lib << std::endl;
             forcedFailure = true;
             continue;
         }
@@ -65,7 +57,7 @@ int main(int argc, char **argv)
                 }
             };
 
-        enumerateTests([&](const xUnitpp::TestDetails &td)
+        testAssembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
             {
                 // check suites:
                 // if any suites are specified, a test has to belong to one of them to be run
@@ -165,19 +157,10 @@ int main(int argc, char **argv)
         {
             std::sort(activeTestIds.begin(), activeTestIds.end());
 
-            xUnitpp::FilteredTestsRunner filteredTestRunner = (xUnitpp::FilteredTestsRunner)GetProcAddress(testlib, "FilteredTestsRunner");
-
-            if (!filteredTestRunner)
-            {
-                std::cerr << "unable to get FilteredTestsRunner" << std::endl;
-                forcedFailure = true;
-                continue;
-            }
-
             std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
                 (xUnitpp::IOutput *)new xUnitpp::StdOutReporter(options.verbose, options.veryVerbose) :
                 (xUnitpp::IOutput *)new xUnitpp::XmlReporter(options.xmlOutput));
-            totalFailures += filteredTestRunner(options.timeLimit, options.threadLimit, *reporter,
+            totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)
                 {
                     return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);

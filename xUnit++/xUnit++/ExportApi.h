@@ -5,6 +5,10 @@
 #include <memory>
 #include <vector>
 
+#if !defined(WIN32)
+# define __declspec(x)
+#endif
+
 namespace xUnitpp
 {
     struct IOutput;

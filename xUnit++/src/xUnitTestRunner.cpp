@@ -178,7 +178,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
         std::condition_variable condition;
     } threadCounter(maxConcurrent);
 
-    std::atomic<int> failedTests = 0;
+    std::atomic<int> failedTests(0);
     int skippedTests = 0;
 
     SharedOutput sharedOutput(output);
@@ -242,7 +242,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                                 }
                             }
                         };
-                        
+
                         try
                         {
                             output->ReportStart(runningTest.TestDetails());
@@ -344,7 +344,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
     {
         test.get();
     }
-    
+
     sharedOutput.ReportAllTestsComplete((int)futures.size(), skippedTests, failedTests, Time::ToDuration(Time::Clock::now() - timeStart));
 
     return failedTests;

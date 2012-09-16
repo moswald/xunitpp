@@ -7,6 +7,6 @@ local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
 local.Append(CPPPATH = ['../xUnit++'])
 
-target = local.Program(targetFile + '.exe', Glob(intDir + '*.cpp'), LIBS = env['xUnit'])
+target = local.Program(targetFile + '.exe', Glob(intDir + '*.cpp'), LIBS = [env['xUnit'], 'dl' ])
 
 Return('target')
