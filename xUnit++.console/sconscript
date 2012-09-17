@@ -10,6 +10,11 @@ local.Append(CPPPATH = ['../xUnit++'])
 if env['windows'] == True:
     targetFile = targetFile + '.exe'
 
-target = local.Program(targetFile, Glob(intDir + '*.cpp'), LIBS = [env['xUnit'], 'dl', 'pthread' ])
+libs = env['xUnit']
+
+if env['windows'] == False:
+    libs = libs + [ 'dl', 'pthread' ]
+
+target = local.Program(targetFile, Glob(intDir + '*.cpp'), LIBS = libs)
 
 Return('target')
