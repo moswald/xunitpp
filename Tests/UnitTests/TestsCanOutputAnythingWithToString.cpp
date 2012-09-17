@@ -1,7 +1,7 @@
 #include <string>
 #include "xUnit++/xUnit++.h"
 
-SUITE(KNRToString)
+SUITE(ADLToString)
 {
 
 namespace HasToString
@@ -47,7 +47,7 @@ namespace HasToString
 
 using HasToString::Point;
 
-FACT(EqualKNR)
+FACT(EqualADL)
 {
     Point p0(0, 0);
     Point p1(1, 1);
@@ -58,7 +58,7 @@ FACT(EqualKNR)
     Check.Contains(result.what(), "Actual: (1, 1)");
 }
 
-FACT(RangeEqualKNR)
+FACT(RangeEqualADL)
 {
     Point p0[] = { Point(0, 0), Point(1, 0), Point(2, 0) };
     Point p1[] = { Point(0, 0), Point(1, 1), Point(2, 0) };
@@ -70,7 +70,7 @@ FACT(RangeEqualKNR)
     Check.Contains(result.what(), "Actual: [ (0, 0), (1, 1), (2, 0) ]");
 }
 
-FACT(InRangeKNR)
+FACT(InRangeADL)
 {
     Point min(0, 0);
     Point max(10, 0);
@@ -82,7 +82,7 @@ FACT(InRangeKNR)
     Check.Contains(result.what(), "Actual: (20, 0)");
 }
 
-FACT(NotInRangeKNR)
+FACT(NotInRangeADL)
 {
     Point min(0, 0);
     Point max(10, 0);
