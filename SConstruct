@@ -68,3 +68,4 @@ if release != 0:
 
     rel = SConscript('.build/release.sconscript', exports = 'env')
     buildProjects(rel)
+

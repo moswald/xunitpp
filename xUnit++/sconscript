@@ -7,10 +7,6 @@ local = env.Clone()
 local.VariantDir(intDir, 'src/', duplicate = 0)
 local.Append(CPPPATH = ['xUnit++'])
 
-# bug in scons? this will fail when doing release builds
-if env['debug'] == True:
-    targetFile = targetFile + '$LIBSUFFIX'
-
 target = local.StaticLibrary(targetFile, Glob(intDir + '*.cpp'))
 
 Return('target')

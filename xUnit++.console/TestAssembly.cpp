@@ -81,8 +81,11 @@ TestAssembly::TestAssembly(const std::string &file)
 #else
         if ((module = dlopen(tempFile.c_str(), RTLD_LAZY)) != nullptr)
         {
-            EnumerateTestDetails = (xUnitpp::EnumerateTestDetails)dlsym(module, "EnumerateTestDetails");
-            FilteredTestsRunner = (xUnitpp::FilteredTestsRunner)dlsym(module, "FilteredTestsRunner");
+            // so silly. ISO C++ forbids casting void * to a pointer-to-function
+            // but POSIX says "sure, go right ahead"
+            // this weird syntax works around that
+            *(void **)(&EnumerateTestDetails) = dlsym(module, "EnumerateTestDetails");
+            *(void **)(&FilteredTestsRunner) = dlsym(module, "FilteredTestsRunner");
         }
 #endif
     }

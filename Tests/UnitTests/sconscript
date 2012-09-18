@@ -10,6 +10,6 @@ local.Append(CPPPATH = ['../../xUnit++'])
 sources = Glob(intDir + '*.cpp')
 sources = sources + Glob(intDir + '/Helpers/*.cpp')
 
-target = local.SharedLibrary(targetFile + '$SHLIBSUFFIX', sources, LIBS = env['xUnit'])
+target = local.SharedLibrary(targetFile, sources, LIBS = env['xUnit'])
 
 Return('target')
