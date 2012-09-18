@@ -185,6 +185,33 @@ xUnitFailure Assert::Equal(double expected, double actual, int precision, const 
     return Equal(er, ar, [](double er, double ar) { return er == ar; }, lineInfo);
 }
 
+xUnitFailure Assert::NotEqual(const std::string &expected, const std::string &actual, const LineInfo &lineInfo) const
+{
+    if (expected == actual)
+    {
+        return OnFailure(xUnitAssert(callPrefix + "NotEqual", lineInfo)
+            .Expected(expected)
+            .Actual(actual));
+    }
+
+    return OnSuccess();
+}
+
+xUnitFailure Assert::NotEqual(const char *expected, const char *actual, const LineInfo &lineInfo) const
+{
+    return NotEqual(std::string(expected), std::string(actual), lineInfo);
+}
+
+xUnitFailure Assert::NotEqual(const char *expected, const std::string &actual, const LineInfo &lineInfo) const
+{
+    return NotEqual(std::string(expected), actual, lineInfo);
+}
+
+xUnitFailure Assert::NotEqual(const std::string &expected, const char *actual, const LineInfo &lineInfo) const
+{
+    return NotEqual(expected, std::string(actual), lineInfo);
+}
+
 xUnitFailure Assert::Fail(const LineInfo &lineInfo) const
 {
     return OnFailure(xUnitAssert(callPrefix + "Fail", lineInfo));
