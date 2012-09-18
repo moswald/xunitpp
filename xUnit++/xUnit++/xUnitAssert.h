@@ -207,6 +207,11 @@ public:
         return NotEqual(expected, actual, [](TExpected expected, TActual actual) { return expected == actual; }, lineInfo);
     }
 
+    xUnitFailure NotEqual(const char *expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure NotEqual(const char *expected, const std::string &actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure NotEqual(const std::string &expected, const char *actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+    xUnitFailure NotEqual(const std::string &expected, const std::string &actual, const LineInfo &lineInfo = LineInfo::empty()) const;
+
     template<typename TExpected, typename TActual, typename TComparer>
     xUnitFailure NotEqual(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
@@ -287,6 +292,30 @@ public:
         if (begin(sequence) != end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "Empty", lineInfo));
+        }
+
+        return OnSuccess();
+    }
+
+    template<typename TSequence>
+    typename std::enable_if<has_empty<TSequence>::value, xUnitFailure>::type NotEmpty(const TSequence &sequence, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        if (sequence.empty())
+        {
+            return OnFailure(xUnitAssert(callPrefix + "NotEmpty", lineInfo));
+        }
+
+        return OnSuccess();
+    }
+
+    template<typename TSequence>
+    typename std::enable_if<!has_empty<TSequence>::value, xUnitFailure>::type NotEmpty(const TSequence &sequence, const LineInfo &lineInfo = LineInfo::empty()) const
+    {
+        using namespace std;
+
+        if (begin(sequence) == end(sequence))
+        {
+            return OnFailure(xUnitAssert(callPrefix + "NotEmpty", lineInfo));
         }
 
         return OnSuccess();

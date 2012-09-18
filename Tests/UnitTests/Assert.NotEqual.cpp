@@ -101,4 +101,15 @@ FACT(AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch)
     Assert.Throws<xUnitAssert>([&]() { Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; }); });
 }
 
+FACT(NotEqualForStrings)
+{
+    std::string expected = "abcd";
+    std::string actual = "abcd";
+
+    Assert.Throws<xUnitAssert>([=]() { Assert.NotEqual(expected.c_str(), actual.c_str()); }, LI);
+    Assert.Throws<xUnitAssert>([=]() { Assert.NotEqual(expected.c_str(), actual); }, LI);
+    Assert.Throws<xUnitAssert>([=]() { Assert.NotEqual(expected, actual.c_str()); }, LI);
+    Assert.Throws<xUnitAssert>([=]() { Assert.NotEqual(expected, actual); }, LI);
+}
+
 }

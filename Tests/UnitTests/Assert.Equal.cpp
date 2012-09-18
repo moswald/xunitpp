@@ -152,4 +152,16 @@ FACT(AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch)
     Assert.Contains(assert.what(), "at location 0");
 }
 
+FACT(EqualForStrings)
+{
+    std::string expected = "abcd";
+    std::string actual = "abc";
+
+    Assert.Throws<xUnitAssert>([=]() { Assert.Equal(expected.c_str(), actual.c_str()); });
+    Assert.Throws<xUnitAssert>([=]() { Assert.Equal(expected.c_str(), actual); });
+    Assert.Throws<xUnitAssert>([=]() { Assert.Equal(expected, actual.c_str()); });
+    Assert.Throws<xUnitAssert>([=]() { Assert.Equal(expected, actual); });
+}
+
+
 }
