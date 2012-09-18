@@ -17,7 +17,7 @@ public:
         const AttributeCollection &attributes, Time::Duration timeLimit,
         const std::string &filename, int line, std::shared_ptr<Check> check);
 
-    const TestDetails &TestDetails() const;
+    const xUnitpp::TestDetails &TestDetails() const;
 
     void Run();
 

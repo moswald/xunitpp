@@ -1,14 +1,14 @@
 Import("env")
 
-debugTag = ""
+debugTag = ''
 
 debug = env['debug']
 
 if debug == True:
-    debugTag = ".Debug"
+    debugTag = '.Debug$SHLIBSUFFIX'
 
-outputDir = "#bin/"
-intDir = "#int/"
+outputDir = '#bin/'
+intDir = '#int/'
 
 def getTargetFile(projectName):
     return outputDir + projectName + '/' + projectName + debugTag

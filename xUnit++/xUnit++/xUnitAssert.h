@@ -40,7 +40,7 @@ public:
         return *this;
     }
 
-    const LineInfo &LineInfo() const;
+    const xUnitpp::LineInfo &LineInfo() const;
 
     static const xUnitAssert &None();
 

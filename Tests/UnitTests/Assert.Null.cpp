@@ -26,7 +26,7 @@ FACT(NullForSmartPointerSuccess)
 FACT(NullForRawPointerAssertsOnFailure)
 {
     int x;
-    Assert.Throws<xUnitAssert>([=]() { Assert.Null(&x); });
+    Assert.Throws<xUnitAssert>([&]() { Assert.Null(&x); });
 }
 
 FACT(NullForSmartPointerAssertsOnFailure)
@@ -38,8 +38,8 @@ FACT(NullForSmartPointerAssertsOnFailure)
 FACT(NullAppendsUserMessage)
 {
     static const std::string msg = "xUnit++";
-    int x;
-    auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.Null(&x) << msg; });
+    auto x = std::make_shared<int>(0);
+    auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Null(x) << msg; });
 
     Assert.Contains(assert.what(), msg.c_str());
 }
