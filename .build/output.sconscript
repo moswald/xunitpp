@@ -1,20 +1,26 @@
 Import("env")
 
-debugTag = ''
+def getTargetFile(projectName, type):
+    debugTag = ''
 
-debug = env['debug']
+    if env['debug'] == True:
+        debugTag = '.Debug'
 
-if debug == True:
-    debugTag = '.Debug$SHLIBSUFFIX'
+    if env['debug'] == True:
+        if type == 'shared':
+            debugTag = debugTag + '$SHLIBSUFFIX'
+        if type == 'static':
+            debugTag = debugTag + '$LIBSUFFIX'
 
-outputDir = '#bin/'
-intDir = '#int/'
+    if type == 'exe' and env['windows'] == True:
+        debugTag = debugTag + '.exe'
 
-def getTargetFile(projectName):
+    outputDir = '#bin/'
     return outputDir + projectName + '/' + projectName + debugTag
 
 def getIntDir(projectName):
-    return intDir + projectName + ('/debug/' if debug != 0 else '/release/')
+    intDir = '#int/'
+    return intDir + projectName + ('/debug/' if env['debug'] != False else '/release/')
 
 env['getTargetFile'] = getTargetFile
 env['getIntDir'] = getIntDir

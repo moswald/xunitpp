@@ -1,14 +1,11 @@
 Import('env')
 
-targetFile = env['getTargetFile']('xUnit++.console')
+targetFile = env['getTargetFile']('xUnit++.console', 'exe')
 intDir = env['getIntDir']('xUnit++.console')
 
 local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
 local.Append(CPPPATH = ['../xUnit++'])
-
-if env['windows'] == True:
-    targetFile = targetFile + '.exe'
 
 libs = env['xUnit']
 

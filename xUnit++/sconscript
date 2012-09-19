@@ -1,6 +1,6 @@
 Import('env')
 
-targetFile = env['getTargetFile']('xUnit++')
+targetFile = env['getTargetFile']('xUnit++', 'static')
 intDir = env['getIntDir']('xUnit++')
 
 local = env.Clone()
