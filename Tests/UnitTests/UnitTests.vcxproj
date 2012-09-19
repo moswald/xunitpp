@@ -91,7 +91,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,8 +107,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
+      <Message>Running Unit Tests...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Assert.Contains.cpp" />
