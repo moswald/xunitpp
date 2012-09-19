@@ -1,6 +1,6 @@
 Import('env')
 
-targetFile = env['getTargetFile']('BareTests')
+targetFile = env['getTargetFile']('BareTests', 'shared')
 intDir = env['getIntDir']('BareTests')
 
 local = env.Clone()
