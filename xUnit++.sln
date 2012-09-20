@@ -20,8 +20,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BareTests", "Tests\BareTest
 		{2F1709B8-9F5A-4625-9404-C348298181B7} = {2F1709B8-9F5A-4625-9404-C348298181B7}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xUnit++.VsExtension", "xUnit++.VsExtension\xUnit++.VsExtension.csproj", "{86D7EE76-854B-43D5-90F5-932853A412F0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -68,12 +66,6 @@ Global
 		{EDEB02E2-F389-4CBF-AE7D-3041A934F86B}.Release|Win32.Build.0 = Release|Win32
 		{EDEB02E2-F389-4CBF-AE7D-3041A934F86B}.Release|x64.ActiveCfg = Release|x64
 		{EDEB02E2-F389-4CBF-AE7D-3041A934F86B}.Release|x64.Build.0 = Release|x64
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Debug|Win32.ActiveCfg = Debug|x86
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Debug|Win32.Build.0 = Debug|x86
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Debug|x64.ActiveCfg = Debug|x86
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Release|Win32.ActiveCfg = Release|x86
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Release|Win32.Build.0 = Release|x86
-		{86D7EE76-854B-43D5-90F5-932853A412F0}.Release|x64.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
