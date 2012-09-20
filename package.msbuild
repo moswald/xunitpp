@@ -66,12 +66,14 @@
     <Copy SourceFiles="@(TestAdapterFiles)"
           DestinationFolder="package\TestAdapter\" />
     <Copy SourceFiles="License.txt"
-          DestinationFolder="package\" />
+          DestinationFolder="package\xUnit++\" />
+    <Copy SourceFiles="License.txt"
+          DestinationFolder="package\TestAdapter\" />
 </Target>
 
 <Target Name="Zip" DependsOnTargets="Package">
     <ItemGroup>
-        <FilesToCompress Include="package\xUnit++\**\*;package\License.txt" />
+        <FilesToCompress Include="package\xUnit++\**\*" />
     </ItemGroup>
 
     <Zip TaskAction="Create"
@@ -92,7 +94,6 @@
 
 <Target Name="All" DependsOnTargets="Zip;Vsix">
     <RemoveDir Directories="package/TestAdapter;package/xUnit++" />
-    <Delete Files="package/License.txt" />
 </Target>
 
 </Project>
