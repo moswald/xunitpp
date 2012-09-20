@@ -8,7 +8,6 @@
         <Locale>1033</Locale>
         <MoreInfoUrl>https://bitbucket.org/moswald/xunit/wiki</MoreInfoUrl>
         <License>License.txt</License>
-        <Icon></Icon>
         <SupportedProducts>
             <VisualStudio Version="11.0">
                 <Edition>Ultimate</Edition>
