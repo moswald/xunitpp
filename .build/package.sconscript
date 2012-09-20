@@ -1,0 +1,9 @@
+Import('env')
+
+env.Install('#package/xUnit++/include/xUnit++/', Glob('#xUnit++/xUnit++/*.h'))
+env.Install('#package/xUnit++/lib/', Glob('#bin/xUnit++/*.a'))
+env.Install('#package/xUnit++/bin/', Glob('#bin/xUnit++.console/*'))
+env.Install('#package/xUnit++/', '#License.txt')
+
+env.Replace(TARFLAGS = '-c -z')
+env.Tar('#package/xUnit++.tar.gz', '#package/xUnit++')

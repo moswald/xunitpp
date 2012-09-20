@@ -29,8 +29,17 @@ else:
 # what are we building?
 debug = ARGUMENTS.get('debug', 0)
 release = ARGUMENTS.get('release', 0)
+package = ARGUMENTS.get('package', 0)
 
-# default to building just debug version
+if env['windows'] == True:
+    package = 0
+
+# if building the package, need to build both
+if package != 0:
+    release = 1
+    debug = 1
+
+# default to building just debug version if nothing is set
 if debug == 0 and release == 0:
     debug = 1
 
@@ -69,3 +78,5 @@ if release != 0:
     rel = SConscript('.build/release.sconscript', exports = 'env')
     buildProjects(rel)
 
+    if package != 0:
+        SConscript('.build/package.sconscript', exports = 'env')
