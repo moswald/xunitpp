@@ -2,30 +2,30 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertNotEqual)
+SUITE("AssertNotEqual")
 {
 
-FACT(AssertNotEqualDefaultComparerWithSuccess)
+FACT("AssertNotEqualDefaultComparerWithSuccess")
 {
     Assert.NotEqual(0, 1);
 }
 
-FACT(AssertNotEqualDefaultComparerAssertsOnFailure)
+FACT("AssertNotEqualDefaultComparerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.NotEqual(0, 0); });
 }
 
-FACT(AssertNotEqualCustomComparerWithSuccess)
+FACT("AssertNotEqualCustomComparerWithSuccess")
 {
     Assert.NotEqual(0, 0, [](int, int) { return false; });
 }
 
-FACT(AssertNotEqualCustomComparerAssertsOnFailure)
+FACT("AssertNotEqualCustomComparerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.NotEqual(0, 1, [](int, int) { return true; }); });
 }
 
-FACT(AssertNotEqualAppendsUserMessage)
+FACT("AssertNotEqualAppendsUserMessage")
 {
     static const std::string msg = "custom message";
 
@@ -34,7 +34,7 @@ FACT(AssertNotEqualAppendsUserMessage)
     Assert.Contains(assert.what(), msg.c_str());
 }
 
-FACT(AssertSequenceNotEqualDefaultComparerWithSuccess)
+FACT("AssertSequenceNotEqualDefaultComparerWithSuccess")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -50,7 +50,7 @@ FACT(AssertSequenceNotEqualDefaultComparerWithSuccess)
     Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end());
 }
 
-FACT(AssertSequenceNotEqualDefaultComparerAssertsOnFailure)
+FACT("AssertSequenceNotEqualDefaultComparerAssertsOnFailure")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -67,7 +67,7 @@ FACT(AssertSequenceNotEqualDefaultComparerAssertsOnFailure)
     Assert.Throws<xUnitAssert>([&]() { Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end()); });
 }
 
-FACT(AssertSequenceNotEqualCustomComparerWithSuccess)
+FACT("AssertSequenceNotEqualCustomComparerWithSuccess")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -84,7 +84,7 @@ FACT(AssertSequenceNotEqualCustomComparerWithSuccess)
     Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return false; });
 }
 
-FACT(AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch)
+FACT("AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -101,7 +101,7 @@ FACT(AssertSequenceNotEqualDefaultAssertsOnFailureDueToMismatch)
     Assert.Throws<xUnitAssert>([&]() { Assert.NotEqual(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; }); });
 }
 
-FACT(NotEqualForStrings)
+FACT("NotEqualForStrings")
 {
     std::string expected = "abcd";
     std::string actual = "abcd";

@@ -2,24 +2,24 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertSame)
+SUITE("AssertSame")
 {
 
-FACT(SameSuccess)
+FACT("SameSuccess")
 {
     int x;
 
     Assert.Same(x, x);
 }
 
-FACT(SameForPointersSuccess)
+FACT("SameForPointersSuccess")
 {
     int x;
 
     Assert.Same(&x, &x);
 }
 
-FACT(SameForConstPointersSuccess)
+FACT("SameForConstPointersSuccess")
 {
     int x;
     const int *px = &x;
@@ -27,7 +27,7 @@ FACT(SameForConstPointersSuccess)
     Assert.Same(px, px);
 }
 
-FACT(SameAssertsOnFailure)
+FACT("SameAssertsOnFailure")
 {
     int x = 2;
     int y = 2;
@@ -35,7 +35,7 @@ FACT(SameAssertsOnFailure)
     Assert.Throws<xUnitAssert>([=]() { Assert.Same(x, y); });
 }
 
-FACT(SameForPointersAssertsOnFailure)
+FACT("SameForPointersAssertsOnFailure")
 {
     int x = 2;
     int y = 2;
@@ -43,7 +43,7 @@ FACT(SameForPointersAssertsOnFailure)
     Assert.Throws<xUnitAssert>([=]() { Assert.Same(&x, &y); });
 }
 
-FACT(SameAppendsUserMessage)
+FACT("SameAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
 

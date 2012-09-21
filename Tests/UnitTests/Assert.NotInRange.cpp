@@ -4,7 +4,7 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertNotInRange)
+SUITE("AssertNotInRange")
 {
 
 std::vector<std::tuple<int, int, int>> NotInRangeSuccessData()
@@ -43,7 +43,7 @@ DATA_THEORY(NotInRangeAssertsOnFailure, (int actual, int min, int max), NotInRan
     Assert.Throws<xUnitAssert>([=]() { Assert.NotInRange(actual, min, max); });
 }
 
-FACT(NotInRangeAppendsUserMessage)
+FACT("NotInRangeAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
 
@@ -52,7 +52,7 @@ FACT(NotInRangeAppendsUserMessage)
     Assert.Contains(assert.what(), msg.c_str());
 }
 
-FACT(NotInRangeNeedsValidRange)
+FACT("NotInRangeNeedsValidRange")
 {
     Assert.Throws<std::invalid_argument>([]() { Assert.NotInRange(0, 0, 0); });
     Assert.Throws<std::invalid_argument>([]() { Assert.NotInRange(0, 1, 0); });

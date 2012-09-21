@@ -2,20 +2,20 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertFalse)
+SUITE("AssertFalse")
 {
 
-FACT(FalseSuccess)
+FACT("FalseSuccess")
 {
     Assert.False(false);
 }
 
-FACT(FalseAssertsOnTrue)
+FACT("FalseAssertsOnTrue")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.False(true); });
 }
 
-FACT(FalseAppendsCustomMessage)
+FACT("FalseAppendsCustomMessage")
 {
     static const std::string msg = "xUnit++";
 

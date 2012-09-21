@@ -2,7 +2,7 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertNotSame)
+SUITE("AssertNotSame")
 {
 
 struct NotSameFixture
@@ -17,27 +17,27 @@ struct NotSameFixture
     int different;
 };
 
-FACT_FIXTURE(NotSameSuccess, NotSameFixture)
+FACT_FIXTURE("NotSameSuccess", NotSameFixture)
 {
     Assert.NotSame(obj, different);
 }
 
-FACT_FIXTURE(NotSameForPointersSuccess, NotSameFixture)
+FACT_FIXTURE("NotSameForPointersSuccess", NotSameFixture)
 {
     Assert.NotSame(&obj, &different);
 }
 
-FACT_FIXTURE(NotSameAssertsOnFailure, NotSameFixture)
+FACT_FIXTURE("NotSameAssertsOnFailure", NotSameFixture)
 {
     Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(obj, obj); });
 }
 
-FACT_FIXTURE(NotSameForPointersAssertsOnFailure, NotSameFixture)
+FACT_FIXTURE("NotSameForPointersAssertsOnFailure", NotSameFixture)
 {
     Assert.Throws<xUnitAssert>([&]() { Assert.NotSame(&obj, &obj); });
 }
 
-FACT_FIXTURE(NotSameAppendsUserMessage, NotSameFixture)
+FACT_FIXTURE("NotSameAppendsUserMessage", NotSameFixture)
 {
     static const std::string msg = "xUnit++";
 

@@ -4,11 +4,12 @@
 #include "xUnit++/xUnit++.h"
 
 
-SUITE(Attributes)
+SUITE("Attributes")
 {
 
-ATTRIBUTES(TestWithAttributes, ("Cats", "Meow"))
-FACT(TestWithAttributes)
+ATTRIBUTES(("Cats", "Meow"))
+{
+FACT("TestWithAttributes")
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
@@ -23,8 +24,9 @@ FACT(TestWithAttributes)
 
     Assert.Fail() << "Could not find self in test list.";
 }
+}
 
-FACT(SkippedTestsShouldNotBeInstantiated)
+FACT("SkippedTestsShouldNotBeInstantiated")
 {
     // have to set this internal test up manually since the macros don't work embedded within each other
     struct SkippedTest : xUnitpp::NoFixture

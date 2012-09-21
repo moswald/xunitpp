@@ -12,8 +12,8 @@
 #include "xUnitCheck.h"
 #include "xUnitMacroHelpers.h"
 
-#define ATTRIBUTES(TestName, ...) \
-    namespace TestName ## _ns { \
+#define ATTRIBUTES(...) \
+    namespace XU_UNIQUE_ATT_NS { \
         namespace xUnitAttributes { \
             inline xUnitpp::AttributeCollection Attributes() \
             { \
@@ -22,51 +22,52 @@
                 return attributes; \
             } \
         } \
-    }
+    } \
+    namespace XU_UNIQUE_ATT_NS
 
-#define SUITE(name) \
-    namespace name ## _xUnitSuite { \
+#define SUITE(SuiteName) \
+    namespace { \
         namespace xUnitSuite { \
             inline const std::string &Name() \
             { \
-                static std::string name = #name; \
+                static std::string name = SuiteName; \
                 return name; \
             } \
         } \
     } \
-    namespace name ## _xUnitSuite
+    namespace
 
 namespace xUnitpp { struct NoFixture {}; }
 
-#define TIMED_FACT_FIXTURE(FactName, FixtureType, timeout) \
-    namespace FactName ## _ns { \
+#define TIMED_FACT_FIXTURE(FactDetails, FixtureType, timeout) \
+    namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
         std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
-        class FactName ## _Fixture : public FixtureType \
+        class XU_UNIQUE_FIXTURE : public FixtureType \
         { \
             /* !!!VS fix when '= delete' is supported */ \
-            FactName ## _Fixture &operator =(FactName ## _Fixture) /* = delete */; \
+            XU_UNIQUE_FIXTURE &operator =(XU_UNIQUE_FIXTURE) /* = delete */; \
         public: \
-            FactName ## _Fixture() : Check(*pCheck) { } \
-            void FactName(); \
+            XU_UNIQUE_FIXTURE() : Check(*pCheck) { } \
+            void XU_UNIQUE_TEST(); \
             const xUnitpp::Check &Check; \
         }; \
-        void FactName ## _runner() { FactName ## _Fixture().FactName(); } \
+        void XU_UNIQUE_RUNNER() { XU_UNIQUE_FIXTURE().XU_UNIQUE_TEST(); } \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            &FactName ## _runner, #FactName, xUnitSuite::Name(), \
+            &XU_UNIQUE_RUNNER, FactDetails, xUnitSuite::Name(), \
             xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
-    void FactName ## _ns::FactName ## _Fixture::FactName()
+    void XU_UNIQUE_NS :: XU_UNIQUE_FIXTURE :: XU_UNIQUE_TEST()
 
-#define UNTIMED_FACT_FIXTURE(FactName, FixtureType) TIMED_FACT_FIXTURE(FactName, FixtureType, 0)
+#define UNTIMED_FACT_FIXTURE(FactDetails, FixtureType) TIMED_FACT_FIXTURE(FactDetails, FixtureType, 0)
 
-#define FACT_FIXTURE(FactName, FixtureType) TIMED_FACT_FIXTURE(FactName, FixtureType, -1)
+#define FACT_FIXTURE(FactDetails, FixtureType) TIMED_FACT_FIXTURE(FactDetails, FixtureType, -1)
 
-#define TIMED_FACT(FactName, timeout) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, timeout)
+#define TIMED_FACT(FactDetails, timeout) TIMED_FACT_FIXTURE(FactDetails, xUnitpp::NoFixture, timeout)
 
-#define UNTIMED_FACT(FactName) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, 0)
+#define UNTIMED_FACT(FactDetails) TIMED_FACT_FIXTURE(FactDetails, xUnitpp::NoFixture, 0)
 
-#define FACT(FactName) TIMED_FACT_FIXTURE(FactName, xUnitpp::NoFixture, -1)
+#define FACT(FactDetails) TIMED_FACT_FIXTURE(FactDetails, xUnitpp::NoFixture, -1)
 
 #define TIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) \
     namespace TheoryName ## _ns { \
