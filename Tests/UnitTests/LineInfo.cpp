@@ -2,10 +2,10 @@
 #include "xUnit++/xUnit++.h"
 
 
-SUITE(LineInfo)
+SUITE("LineInfo")
 {
 
-FACT(LineInfoOverridesDefaultTestLineInfo)
+FACT("LineInfoOverridesDefaultTestLineInfo")
 {
     auto file = "filename";
     auto line = 1;

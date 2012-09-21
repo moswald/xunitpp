@@ -4,24 +4,24 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertContains)
+SUITE("AssertContains")
 {
 
-FACT(ContainsForSequenceSuccess)
+FACT("ContainsForSequenceSuccess")
 {
     std::vector<int> v(1, 0);
 
     Assert.Contains(v, 0);
 }
 
-FACT(ContainsForSequenceAssertsOnFailure)
+FACT("ContainsForSequenceAssertsOnFailure")
 {
     std::vector<int> v;
 
     Assert.Throws<xUnitAssert>([&]() { Assert.Contains(v, 0); });
 }
 
-FACT(ContainsForSequenceAppendsUserMessage)
+FACT("ContainsForSequenceAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
     std::vector<int> v;
@@ -32,21 +32,21 @@ FACT(ContainsForSequenceAppendsUserMessage)
     Assert.NotEqual(std::string::npos, what.find(msg));
 }
 
-FACT(ContainsForStringSuccess)
+FACT("ContainsForStringSuccess")
 {
     std::string actual = "abcd";
 
     Assert.Contains(actual, "a");
 }
 
-FACT(ContainsForStringAssertsOnFailure)
+FACT("ContainsForStringAssertsOnFailure")
 {
     std::string actual = "abcd";
 
     Assert.Throws<xUnitAssert>([&]() { Assert.Contains(actual, "xyz"); });
 }
 
-FACT(ContainsForStringAppendsUserMessage)
+FACT("ContainsForStringAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
     std::string actual = "abcd";

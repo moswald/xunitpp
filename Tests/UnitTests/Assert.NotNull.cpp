@@ -3,17 +3,17 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertNotNull)
+SUITE("AssertNotNull")
 {
 
-FACT(NotNullForRawPointerSuccess)
+FACT("NotNullForRawPointerSuccess")
 {
     int x;
 
     Assert.NotNull(&x);
 }
 
-FACT(NotNullForDoubleConstRawPointerSuccess)
+FACT("NotNullForDoubleConstRawPointerSuccess")
 {
     int x;
     const int * const px = &x;
@@ -21,24 +21,24 @@ FACT(NotNullForDoubleConstRawPointerSuccess)
     Assert.NotNull(px);
 }
 
-FACT(NotNullForSmartPointerSuccess)
+FACT("NotNullForSmartPointerSuccess")
 {
     std::unique_ptr<int> x(new int);
 
     Assert.NotNull(x);
 }
 
-FACT(NotNullForRawPointerAssertsOnFailure)
+FACT("NotNullForRawPointerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.NotNull(nullptr); });
 }
 
-FACT(NotNullForSmartPointerAssertsOnFailure)
+FACT("NotNullForSmartPointerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.NotNull(std::unique_ptr<int>()); });
 }
 
-FACT(NotNullAppendsUserMessage)
+FACT("NotNullAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
     auto assert = Assert.Throws<xUnitAssert>([]() { Assert.NotNull(nullptr) << msg; });

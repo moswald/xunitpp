@@ -2,15 +2,15 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertFail)
+SUITE("AssertFail")
 {
 
-FACT(FailAlwaysAsserts)
+FACT("FailAlwaysAsserts")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.Fail(); });
 }
 
-FACT(FailAppendsMessage)
+FACT("FailAppendsMessage")
 {
     static const std::string msg = "xUnit++";
 

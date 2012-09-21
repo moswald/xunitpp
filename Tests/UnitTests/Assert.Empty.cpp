@@ -31,26 +31,26 @@ namespace
     }
 }
 
-SUITE(AssertEmpty)
+SUITE("AssertEmpty")
 {
 
-FACT(EmptyCallsEmptyForContainerWithConstEmptyMember)
+FACT("EmptyCallsEmptyForContainerWithConstEmptyMember")
 {
     Assert.Empty(hasConstEmpty);
 }
 
-FACT(EmptyFindsLocalBeginEnd)
+FACT("EmptyFindsLocalBeginEnd")
 {
     Assert.Empty(Local::Container());
 }
 
-FACT(EmptyFindsStdBeginEnd)
+FACT("EmptyFindsStdBeginEnd")
 {
     int array[10];
     Assert.Throws<xUnitAssert>([&]() { Assert.Empty(array); });
 }
 
-FACT(EmptyFindsMemberBeginEnd)
+FACT("EmptyFindsMemberBeginEnd")
 {
     struct
     {
@@ -68,7 +68,7 @@ FACT(EmptyFindsMemberBeginEnd)
     Assert.Empty(hasMembers);
 }
 
-FACT(EmptyAssertsOnFailure)
+FACT("EmptyAssertsOnFailure")
 {
     std::vector<int> v;
     v.push_back(0);
@@ -77,7 +77,7 @@ FACT(EmptyAssertsOnFailure)
     Assert.Throws<xUnitAssert>([&]() { Assert.Empty(v); });
 }
 
-FACT(EmptyAppendsUserMessage)
+FACT("EmptyAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
 

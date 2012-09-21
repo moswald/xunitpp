@@ -3,10 +3,10 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertDoesNotThrow)
+SUITE("AssertDoesNotThrow")
 {
 
-FACT(DoesNotThrowSuccess)
+FACT("DoesNotThrowSuccess")
 {
     try
     {
@@ -18,7 +18,7 @@ FACT(DoesNotThrowSuccess)
     }
 }
 
-FACT(DoesNotThrowAssertsOnFailure)
+FACT("DoesNotThrowAssertsOnFailure")
 {
     static const std::string msg = "xUnit++";
 
@@ -34,7 +34,7 @@ FACT(DoesNotThrowAssertsOnFailure)
     Assert.Fail();
 }
 
-FACT(DoesNotThrowAppendsMessages)
+FACT("DoesNotThrowAppendsMessages")
 {
     static const std::string exceptionMessage = "xUnit++";
     static const std::string userMessage = "custom";

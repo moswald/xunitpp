@@ -4,6 +4,12 @@
 #define XU_CAT2(a,b) a ## b
 #define XU_CAT(a,b) XU_CAT2(a,b)
 
+#define XU_UNIQUE_ATT_NS XU_CAT(TestAtt_, __LINE__)
+#define XU_UNIQUE_NS XU_CAT(TestNs_, __LINE__)
+#define XU_UNIQUE_FIXTURE XU_CAT(TestFixture_, __LINE__)
+#define XU_UNIQUE_TEST XU_CAT(TestFn_, __LINE__)
+#define XU_UNIQUE_RUNNER XU_CAT(TestRunner_, __LINE__)
+
 // with thanks for various sources, but I got it from
 // http://stackoverflow.com/questions/2308243/macro-returning-the-number-of-arguments-it-is-given-in-c
 

@@ -10,7 +10,7 @@ using xUnitpp::RunTests;
 namespace Tests = xUnitpp::Tests;
 namespace Time = xUnitpp::Time;
 
-SUITE(TestRunner)
+SUITE("TestRunner")
 {
 
 struct TestFactory
@@ -125,7 +125,7 @@ struct SleepyTest
     std::chrono::milliseconds duration;
 };
 
-FACT_FIXTURE(TestStartIsReported, TestRunnerFixture)
+FACT_FIXTURE("TestStartIsReported", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck).Name("started"));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -134,7 +134,7 @@ FACT_FIXTURE(TestStartIsReported, TestRunnerFixture)
     Assert.Equal("started", output.orderedTestList[0].Name);
 }
 
-FACT_FIXTURE(TestFinishIsReported, TestRunnerFixture)
+FACT_FIXTURE("TestFinishIsReported", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck).Name("finished"));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -143,7 +143,7 @@ FACT_FIXTURE(TestFinishIsReported, TestRunnerFixture)
     Assert.Equal("finished", std::get<0>(output.finishedTests[0]).Name);
 }
 
-FACT_FIXTURE(NoTestsAreFailuresWhenNoTestsRun, TestRunnerFixture)
+FACT_FIXTURE("NoTestsAreFailuresWhenNoTestsRun", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck).Name("not run"));
 
@@ -152,7 +152,7 @@ FACT_FIXTURE(NoTestsAreFailuresWhenNoTestsRun, TestRunnerFixture)
     Assert.Equal(0U, output.finishedTests.size());
 }
 
-FACT_FIXTURE(FailureIsReportedOncePerAssert, TestRunnerFixture)
+FACT_FIXTURE("FailureIsReportedOncePerAssert", TestRunnerFixture)
 {
     tests.push_back(TestFactory(FailingTest(), testCheck).Name("failing"));
     tests.push_back(TestFactory(EmptyTest(), testCheck).Name("empty"));
@@ -163,7 +163,7 @@ FACT_FIXTURE(FailureIsReportedOncePerAssert, TestRunnerFixture)
     
 }
 
-FACT_FIXTURE(TestsAbortOnFirstAssert, TestRunnerFixture)
+FACT_FIXTURE("TestsAbortOnFirstAssert", TestRunnerFixture)
 {
     tests.push_back(TestFactory([]() { Assert.Fail() << "first"; Assert.Fail() << "second"; }, testCheck));
 
@@ -173,7 +173,7 @@ FACT_FIXTURE(TestsAbortOnFirstAssert, TestRunnerFixture)
     Assert.DoesNotContain(std::get<1>(output.failures[0]), "second", LI);
 }
 
-FACT_FIXTURE(FailureIsReportedOncePerCheck, TestRunnerFixture)
+FACT_FIXTURE("FailureIsReportedOncePerCheck", TestRunnerFixture)
 {
     tests.push_back(TestFactory([=]() { testCheck->Fail(); }, testCheck));
 
@@ -181,7 +181,7 @@ FACT_FIXTURE(FailureIsReportedOncePerCheck, TestRunnerFixture)
     Assert.Equal(1U, output.failures.size());
 }
 
-FACT_FIXTURE(TestsDoNotAbortOnCheck, TestRunnerFixture)
+FACT_FIXTURE("TestsDoNotAbortOnCheck", TestRunnerFixture)
 {
     tests.push_back(TestFactory([=]() { testCheck->Fail() << "first"; testCheck->Fail() << "second"; }, testCheck));
 
@@ -191,7 +191,7 @@ FACT_FIXTURE(TestsDoNotAbortOnCheck, TestRunnerFixture)
     Assert.Contains(std::get<1>(output.failures[1]), "second");
 }
 
-FACT_FIXTURE(TestCountIsReported, TestRunnerFixture)
+FACT_FIXTURE("TestCountIsReported", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -199,7 +199,7 @@ FACT_FIXTURE(TestCountIsReported, TestRunnerFixture)
     Assert.Equal(1U, output.summaryCount);
 }
 
-FACT_FIXTURE(FailedTestsAreReported, TestRunnerFixture)
+FACT_FIXTURE("FailedTestsAreReported", TestRunnerFixture)
 {
     tests.push_back(TestFactory(FailingTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -207,7 +207,7 @@ FACT_FIXTURE(FailedTestsAreReported, TestRunnerFixture)
     Assert.Equal(1U, output.summaryFailed);
 }
 
-FACT_FIXTURE(FailuresAreReported, TestRunnerFixture)
+FACT_FIXTURE("FailuresAreReported", TestRunnerFixture)
 {
     tests.push_back(TestFactory([=]() { testCheck->Fail(); testCheck->Fail(); }, testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -215,7 +215,7 @@ FACT_FIXTURE(FailuresAreReported, TestRunnerFixture)
     Assert.Equal(2U, output.failures.size());
 }
 
-FACT_FIXTURE(SkippedTestsAreReported, TestRunnerFixture)
+FACT_FIXTURE("SkippedTestsAreReported", TestRunnerFixture)
 {
     xUnitpp::AttributeCollection attributes;
     attributes.insert(std::make_pair("Skip", ""));
@@ -227,7 +227,7 @@ FACT_FIXTURE(SkippedTestsAreReported, TestRunnerFixture)
     Assert.Equal(1U, output.summarySkipped);
 }
 
-UNTIMED_FACT_FIXTURE(SlowTestsPassHighTimeThreshold, TestRunnerFixture)
+UNTIMED_FACT_FIXTURE("SlowTestsPassHighTimeThreshold", TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(200)), 0);
@@ -236,7 +236,7 @@ UNTIMED_FACT_FIXTURE(SlowTestsPassHighTimeThreshold, TestRunnerFixture)
     Assert.Equal(0U, output.summaryFailed);
 }
 
-UNTIMED_FACT_FIXTURE(SlowTestsFailLowTimeThreshold, TestRunnerFixture)
+UNTIMED_FACT_FIXTURE("SlowTestsFailLowTimeThreshold", TestRunnerFixture)
 {
     SleepyTest sleepyTest;
     tests.push_back(TestFactory(sleepyTest, testCheck));
@@ -246,7 +246,7 @@ UNTIMED_FACT_FIXTURE(SlowTestsFailLowTimeThreshold, TestRunnerFixture)
     Assert.Equal(1U, output.summaryFailed);
 }
 
-UNTIMED_FACT_FIXTURE(SlowTestFailsBecauseOfTimeLimitReportsReason, TestRunnerFixture)
+UNTIMED_FACT_FIXTURE("SlowTestFailsBecauseOfTimeLimitReportsReason", TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(1)), 0);
@@ -256,14 +256,14 @@ UNTIMED_FACT_FIXTURE(SlowTestFailsBecauseOfTimeLimitReportsReason, TestRunnerFix
     Assert.Contains(std::get<1>(output.failures[0]), "1 milliseconds.");
 }
 
-UNTIMED_FACT_FIXTURE(SlowTestWithTimeExemptionPasses, TestRunnerFixture)
+UNTIMED_FACT_FIXTURE("SlowTestWithTimeExemptionPasses", TestRunnerFixture)
 {
     tests.push_back(TestFactory(SleepyTest(), testCheck).Duration(Time::ToDuration(Time::ToMilliseconds(0))));
 
     Assert.Equal(0, RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(1)), 0));
 }
 
-FACT_FIXTURE(AllTestsAreRunWithNoFilter, TestRunnerFixture)
+FACT_FIXTURE("AllTestsAreRunWithNoFilter", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, duration, 0);
@@ -271,7 +271,7 @@ FACT_FIXTURE(AllTestsAreRunWithNoFilter, TestRunnerFixture)
     Assert.Equal(1U, output.summaryCount);
 }
 
-FACT_FIXTURE(FilteredTestsDoNotRun, TestRunnerFixture)
+FACT_FIXTURE("FilteredTestsDoNotRun", TestRunnerFixture)
 {
     tests.push_back(TestFactory(EmptyTest(), testCheck));
     RunTests(output, &Filter::NoTests, tests, duration, 0);

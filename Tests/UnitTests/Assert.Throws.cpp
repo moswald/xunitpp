@@ -2,10 +2,10 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertThrows)
+SUITE("AssertThrows")
 {
 
-FACT(ThrowsSuccess)
+FACT("ThrowsSuccess")
 {
     struct exp
     {
@@ -22,7 +22,7 @@ FACT(ThrowsSuccess)
     Assert.Equal(10, x.x);
 }
 
-FACT(ThrowsAssertsOnFailure)
+FACT("ThrowsAssertsOnFailure")
 {
     try
     {
@@ -36,7 +36,7 @@ FACT(ThrowsAssertsOnFailure)
     Assert.Fail();
 }
 
-FACT(ThrowAppendsMessages)
+FACT("ThrowAppendsMessages")
 {
     static const std::string userMessage = "xUnit++";
 

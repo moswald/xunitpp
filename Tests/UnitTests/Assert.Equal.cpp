@@ -2,30 +2,30 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertEqual)
+SUITE("AssertEqual")
 {
 
-FACT(AssertEqualWithDefaultComparerWithSuccess)
+FACT("AssertEqualWithDefaultComparerWithSuccess")
 {
     Assert.Equal(0, 0);
 }
 
-FACT(AssertEqualWithDefaultComparerAssertsOnFailure)
+FACT("AssertEqualWithDefaultComparerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.Equal(0, 1); });
 }
 
-FACT(AssertEqualWithCustomComparerWithSuccess)
+FACT("AssertEqualWithCustomComparerWithSuccess")
 {
     Assert.Equal(0, 1, [](int, int) { return true; });
 }
 
-FACT(AssertEqualWithCustomComparerAssertsOnFailure)
+FACT("AssertEqualWithCustomComparerAssertsOnFailure")
 {
     Assert.Throws<xUnitAssert>([]() { Assert.Equal(0, 0, [](int, int) { return false; }); });
 }
 
-FACT(AssertEqualAppendsUserMessage)
+FACT("AssertEqualAppendsUserMessage")
 {
     static const std::string msg = "custom message";
 
@@ -34,7 +34,7 @@ FACT(AssertEqualAppendsUserMessage)
     Assert.Contains(assert.what(), msg.c_str());
 }
 
-FACT(AssertEqualForFloatsWithinPrecision)
+FACT("AssertEqualForFloatsWithinPrecision")
 {
     auto f0 = 1.2345678f;
     auto f1 = 1.2349999f;
@@ -42,7 +42,7 @@ FACT(AssertEqualForFloatsWithinPrecision)
     Assert.Equal(f0, f1, 3);
 }
 
-FACT(AssertEqualForFloatsAssertsOnFailure)
+FACT("AssertEqualForFloatsAssertsOnFailure")
 {
     auto f0 = 1.2345678f;
     auto f1 = 1.2349999f;
@@ -50,7 +50,7 @@ FACT(AssertEqualForFloatsAssertsOnFailure)
     Assert.Throws<xUnitAssert>([=]() { Assert.Equal(f0, f1, 4); });
 }
 
-FACT(AssertSequenceEqualDefaultComparerWithSuccess)
+FACT("AssertSequenceEqualDefaultComparerWithSuccess")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -67,7 +67,7 @@ FACT(AssertSequenceEqualDefaultComparerWithSuccess)
     Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end());
 }
 
-FACT(AssertSequenceEqualDefaultComparerAssertsOnFailureDueToLength)
+FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToLength")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -84,7 +84,7 @@ FACT(AssertSequenceEqualDefaultComparerAssertsOnFailureDueToLength)
     Assert.Contains(assert.what(), "at location 2");
 }
 
-FACT(AssertSequenceEqualDefaultComparerAssertsOnFailureDueToMismatch)
+FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToMismatch")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -101,7 +101,7 @@ FACT(AssertSequenceEqualDefaultComparerAssertsOnFailureDueToMismatch)
     Assert.Contains(assert.what(), "at location 1");
 }
 
-FACT(AssertSequenceEqualCustomComparerWithSuccess)
+FACT("AssertSequenceEqualCustomComparerWithSuccess")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -118,7 +118,7 @@ FACT(AssertSequenceEqualCustomComparerWithSuccess)
     Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; });
 }
 
-FACT(AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength)
+FACT("AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -135,7 +135,7 @@ FACT(AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength)
     Assert.Contains(assert.what(), "at location 2");
 }
 
-FACT(AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch)
+FACT("AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -152,7 +152,7 @@ FACT(AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch)
     Assert.Contains(assert.what(), "at location 0");
 }
 
-FACT(EqualForStrings)
+FACT("EqualForStrings")
 {
     std::string expected = "abcd";
     std::string actual = "abc";

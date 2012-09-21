@@ -8,8 +8,7 @@
 #include "xUnit++/xUnitTime.h"
 #include "xUnit++/xUnit++.h"
 
-
-SUITE(Theory)
+SUITE("Theory")
 {
 
 void TheoryUnderTest(int x)
@@ -89,19 +88,19 @@ std::vector<std::tuple<int>> RawFunctionProvider()
     return std::vector<std::tuple<int>>(std::begin(tuples), std::end(tuples));
 }
 
-FACT_FIXTURE(TheoriesAcceptRawFunctions, TheoryFixture)
+FACT_FIXTURE("TheoriesAcceptRawFunctions", TheoryFixture)
 {
     RegisterAndRun("TheoriesAcceptRawFunctions", RawFunctionProvider);
 }
 
-FACT_FIXTURE(TheoriesAcceptStdFunction, TheoryFixture)
+FACT_FIXTURE("TheoriesAcceptStdFunction", TheoryFixture)
 {
     std::function<std::vector<std::tuple<int>>()> provider = RawFunctionProvider;
 
     RegisterAndRun("TheoriesAcceptStdFunction", provider);
 }
 
-FACT_FIXTURE(TheoriesAcceptFunctors, TheoryFixture)
+FACT_FIXTURE("TheoriesAcceptFunctors", TheoryFixture)
 {
     struct
     {
@@ -114,7 +113,7 @@ FACT_FIXTURE(TheoriesAcceptFunctors, TheoryFixture)
     RegisterAndRun("TheoriesAcceptFunctors", functor);
 }
 
-FACT_FIXTURE(TheoriesGetAllDataPassedToThem, TheoryFixture)
+FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
 {
     std::mutex lock;
     std::vector<int> dataProvided;
@@ -131,7 +130,7 @@ FACT_FIXTURE(TheoriesGetAllDataPassedToThem, TheoryFixture)
     Assert.Equal(1, std::count(dataProvided.begin(), dataProvided.end(), 3), LI);
 }
 
-FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
+FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
 {
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
@@ -143,7 +142,8 @@ FACT_FIXTURE(TheoriesCanBeSkipped, TheoryFixture)
     Run();
 }
 
-ATTRIBUTES(TheoriesCanHaveAttributes, ("Cats", "Meow"))
+ATTRIBUTES(("Cats", "Meow"))
+{
 DATA_THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
@@ -158,6 +158,7 @@ DATA_THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
     }
 
     Assert.Fail() << "Could not find self in test list.";
+}
 }
 
 std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> ComplexProvider()

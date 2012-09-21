@@ -3,39 +3,39 @@
 
 using xUnitpp::xUnitAssert;
 
-SUITE(AssertNull)
+SUITE("AssertNull")
 {
 
-FACT(NullForRawPointerSuccess)
+FACT("NullForRawPointerSuccess")
 {
     Assert.Null(nullptr);
 }
 
-FACT(NullForDoubleConstRawPointerSuccess)
+FACT("NullForDoubleConstRawPointerSuccess")
 {
     const int * const px = nullptr;
 
     Assert.Null(px);
 }
 
-FACT(NullForSmartPointerSuccess)
+FACT("NullForSmartPointerSuccess")
 {
     Assert.Null(std::unique_ptr<int>());
 }
 
-FACT(NullForRawPointerAssertsOnFailure)
+FACT("NullForRawPointerAssertsOnFailure")
 {
     int x;
     Assert.Throws<xUnitAssert>([&]() { Assert.Null(&x); });
 }
 
-FACT(NullForSmartPointerAssertsOnFailure)
+FACT("NullForSmartPointerAssertsOnFailure")
 {
     std::unique_ptr<int> x(new int);
     Assert.Throws<xUnitAssert>([&]() { Assert.Null(x); });
 }
 
-FACT(NullAppendsUserMessage)
+FACT("NullAppendsUserMessage")
 {
     static const std::string msg = "xUnit++";
     auto x = std::make_shared<int>(0);

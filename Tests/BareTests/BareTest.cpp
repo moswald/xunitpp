@@ -5,6 +5,6 @@
 // This is the simplest valid test library possible, and is intended to ensure
 // this error does not happen in the future.
 
-FACT(BareTest)
+FACT("BareTest")
 {
 }
