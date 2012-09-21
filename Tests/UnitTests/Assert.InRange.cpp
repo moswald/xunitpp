@@ -19,7 +19,7 @@ std::vector<std::tuple<float, int, int>> InRangeSuccessData()
     return data;
 }
 
-DATA_THEORY(InRangeSuccess, (float actual, int min, int max), InRangeSuccessData)
+DATA_THEORY("InRangeSuccess", (float actual, int min, int max), InRangeSuccessData)
 {
     Assert.InRange(actual, min, max);
 }
@@ -38,7 +38,7 @@ std::vector<std::tuple<int, int, int>> InRangeAssertsOnFailureData()
     return data;
 }
 
-DATA_THEORY(InRangeAssertsOnFailure, (int actual, int min, int max), InRangeAssertsOnFailureData)
+DATA_THEORY("InRangeAssertsOnFailure", (int actual, int min, int max), InRangeAssertsOnFailureData)
 {
     Assert.Throws<xUnitAssert>([=]() { Assert.InRange(actual, min, max); });
 }

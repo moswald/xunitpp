@@ -144,7 +144,7 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
 
 ATTRIBUTES(("Cats", "Meow"))
 {
-DATA_THEORY(TheoriesCanHaveAttributes, (int), RawFunctionProvider)
+DATA_THEORY("TheoriesCanHaveAttributes", (int), RawFunctionProvider)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
@@ -173,12 +173,12 @@ std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> 
     return result;
 }
 
-DATA_THEORY(TheoriesCanAcceptComplexObjects, (const std::string &, const std::vector<std::tuple<int, std::string>> &), ComplexProvider)
+DATA_THEORY("TheoriesCanAcceptComplexObjects", (const std::string &, const std::vector<std::tuple<int, std::string>> &), ComplexProvider)
 {
     // just existing is good enough
 }
 
-DATA_THEORY(TheoriesCanAcceptLambdas, (int, int),
+DATA_THEORY("TheoriesCanAcceptLambdas", (int, int),
     ([]() -> std::vector<std::tuple<int, int>>
     {
         std::vector<std::tuple<int, int>> data;
@@ -190,7 +190,7 @@ DATA_THEORY(TheoriesCanAcceptLambdas, (int, int),
     // just existing is good enough
 }
 
-THEORY(TestingSuccessfulInlineTheory, (int x, const std::string &str),
+THEORY("TestingSuccessfulInlineTheory", (int x, const std::string &str),
     std::make_tuple(0, ""),
     std::make_tuple(0, ""),
     std::make_tuple(0, ""),
@@ -200,7 +200,7 @@ THEORY(TestingSuccessfulInlineTheory, (int x, const std::string &str),
     Assert.Empty(str);
 }
 
-THEORY(TestingFailingInlineTheory, (int, const std::string &str),
+THEORY("TestingFailingInlineTheory", (int, const std::string &str),
     std::make_tuple(1, "a"),
     std::make_tuple(1, "b"),
     std::make_tuple(1, "c"),
@@ -209,8 +209,9 @@ THEORY(TestingFailingInlineTheory, (int, const std::string &str),
     Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Empty(str); });
 }
 
+// !!!g++ figure out why g++ barfs on this one
 #if defined(WIN32)
-DATA_THEORY(TestingLambdasAsData, (std::function<void()> fn),
+DATA_THEORY("TestingLambdasAsData", (std::function<void()> fn),
 ([]() -> std::vector<std::tuple<std::function<void()>>>
 {
     std::vector<std::tuple<std::function<void()>>> data;

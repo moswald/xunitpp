@@ -69,38 +69,38 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define FACT(FactDetails) TIMED_FACT_FIXTURE(FactDetails, xUnitpp::NoFixture, -1)
 
-#define TIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) \
-    namespace TheoryName ## _ns { \
+#define TIMED_DATA_THEORY(TheoryDetails, params, DataProvider, timeout) \
+    namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
         std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
         xUnitpp::Check &Check = *pCheck; \
-        void TheoryName params; \
+        void XU_UNIQUE_TEST params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            TheoryName, DataProvider, #TheoryName, xUnitSuite::Name(), \
+            XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), \
             xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
-    void TheoryName ## _ns::TheoryName params
+    void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
-#define UNTIMED_DATA_THEORY(TheoryName, params, DataProvider, timeout) TIMED_DATA_THEORY(TheoryName, params, DataProvider, 0)
+#define UNTIMED_DATA_THEORY(TheoryDetails, params, DataProvider, timeout) TIMED_DATA_THEORY(TheoryDetails, params, DataProvider, 0)
 
-#define DATA_THEORY(TheoryName, params, DataProvider) TIMED_DATA_THEORY(TheoryName, params, DataProvider, -1)
+#define DATA_THEORY(TheoryDetails, params, DataProvider) TIMED_DATA_THEORY(TheoryDetails, params, DataProvider, -1)
 
-#define TIMED_THEORY(TheoryName, params, timeout, ...) \
-    namespace TheoryName ## _ns { \
+#define TIMED_THEORY(TheoryDetails, params, timeout, ...) \
+    namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
         std::shared_ptr<xUnitpp::Check> pCheck = std::make_shared<xUnitpp::Check>(); \
         xUnitpp::Check &Check = *pCheck; \
-        void TheoryName params; \
+        void XU_UNIQUE_TEST params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            TheoryName, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), #TheoryName, \
+            XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), TheoryDetails, \
             xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, pCheck); \
     } \
-    void TheoryName ## _ns::TheoryName params
+    void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
-#define UNTIMED_THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, 0, __VA_ARGS__)
+#define UNTIMED_THEORY(TheoryDetails, params, ...) TIMED_THEORY(TheoryDetails, params, 0, __VA_ARGS__)
 
-#define THEORY(TheoryName, params, ...) TIMED_THEORY(TheoryName, params, -1, __VA_ARGS__)
+#define THEORY(TheoryDetails, params, ...) TIMED_THEORY(TheoryDetails, params, -1, __VA_ARGS__)
 
 #define LI xUnitpp::LineInfo(__FILE__, __LINE__)
 
