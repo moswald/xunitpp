@@ -11,6 +11,7 @@
 #include "TestEventRecorder.h"
 #include "Suite.h"
 #include "xUnitCheck.h"
+#include "xUnitLog.h"
 #include "xUnitMacroHelpers.h"
 #include "xUnitWarn.h"
 
@@ -53,10 +54,12 @@ namespace xUnitpp { struct NoFixture {}; }
             XU_UNIQUE_FIXTURE() \
                 : Check(*detail::pCheck) \
                 , Warn(*detail::pWarn) \
+                , Log(*detail::pLog) \
                 { } \
             void XU_UNIQUE_TEST(); \
             const xUnitpp::Check &Check; \
             const xUnitpp::Warn &Warn; \
+            const xUnitpp::Log &Log; \
         }; \
         void XU_UNIQUE_RUNNER() { XU_UNIQUE_FIXTURE().XU_UNIQUE_TEST(); } \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
@@ -81,6 +84,7 @@ namespace xUnitpp { struct NoFixture {}; }
         XU_TEST_EVENTS \
         const xUnitpp::Check &Check = *detail::pCheck; \
         const xUnitpp::Warn &Warn = *detail::pWarn; \
+        const xUnitpp::Log &Log = *detail::pLog; \
         void XU_UNIQUE_TEST params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), \
@@ -98,6 +102,7 @@ namespace xUnitpp { struct NoFixture {}; }
         XU_TEST_EVENTS \
         const xUnitpp::Check &Check = *detail::pCheck; \
         const xUnitpp::Warn &Warn = *detail::pWarn; \
+        const xUnitpp::Log &Log = *detail::pLog; \
         void XU_UNIQUE_TEST params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \

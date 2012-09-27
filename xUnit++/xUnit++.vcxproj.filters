@@ -12,6 +12,7 @@
     <ClCompile Include="..\src\TestEvent.cpp" />
     <ClCompile Include="src\xUnitWarn.cpp" />
     <ClCompile Include="src\TestEventRecorder.cpp" />
+    <ClCompile Include="src\xUnitLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnit++/xUnitAssert.h" />
@@ -33,5 +34,6 @@
     <ClInclude Include="xUnit++/TestEvent.h" />
     <ClInclude Include="xUnit++\xUnitWarn.h" />
     <ClInclude Include="xUnit++\TestEventRecorder.h" />
+    <ClInclude Include="xUnit++\xUnitLog.h" />
   </ItemGroup>
 </Project>

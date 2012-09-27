@@ -29,6 +29,7 @@
     <ClCompile Include="src/xUnitTestRunner.cpp" />
     <ClCompile Include="src\TestEventRecorder.cpp" />
     <ClCompile Include="src/xUnitCheck.cpp" />
+    <ClCompile Include="src\xUnitLog.cpp" />
     <ClCompile Include="src\xUnitWarn.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +51,7 @@
     <ClInclude Include="xUnit++\TestEventRecorder.h" />
     <ClInclude Include="xUnit++/TestEvent.h" />
     <ClInclude Include="xUnit++/xUnitCheck.h" />
+    <ClInclude Include="xUnit++\xUnitLog.h" />
     <ClInclude Include="xUnit++\xUnitWarn.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
