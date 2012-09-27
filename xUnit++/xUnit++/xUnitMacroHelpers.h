@@ -10,6 +10,19 @@
 #define XU_UNIQUE_TEST XU_CAT(TestFn_, __LINE__)
 #define XU_UNIQUE_RUNNER XU_CAT(TestRunner_, __LINE__)
 
+// !!!VS fix when initializer lists are supported
+#define XU_TEST_EVENTS \
+namespace detail \
+{ \
+    std::shared_ptr<xUnitpp::TestEventRecorder> eventRecorders[] = { \
+        /* check */ std::make_shared<xUnitpp::TestEventRecorder>(), \
+        /* warn */  std::make_shared<xUnitpp::TestEventRecorder>() \
+    }; \
+    auto pCheck = std::make_shared<xUnitpp::Check>(*eventRecorders[0]); \
+    auto pWarn = std::make_shared<xUnitpp::Warn>(*eventRecorders[1]); \
+} \
+std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> eventRecorders(std::begin(detail::eventRecorders), std::end(detail::eventRecorders)); \
+
 // with thanks for various sources, but I got it from
 // http://stackoverflow.com/questions/2308243/macro-returning-the-number-of-arguments-it-is-given-in-c
 

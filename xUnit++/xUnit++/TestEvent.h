@@ -20,11 +20,13 @@ enum class EventLevel
     Fatal
 };
 
+const std::string &to_string(EventLevel level);
+
 class TestEvent
 {
 public:
     TestEvent(EventLevel level, const std::string &message);
-    TestEvent(const xUnitAssert &assert);
+    TestEvent(EventLevel level, const xUnitAssert &assert);
     TestEvent(const std::exception &e);
 
     bool IsFailure() const;
@@ -32,8 +34,7 @@ public:
     EventLevel Level() const;
     const xUnitpp::LineInfo &LineInfo() const;
 
-    const std::string &LevelString() const;
-    const std::string &ToString() const;
+    friend const std::string &to_string(const TestEvent &evt);
 
 private:
     EventLevel level;

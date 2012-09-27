@@ -10,15 +10,18 @@ FACT("LineInfoOverridesDefaultTestLineInfo")
 {
     auto file = "filename";
     auto line = 1;
-    auto test = [=]() { Assert.Fail(xUnitpp::LineInfo(file, line)); };
+    auto test = [=]()
+    {
+        Assert.Fail(xUnitpp::LineInfo(file, line));
+    };
 
     xUnitpp::Tests::OutputRecord record;
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> localEventSources;
+    std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> localEventRecorders;
     xUnitpp::TestCollection::Register reg(collection, test,
         "LineInfoOverridesDefaultTestLineInfo", "LineInfo", attributes,
-        -1, __FILE__, __LINE__, localEventSources);
+        -1, __FILE__, __LINE__, localEventRecorders);
 
     xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 

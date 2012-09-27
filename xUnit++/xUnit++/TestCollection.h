@@ -11,7 +11,7 @@
 namespace xUnitpp
 {
 
-struct ITestEventSource;
+class TestEventRecorder;
 
 // !!!VS convert this to an initializer list when VS implements them
 template<typename TTuple>
@@ -82,11 +82,11 @@ public:
 
     public:
         Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources);
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
         template<typename TTheory, typename TTheoryData>
         Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources)
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
         {
             int id = 0;
             for (auto t : theoryData())
@@ -96,7 +96,7 @@ public:
                 auto theoryName = name + "(" + std::to_string(++id) + ")";
 
                 collection.mTests.emplace_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
-                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventSources));
+                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorders));
             }
         }
     };

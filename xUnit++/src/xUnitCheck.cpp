@@ -1,20 +1,16 @@
 #include "xUnitCheck.h"
 #include "TestEvent.h"
+#include "TestEventRecorder.h"
 
 namespace xUnitpp
 {
 
-Check::Check()
+Check::Check(const TestEventRecorder &recorder)
     : Assert("Check.", [&](const xUnitAssert &assert)
         {
-            sinks[std::this_thread::get_id()](TestEvent(assert));
+            recorder(TestEvent(EventLevel::Check, assert));
         })
 {
-}
-
-void Check::SetSink(std::function<void(TestEvent &&)> sink)
-{
-    sinks[std::this_thread::get_id()] = sink;
 }
 
 }

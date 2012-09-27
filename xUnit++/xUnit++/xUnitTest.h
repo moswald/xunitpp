@@ -13,7 +13,7 @@ namespace xUnitpp
 {
 
 class TestEvent;
-struct ITestEventSource;
+class TestEventRecorder;
 
 enum class TestResult
 {
@@ -26,7 +26,7 @@ class xUnitTest
 public:
     xUnitTest(std::function<void()> test, const std::string &name, const std::string &suite,
         const AttributeCollection &attributes, Time::Duration timeLimit,
-        const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources);
+        const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
     const xUnitpp::TestDetails &TestDetails() const;
 
@@ -48,7 +48,7 @@ private:
     Time::TimeStamp testStart;
     Time::TimeStamp testStop;
 
-    std::vector<std::shared_ptr<ITestEventSource>> testEventSources;
+    std::vector<std::shared_ptr<TestEventRecorder>> testEventRecorders;
 
     std::mutex eventLock;
     std::vector<TestEvent> testEvents;

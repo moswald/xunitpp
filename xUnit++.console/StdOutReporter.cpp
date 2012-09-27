@@ -37,7 +37,7 @@ void StdOutReporter::ReportStart(const TestDetails &testDetails)
 void StdOutReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
 {
     std::cout << (FileAndLine(testDetails, evt.LineInfo()) +
-        ": " + testDetails.Name+ ": " + evt.LevelString() + ": " + evt.ToString() + "\n");
+        ": " + testDetails.Name+ ": " + to_string(evt.Level()) + ": " + to_string(evt) + "\n");
 }
 
 void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)

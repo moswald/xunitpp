@@ -8,9 +8,11 @@
 #include "LineInfo.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
+#include "TestEventRecorder.h"
 #include "Suite.h"
 #include "xUnitCheck.h"
 #include "xUnitMacroHelpers.h"
+#include "xUnitWarn.h"
 
 #define ATTRIBUTES(...) \
     namespace XU_UNIQUE_ATT_NS { \
@@ -42,26 +44,24 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_FACT_FIXTURE(FactDetails, FixtureType, timeout) \
     namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
-        namespace detail { \
-            /* !!!VS fix when initializer lists are supported */ \
-            std::shared_ptr<xUnitpp::ITestEventSource> eventSources[] = { \
-                std::make_shared<xUnitpp::Check>(), \
-            }; \
-        } \
-        std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> eventSources(std::begin(detail::eventSources), std::end(detail::eventSources)); \
+        XU_TEST_EVENTS \
         class XU_UNIQUE_FIXTURE : public FixtureType \
         { \
             /* !!!VS fix when '= delete' is supported */ \
             XU_UNIQUE_FIXTURE &operator =(XU_UNIQUE_FIXTURE) /* = delete */; \
         public: \
-            XU_UNIQUE_FIXTURE() : Check(*static_cast<xUnitpp::Check *>(eventSources[0].get())) { } \
+            XU_UNIQUE_FIXTURE() \
+                : Check(*detail::pCheck) \
+                , Warn(*detail::pWarn) \
+                { } \
             void XU_UNIQUE_TEST(); \
             const xUnitpp::Check &Check; \
+            const xUnitpp::Warn &Warn; \
         }; \
         void XU_UNIQUE_RUNNER() { XU_UNIQUE_FIXTURE().XU_UNIQUE_TEST(); } \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             &XU_UNIQUE_RUNNER, FactDetails, xUnitSuite::Name(), \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventSources); \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_FIXTURE :: XU_UNIQUE_TEST()
 
@@ -78,18 +78,13 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_DATA_THEORY(TheoryDetails, params, DataProvider, timeout) \
     namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
-        namespace detail { \
-            /* !!!VS fix when initializer lists are supported */ \
-            std::shared_ptr<xUnitpp::ITestEventSource> eventSources[] = { \
-                std::make_shared<xUnitpp::Check>(), \
-            }; \
-        } \
-        std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> eventSources(std::begin(detail::eventSources), std::end(detail::eventSources)); \
-        xUnitpp::Check &Check = *static_cast<xUnitpp::Check *>(eventSources[0].get()); \
+        XU_TEST_EVENTS \
+        const xUnitpp::Check &Check = *detail::pCheck; \
+        const xUnitpp::Warn &Warn = *detail::pWarn; \
         void XU_UNIQUE_TEST params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventSources); \
+            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
@@ -100,19 +95,14 @@ namespace xUnitpp { struct NoFixture {}; }
 #define TIMED_THEORY(TheoryDetails, params, timeout, ...) \
     namespace XU_UNIQUE_NS { \
         using xUnitpp::Assert; \
-        namespace detail { \
-            /* !!!VS fix when initializer lists are supported */ \
-            std::shared_ptr<xUnitpp::ITestEventSource> eventSources[] = { \
-                std::make_shared<xUnitpp::Check>(), \
-            }; \
-        } \
-        std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> eventSources(std::begin(detail::eventSources), std::end(detail::eventSources)); \
-        xUnitpp::Check &Check = *static_cast<xUnitpp::Check *>(eventSources[0].get()); \
+        XU_TEST_EVENTS \
+        const xUnitpp::Check &Check = *detail::pCheck; \
+        const xUnitpp::Warn &Warn = *detail::pWarn; \
         void XU_UNIQUE_TEST params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), TheoryDetails, \
-            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventSources); \
+            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
