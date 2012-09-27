@@ -4,6 +4,26 @@
 namespace xUnitpp
 {
 
+const std::string &to_string(EventLevel level)
+{
+    static std::string msg[] =
+    {
+        "DEBUG",
+        "info",
+        "warning",
+        "error",
+        "error",
+        "error"
+    };
+
+    return msg[(int)level];
+}
+
+const std::string &to_string(const TestEvent &evt)
+{
+    return evt.message;
+}
+
 TestEvent::TestEvent(EventLevel level, const std::string &message)
     : level(level)
     , message(message)
@@ -11,8 +31,8 @@ TestEvent::TestEvent(EventLevel level, const std::string &message)
 {
 }
 
-TestEvent::TestEvent(const xUnitAssert &assert)
-    : level(EventLevel::Assert)
+TestEvent::TestEvent(EventLevel level, const xUnitAssert &assert)
+    : level(level)
     , message(assert.what())
     , lineInfo(assert.LineInfo())
 {
@@ -38,26 +58,6 @@ EventLevel TestEvent::Level() const
 const xUnitpp::LineInfo &TestEvent::LineInfo() const
 {
     return lineInfo;
-}
-
-const std::string &TestEvent::LevelString() const
-{
-    static std::string msg[] =
-    {
-        "DEBUG",
-        "info",
-        "warning",
-        "error",
-        "error",
-        "error"
-    };
-
-    return msg[(int)level];
-}
-
-const std::string &TestEvent::ToString() const
-{
-    return message;
 }
 
 }

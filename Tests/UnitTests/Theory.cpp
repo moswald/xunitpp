@@ -28,7 +28,7 @@ public:
     void Register(const std::string &name, TTheoryData &&theoryData)
     {
         xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, theoryData,
-            name, "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
+            name, "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
     }
 
     void Run()
@@ -48,7 +48,7 @@ public:
     xUnitpp::Tests::OutputRecord record;
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> localEventSources;
+    std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> localEventRecorders;
 };
 
 std::vector<std::tuple<int>> RawFunctionProvider()
@@ -72,7 +72,7 @@ FACT_FIXTURE("TheoriesAcceptRawFunctions", TheoryFixture)
 
 FACT_FIXTURE("TheoriesAcceptStdFunction", TheoryFixture)
 {
-    std::function<std::vector<std::tuple<int>>()> provider = RawFunctionProvider;
+    std::function<std::vector<std::tuple<int>>()> provider = &RawFunctionProvider;
 
     RegisterAndRun("TheoriesAcceptStdFunction", provider);
 }
@@ -97,7 +97,7 @@ FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
 
     auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
 
     Run();
 
@@ -114,7 +114,7 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
     auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
 
     Run();
 }

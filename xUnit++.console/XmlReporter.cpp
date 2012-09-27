@@ -289,7 +289,7 @@ void XmlReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &e
     if (evt.IsFailure())
     {
         suiteResults[testDetails.Suite].failures++;
-        suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(evt.ToString());
+        suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(to_string(evt));
         suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Failure;
     }
 }

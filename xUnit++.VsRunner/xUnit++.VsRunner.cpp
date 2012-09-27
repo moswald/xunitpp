@@ -55,7 +55,7 @@ namespace
                 result->Outcome = TestOutcome::Failed;
             }
 
-            result->Messages->Add(gcnew TestResultMessage(marshal_as<String ^>(evt.LevelString()), marshal_as<String ^>(evt.ToString())));
+            result->Messages->Add(gcnew TestResultMessage(marshal_as<String ^>(to_string(evt.Level())), marshal_as<String ^>(to_string(evt))));
         }
 
         void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
