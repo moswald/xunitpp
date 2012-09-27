@@ -16,10 +16,12 @@ namespace detail \
 { \
     std::shared_ptr<xUnitpp::TestEventRecorder> eventRecorders[] = { \
         /* check */ std::make_shared<xUnitpp::TestEventRecorder>(), \
-        /* warn */  std::make_shared<xUnitpp::TestEventRecorder>() \
+        /* warn  */ std::make_shared<xUnitpp::TestEventRecorder>(), \
+        /* log   */ std::make_shared<xUnitpp::TestEventRecorder>(), \
     }; \
     auto pCheck = std::make_shared<xUnitpp::Check>(*eventRecorders[0]); \
     auto pWarn = std::make_shared<xUnitpp::Warn>(*eventRecorders[1]); \
+    auto pLog = std::make_shared<xUnitpp::Log>(*eventRecorders[2]); \
 } \
 std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> eventRecorders(std::begin(detail::eventRecorders), std::end(detail::eventRecorders)); \
 
