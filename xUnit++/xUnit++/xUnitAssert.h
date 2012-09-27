@@ -63,7 +63,7 @@ private:
     xUnitFailure();
 
 public:
-    xUnitFailure(xUnitAssert assert, std::function<void(const xUnitAssert &)> onFailureComplete);
+    xUnitFailure(const xUnitAssert &assert, std::function<void(const xUnitAssert &)> onFailureComplete);
     xUnitFailure(const xUnitFailure &other);
     ~xUnitFailure() noexcept(false);
 
@@ -122,10 +122,11 @@ protected:
         static const bool value = (sizeof(f<T>(nullptr)) == sizeof(char));
     };
 
-    std::string callPrefix;
-    std::function<xUnitFailure(xUnitAssert)> OnFailure;
-
+    xUnitFailure OnFailure(xUnitAssert assert) const;
     xUnitFailure OnSuccess() const;
+
+    std::string callPrefix;
+    std::function<void (const xUnitAssert &)> handleFailure;
 
 public:
     template<typename TExpected, typename TActual, typename TComparer>
@@ -501,7 +502,7 @@ public:
     }
 
     Assert(const std::string &callPrefix = "Assert.",
-           std::function<xUnitFailure(xUnitAssert)> onFailure = [](xUnitAssert assert) { return xUnitFailure(assert, [](const xUnitAssert &assert) { throw assert; }); });
+           std::function<void (const xUnitAssert &)> onFailure = [](const xUnitAssert &assert) { throw assert; });
 };
 
 const class : public Assert

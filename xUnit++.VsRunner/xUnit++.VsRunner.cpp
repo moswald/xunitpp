@@ -9,6 +9,7 @@
 #include "xUnit++/IOutput.h"
 #include "xUnit++/LineInfo.h"
 #include "xUnit++/TestDetails.h"
+#include "xUnit++/TestEvent.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -45,11 +46,16 @@ namespace
             testResults.Add(key, result);
         }
 
-        void ReportFailure(const xUnitpp::TestDetails &td, const std::string &msg, const xUnitpp::LineInfo &)
+        void ReportEvent(const xUnitpp::TestDetails &td, const xUnitpp::TestEvent &evt)
         {
             auto result = testResults[marshal_as<String ^>(td.Name)];
-            result->Outcome = TestOutcome::Failed;
-            result->ErrorMessage = marshal_as<String ^>(msg);
+
+            if (evt.IsFailure())
+            {
+                result->Outcome = TestOutcome::Failed;
+            }
+
+            result->Messages->Add(gcnew TestResultMessage(marshal_as<String ^>(evt.LevelString()), marshal_as<String ^>(evt.ToString())));
         }
 
         void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
@@ -100,9 +106,9 @@ namespace
             reporter->ReportStart(td);
         }
 
-        virtual void ReportFailure(const xUnitpp::TestDetails &testDetails, const std::string &msg, const xUnitpp::LineInfo &lineInfo) override
+        virtual void ReportEvent(const xUnitpp::TestDetails &testDetails, const xUnitpp::TestEvent &evt) override
         {
-            reporter->ReportFailure(testDetails, msg, lineInfo);
+            reporter->ReportEvent(testDetails, evt);
         }
 
         virtual void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason) override

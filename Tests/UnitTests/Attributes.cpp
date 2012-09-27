@@ -2,7 +2,7 @@
 #include "xUnit++/TestCollection.h"
 #include "xUnit++/xUnitTestRunner.h"
 #include "xUnit++/xUnit++.h"
-
+#include "Helpers/OutputRecord.h"
 
 SUITE("Attributes")
 {
@@ -42,38 +42,17 @@ FACT("SkippedTestsShouldNotBeInstantiated")
         }
     };
 
-    struct : xUnitpp::IOutput
-    {
-        virtual void ReportStart(const xUnitpp::TestDetails &) override
-        {
-        }
-
-        virtual void ReportFailure(const xUnitpp::TestDetails &, const std::string &, const xUnitpp::LineInfo &) override
-        {
-        }
-
-        virtual void ReportSkip(const xUnitpp::TestDetails &, const std::string &) override
-        {
-        }
-
-        virtual void ReportFinish(const xUnitpp::TestDetails &, xUnitpp::Time::Duration) override
-        {
-        }
-
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override 
-        {
-        }
-    } emptyReporter;
+    xUnitpp::Tests::OutputRecord record;
 
     xUnitpp::AttributeCollection attributes;
     attributes.insert(std::make_pair("Skip", "Testing skip."));
 
     xUnitpp::TestCollection collection;
-    auto check = std::make_shared<xUnitpp::Check>();
+    std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> localEventSources;
     xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); },
-        "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__, check);
+        "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__, localEventSources);
 
-    xUnitpp::RunTests(emptyReporter, [](const xUnitpp::TestDetails &) { return true; },
+    xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
         collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }
 

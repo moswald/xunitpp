@@ -4,11 +4,14 @@
 #include <chrono>
 #include <functional>
 #include <map>
+#include <memory>
 #include <vector>
 #include "xUnitTest.h"
 
 namespace xUnitpp
 {
+
+struct ITestEventSource;
 
 // !!!VS convert this to an initializer list when VS implements them
 template<typename TTuple>
@@ -79,21 +82,21 @@ public:
 
     public:
         Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check);
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources);
 
         template<typename TTheory, typename TTheoryData>
         Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
-            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check)
+            const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources)
         {
-            int id = 1;
+            int id = 0;
             for (auto t : theoryData())
             {
                 // !!! someday, I'd like to embed the actual parameter values, rather than the theory data index
                 // not sure how feasible that is in C++, since it's lacking the type reflection of C# :(
-                auto theoryName = name + "(" + std::to_string(id++) + ")";
+                auto theoryName = name + "(" + std::to_string(++id) + ")";
 
                 collection.mTests.emplace_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
-                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, check));
+                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventSources));
             }
         }
     };

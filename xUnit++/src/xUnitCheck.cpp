@@ -1,24 +1,20 @@
 #include "xUnitCheck.h"
+#include "TestEvent.h"
 
 namespace xUnitpp
 {
 
 Check::Check()
-    : Assert("Check.",
-        [&](xUnitAssert assert)
+    : Assert("Check.", [&](const xUnitAssert &assert)
         {
-            return xUnitFailure(assert,
-                [&](const xUnitAssert &assert)
-                {
-                    failedChecks.emplace_back(assert);
-                });
+            sinks[std::this_thread::get_id()](TestEvent(assert));
         })
 {
 }
 
-const std::vector<xUnitAssert> &Check::Failures() const
+void Check::SetSink(std::function<void(TestEvent &&)> sink)
 {
-    return failedChecks;
+    sinks[std::this_thread::get_id()] = sink;
 }
 
 }

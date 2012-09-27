@@ -62,7 +62,9 @@ struct TestFactory
 
     operator std::shared_ptr<xUnitTest>() const
     {
-        return std::make_shared<xUnitTest>(testFn, name, suite, attributes, timeLimit, file, line, check);
+        std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> testEventSources;
+        testEventSources.push_back(check);
+        return std::make_shared<xUnitTest>(testFn, name, suite, attributes, timeLimit, file, line, testEventSources);
     }
 
 private:
@@ -159,7 +161,7 @@ FACT_FIXTURE("FailureIsReportedOncePerAssert", TestRunnerFixture)
     tests.push_back(TestFactory(FailingTest(), testCheck).Name("failing"));
 
     Assert.Equal(2, RunTests(output, &Filter::AllTests, tests, duration, 0));
-    Assert.Equal(2U, output.failures.size());
+    Assert.Equal(2U, output.events.size());
     
 }
 
@@ -168,9 +170,9 @@ FACT_FIXTURE("TestsAbortOnFirstAssert", TestRunnerFixture)
     tests.push_back(TestFactory([]() { Assert.Fail() << "first"; Assert.Fail() << "second"; }, testCheck));
 
     Assert.Equal(1, RunTests(output, &Filter::AllTests, tests, duration, 0), LI);
-    Assert.Equal(1U, output.failures.size(), LI);
-    Assert.Contains(std::get<1>(output.failures[0]), "first", LI);
-    Assert.DoesNotContain(std::get<1>(output.failures[0]), "second", LI);
+    Assert.Equal(1U, output.events.size(), LI);
+    Assert.Contains(std::get<1>(output.events[0]).ToString(), "first", LI);
+    Assert.DoesNotContain(std::get<1>(output.events[0]).ToString(), "second", LI);
 }
 
 FACT_FIXTURE("FailureIsReportedOncePerCheck", TestRunnerFixture)
@@ -178,7 +180,7 @@ FACT_FIXTURE("FailureIsReportedOncePerCheck", TestRunnerFixture)
     tests.push_back(TestFactory([=]() { testCheck->Fail(); }, testCheck));
 
     Assert.Equal(1, RunTests(output, &Filter::AllTests, tests, duration, 0));
-    Assert.Equal(1U, output.failures.size());
+    Assert.Equal(1U, output.events.size());
 }
 
 FACT_FIXTURE("TestsDoNotAbortOnCheck", TestRunnerFixture)
@@ -186,9 +188,17 @@ FACT_FIXTURE("TestsDoNotAbortOnCheck", TestRunnerFixture)
     tests.push_back(TestFactory([=]() { testCheck->Fail() << "first"; testCheck->Fail() << "second"; }, testCheck));
 
     Assert.Equal(1, RunTests(output, &Filter::AllTests, tests, duration, 0));
-    Assert.Equal(2U, output.failures.size());
-    Assert.Contains(std::get<1>(output.failures[0]), "first");
-    Assert.Contains(std::get<1>(output.failures[1]), "second");
+    Assert.Equal(2U, output.events.size());
+    Assert.Contains(std::get<1>(output.events[0]).ToString(), "first");
+    Assert.Contains(std::get<1>(output.events[1]).ToString(), "second");
+}
+
+FACT_FIXTURE("FailuresAreReported", TestRunnerFixture)
+{
+    tests.push_back(TestFactory([=]() { testCheck->Fail(); testCheck->Fail(); }, testCheck));
+    RunTests(output, &Filter::AllTests, tests, duration, 0);
+
+    Assert.Equal(2U, output.events.size());
 }
 
 FACT_FIXTURE("TestCountIsReported", TestRunnerFixture)
@@ -205,14 +215,6 @@ FACT_FIXTURE("FailedTestsAreReported", TestRunnerFixture)
     RunTests(output, &Filter::AllTests, tests, duration, 0);
 
     Assert.Equal(1U, output.summaryFailed);
-}
-
-FACT_FIXTURE("FailuresAreReported", TestRunnerFixture)
-{
-    tests.push_back(TestFactory([=]() { testCheck->Fail(); testCheck->Fail(); }, testCheck));
-    RunTests(output, &Filter::AllTests, tests, duration, 0);
-
-    Assert.Equal(2U, output.failures.size());
 }
 
 FACT_FIXTURE("SkippedTestsAreReported", TestRunnerFixture)
@@ -232,7 +234,7 @@ UNTIMED_FACT_FIXTURE("SlowTestsPassHighTimeThreshold", TestRunnerFixture)
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(200)), 0);
 
-    Assert.Equal(0U, output.failures.size());
+    Assert.Equal(0U, output.events.size());
     Assert.Equal(0U, output.summaryFailed);
 }
 
@@ -242,7 +244,7 @@ UNTIMED_FACT_FIXTURE("SlowTestsFailLowTimeThreshold", TestRunnerFixture)
     tests.push_back(TestFactory(sleepyTest, testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(1)), 0);
 
-    Assert.Equal(1U, output.failures.size());
+    Assert.Equal(1U, output.events.size());
     Assert.Equal(1U, output.summaryFailed);
 }
 
@@ -251,9 +253,9 @@ UNTIMED_FACT_FIXTURE("SlowTestFailsBecauseOfTimeLimitReportsReason", TestRunnerF
     tests.push_back(TestFactory(SleepyTest(), testCheck));
     RunTests(output, &Filter::AllTests, tests, Time::ToDuration(Time::ToMilliseconds(1)), 0);
 
-    Assert.Equal(1U, output.failures.size());
-    Assert.Contains(std::get<1>(output.failures[0]), "Test failed to complete within");
-    Assert.Contains(std::get<1>(output.failures[0]), "1 milliseconds.");
+    Assert.Equal(1U, output.events.size());
+    Assert.Contains(std::get<1>(output.events[0]).ToString(), "Test failed to complete within");
+    Assert.Contains(std::get<1>(output.events[0]).ToString(), "1 milliseconds.");
 }
 
 UNTIMED_FACT_FIXTURE("SlowTestWithTimeExemptionPasses", TestRunnerFixture)
