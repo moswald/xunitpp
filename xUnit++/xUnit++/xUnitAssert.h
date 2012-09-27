@@ -132,7 +132,7 @@ public:
     template<typename TExpected, typename TActual, typename TComparer>
     xUnitFailure Equal(TExpected expected, TActual actual, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using namespace std;
+        using std::to_string;
 
         if (!comparer(expected, actual))
         {
