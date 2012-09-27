@@ -3,6 +3,10 @@
 
 #if defined(WIN32)
 #include <Windows.h>
+
+// thanks, Microsoft. "ReportEvent" isn't likely to be used anywhere else, ever
+#undef ReportEvent
+
 #endif
 
 #include <string>

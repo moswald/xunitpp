@@ -1,6 +1,7 @@
 #include "OutputRecord.h"
 #include "xUnit++/LineInfo.h"
 #include "xUnit++/TestDetails.h"
+#include "xUnit++/TestEvent.h"
 
 namespace xUnitpp { namespace Tests {
 
@@ -10,10 +11,10 @@ void OutputRecord::ReportStart(const TestDetails &testDetails)
     orderedTestList.push_back(testDetails);
 }
 
-void OutputRecord::ReportFailure(const TestDetails &testDetails, const std::string &msg, const LineInfo &lineInfo)
+void OutputRecord::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
 {
     std::lock_guard<std::mutex> guard(lock);
-    failures.push_back(std::make_tuple(testDetails, msg, lineInfo));
+    events.push_back(std::make_tuple(testDetails, evt));
 }
 
 void OutputRecord::ReportSkip(const TestDetails &testDetails, const std::string &reason)

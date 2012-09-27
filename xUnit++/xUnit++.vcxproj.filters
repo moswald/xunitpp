@@ -9,6 +9,8 @@
     <ClCompile Include="src/xUnitTest.cpp" />
     <ClCompile Include="src/IOutput.cpp" />
     <ClCompile Include="src\xUnitCheck.cpp" />
+    <ClCompile Include="..\src\TestEvent.cpp" />
+    <ClCompile Include="src\ITestEventSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnit++/xUnitAssert.h" />
@@ -27,5 +29,7 @@
     <ClInclude Include="xUnit++/xUnitTest.h" />
     <ClInclude Include="xUnit++/xUnitMacros.h" />
     <ClInclude Include="xUnit++\xUnitCheck.h" />
+    <ClInclude Include="xUnit++\TestEvent.h" />
+    <ClInclude Include="xUnit++\ITestEventSource.h" />
   </ItemGroup>
 </Project>

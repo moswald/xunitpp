@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include "xUnit++/TestDetails.h"
+#include "xUnit++/TestEvent.h"
 #include "xUnit++/xUnitTime.h"
 
 namespace
@@ -29,7 +30,7 @@ namespace
         } status;
 
         xUnitpp::Time::Duration time;
-        std::string message;
+        std::vector<std::string> messages;
     };
 }
 
@@ -176,12 +177,18 @@ namespace
             " />\n";
     }
 
-    std::string XmlTestFailed(const std::string &file, int line, const std::string &message)
+    std::string XmlTestFailed(const std::string &file, int line, const std::vector<std::string> &messages)
     {
-        return std::string("         ") +
-            "<failure" +
-                XmlAttribute("message", file + "(" + std::to_string(line) + "): " + XmlEscape(message)) +
-            "</failure>\n";
+        std::string result;
+        for (const auto &message : messages)
+        {
+            result += std::string("         ") +
+                "<failure" +
+                    XmlAttribute("message", file + "(" + std::to_string(line) + "): " + XmlEscape(message)) +
+                "</failure>\n";
+        }
+
+        return result;
     }
 
     std::string XmlTestSkipped(const std::string &message)
@@ -229,16 +236,17 @@ void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failur
                         if (att.first != "Skip")
                         {
                             stream << XmlTestAttribute(att.first, att.second);
+                            break;
                         }
                     }
 
                     if (test.status == TestResult::Failure)
                     {
-                        stream << XmlTestFailed(test.testDetails.Filename, test.testDetails.Line, test.message);
+                        stream << XmlTestFailed(test.testDetails.Filename, test.testDetails.Line, test.messages);
                     }
                     else if (test.status == TestResult::Skipped)
                     {
-                        stream << XmlTestSkipped(test.message);
+                        stream << XmlTestSkipped(test.messages[0]);
                     }
 
                     stream << XmlEndTest(test.status == TestResult::Success && test.testDetails.Attributes.empty());
@@ -276,18 +284,21 @@ void XmlReporter::ReportStart(const TestDetails &testDetails)
     suiteResults[testDetails.Suite].testResults.insert(std::make_pair(testDetails.Name, TestResult(testDetails)));
 }
 
-void XmlReporter::ReportFailure(const TestDetails &testDetails, const std::string &msg, const LineInfo &)
+void XmlReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
 {
-    suiteResults[testDetails.Suite].failures++;
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].message = msg;
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Failure;
+    if (evt.IsFailure())
+    {
+        suiteResults[testDetails.Suite].failures++;
+        suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(evt.ToString());
+        suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Failure;
+    }
 }
 
 void XmlReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
     ReportStart(testDetails);
     suiteResults[testDetails.Suite].skipped++;
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].message = reason;
+    suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(reason);
     suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Skipped;
 }
 

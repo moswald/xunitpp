@@ -4,6 +4,7 @@
 #include <iostream>
 #include "xUnit++/LineInfo.h"
 #include "xUnit++/TestDetails.h"
+#include "xUnit++/TestEvent.h"
 
 namespace
 {
@@ -13,18 +14,6 @@ namespace
         auto line = lineInfo.file.empty() ? td.Line : lineInfo.line;
 
         return file + "(" + std::to_string(line) + ")";
-    }
-
-    std::string NameAndDataIndex(const std::string &name, int dataIndex)
-    {
-        if (dataIndex < 0)
-        {
-            return name;
-        }
-        else
-        {
-            return name + "(" + std::to_string(dataIndex) +")";
-        }
     }
 }
 
@@ -45,10 +34,10 @@ void StdOutReporter::ReportStart(const TestDetails &testDetails)
     }
 }
 
-void StdOutReporter::ReportFailure(const TestDetails &testDetails, const std::string &msg, const LineInfo &lineInfo)
+void StdOutReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
 {
-    std::cout << (FileAndLine(testDetails, lineInfo) +
-        ": error in " + testDetails.Name+ ": " + msg + "\n");
+    std::cout << (FileAndLine(testDetails, evt.LineInfo()) +
+        ": " + testDetails.Name+ ": " + evt.LevelString() + ": " + evt.ToString() + "\n");
 }
 
 void StdOutReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)

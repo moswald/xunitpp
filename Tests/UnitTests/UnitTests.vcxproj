@@ -132,6 +132,7 @@
     <ClCompile Include="Assert.Throws.cpp" />
     <ClCompile Include="Assert.True.cpp" />
     <ClCompile Include="Attributes.cpp" />
+    <ClCompile Include="Check.cpp" />
     <ClCompile Include="Helpers\OutputRecord.cpp" />
     <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="TestRunner.cpp" />

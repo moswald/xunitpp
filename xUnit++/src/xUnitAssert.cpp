@@ -95,7 +95,7 @@ xUnitFailure::xUnitFailure()
 {
 }
 
-xUnitFailure::xUnitFailure(xUnitAssert assert, std::function<void(const xUnitAssert &)> onFailureComplete)
+xUnitFailure::xUnitFailure(const xUnitAssert &assert, std::function<void(const xUnitAssert &)> onFailureComplete)
     : OnFailureComplete(onFailureComplete)
     , assert(assert)
     , refCount(*(new int(1)))
@@ -126,6 +126,11 @@ xUnitFailure::~xUnitFailure() noexcept(false)
 xUnitFailure xUnitFailure::None()
 {
     return xUnitFailure();
+}
+
+xUnitFailure Assert::OnFailure(xUnitAssert assert) const
+{
+    return xUnitFailure(std::move(assert), handleFailure);
 }
 
 xUnitFailure Assert::OnSuccess() const
@@ -288,9 +293,9 @@ xUnitFailure Assert::Contains(const std::string &actualString, const std::string
     return OnSuccess();
 }
 
-Assert::Assert(const std::string &callPrefix, std::function<xUnitFailure(xUnitAssert)> onFailure)
+Assert::Assert(const std::string &callPrefix, std::function<void (const xUnitAssert &)> onFailure)
     : callPrefix(callPrefix)
-    , OnFailure(onFailure)
+    , handleFailure(onFailure)
 {
 }
 

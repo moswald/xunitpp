@@ -1,3 +1,4 @@
+#include "TestCollection.h"
 #include <chrono>
 #include <memory>
 #include <string>
@@ -5,7 +6,7 @@
 #include <vector>
 #include "ExportApi.h"
 #include "IOutput.h"
-#include "TestCollection.h"
+#include "ITestEventSource.h"
 #include "xUnitTestRunner.h"
 #include "xUnitTime.h"
 
@@ -36,9 +37,9 @@ TestCollection &TestCollection::Instance()
 }
 
 TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, std::shared_ptr<Check> check)
+                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<ITestEventSource>> &testEventSources)
 {
-    collection.mTests.emplace_back(std::make_shared<xUnitTest>(fn, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, check));
+    collection.mTests.emplace_back(std::make_shared<xUnitTest>(fn, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventSources));
 }
 
 const std::vector<std::shared_ptr<xUnitTest>> &TestCollection::Tests()

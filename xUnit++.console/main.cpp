@@ -10,7 +10,6 @@
 #include "TestAssembly.h"
 #include "XmlReporter.h"
 
-
 int main(int argc, char **argv)
 {
     xUnitpp::Utilities::CommandLine::Options options;

@@ -7,6 +7,7 @@
 #include "xUnit++/xUnitTestRunner.h"
 #include "xUnit++/xUnitTime.h"
 #include "xUnit++/xUnit++.h"
+#include "Helpers/OutputRecord.h"
 
 SUITE("Theory")
 {
@@ -18,33 +19,8 @@ void TheoryUnderTest(int x)
 
 struct TheoryFixture
 {
-private:
-    struct : xUnitpp::IOutput
-    {
-        virtual void ReportStart(const xUnitpp::TestDetails &) override
-        {
-        }
-
-        virtual void ReportFailure(const xUnitpp::TestDetails &, const std::string &, const xUnitpp::LineInfo &) override
-        {
-        }
-
-        virtual void ReportSkip(const xUnitpp::TestDetails &, const std::string &) override
-        {
-        }
-
-        virtual void ReportFinish(const xUnitpp::TestDetails &, xUnitpp::Time::Duration) override
-        {
-        }
-
-        virtual void ReportAllTestsComplete(size_t, size_t, size_t, xUnitpp::Time::Duration) override
-        {
-        }
-    } emptyReporter;
-
 public:
     TheoryFixture()
-        : localCheck(std::make_shared<xUnitpp::Check>())
     {
     }
 
@@ -52,12 +28,12 @@ public:
     void Register(const std::string &name, TTheoryData &&theoryData)
     {
         xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, theoryData,
-            name, "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
+            name, "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
     }
 
     void Run()
     {
-        RunTests(emptyReporter, [](const xUnitpp::TestDetails &) { return true; },
+        RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
             collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
     }
 
@@ -69,9 +45,10 @@ public:
         Run();
     }
 
+    xUnitpp::Tests::OutputRecord record;
     xUnitpp::AttributeCollection attributes;
     xUnitpp::TestCollection collection;
-    std::shared_ptr<xUnitpp::Check> localCheck;
+    std::vector<std::shared_ptr<xUnitpp::ITestEventSource>> localEventSources;
 };
 
 std::vector<std::tuple<int>> RawFunctionProvider()
@@ -120,7 +97,7 @@ FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
 
     auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
 
     Run();
 
@@ -137,7 +114,7 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
     auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localCheck);
+        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventSources);
 
     Run();
 }
