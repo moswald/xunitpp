@@ -36,6 +36,7 @@ if env['windows'] == True:
 
 # if building the package, need to build both
 if package != 0:
+    env['version'] = raw_input("Enter Version String: ")
     release = 1
     debug = 1
 

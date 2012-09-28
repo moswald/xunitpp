@@ -6,4 +6,4 @@ env.Install('#package/xUnit++/bin/', Glob('#bin/xUnit++.console/*'))
 env.Install('#package/xUnit++/', '#License.txt')
 
 env.Replace(TARFLAGS = '-c -z')
-env.Tar('#package/xUnit++.tar.gz', '#package/xUnit++')
+env.Tar('#package/xUnit++.' + env['version'] + '.tar.gz', '#package/xUnit++')
