@@ -9,10 +9,10 @@
     <ClCompile Include="src/xUnitTest.cpp" />
     <ClCompile Include="src/IOutput.cpp" />
     <ClCompile Include="src/xUnitCheck.cpp" />
-    <ClCompile Include="..\src\TestEvent.cpp" />
-    <ClCompile Include="src\xUnitWarn.cpp" />
-    <ClCompile Include="src\TestEventRecorder.cpp" />
-    <ClCompile Include="src\xUnitLog.cpp" />
+    <ClCompile Include="src/TestEvent.cpp" />
+    <ClCompile Include="src/xUnitWarn.cpp" />
+    <ClCompile Include="src/TestEventRecorder.cpp" />
+    <ClCompile Include="src/xUnitLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnit++/xUnitAssert.h" />
