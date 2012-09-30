@@ -96,8 +96,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="ConsoleReporter.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="StdOutReporter.cpp" />
     <ClCompile Include="TestAssembly.cpp" />
     <ClCompile Include="XmlReporter.cpp" />
   </ItemGroup>
@@ -108,7 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandLine.h" />
-    <ClInclude Include="StdOutReporter.h" />
+    <ClInclude Include="ConsoleReporter.h" />
     <ClInclude Include="TestAssembly.h" />
     <ClInclude Include="XmlReporter.h" />
   </ItemGroup>

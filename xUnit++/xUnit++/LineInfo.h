@@ -15,6 +15,8 @@ struct LineInfo
     std::string file;
     int line;
 
+    friend std::string to_string(const LineInfo &lineInfo);
+
 private:
     LineInfo();
 };

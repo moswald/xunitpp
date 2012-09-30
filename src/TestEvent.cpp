@@ -24,10 +24,10 @@ const std::string &to_string(const TestEvent &evt)
     return evt.message;
 }
 
-TestEvent::TestEvent(EventLevel level, const std::string &message)
+TestEvent::TestEvent(EventLevel level, const std::string &message, const xUnitpp::LineInfo &lineInfo)
     : level(level)
     , message(message)
-    , lineInfo(LineInfo::empty())
+    , lineInfo(lineInfo)
 {
 }
 

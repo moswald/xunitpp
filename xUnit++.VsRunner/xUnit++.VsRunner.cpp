@@ -230,8 +230,8 @@ namespace
                     {
                         TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.ShortName), uri, marshal_as<String ^>(source));
                         testCase->DisplayName = marshal_as<String ^>(td.ShortName);
-                        testCase->CodeFilePath = marshal_as<String ^>(td.Filename);
-                        testCase->LineNumber = td.Line;
+                        testCase->CodeFilePath = marshal_as<String ^>(td.LineInfo.file);
+                        testCase->LineNumber = td.LineInfo.line;
 
                         dict->Add(marshal_as<String ^>(td.ShortName), testCase);
                     }

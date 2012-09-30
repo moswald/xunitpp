@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "LineInfo.h"
 #include "xUnitTime.h"
 
 namespace xUnitpp
@@ -32,8 +33,7 @@ struct TestDetails
     std::string Suite;
     AttributeCollection Attributes;
     Time::Duration TimeLimit;
-    std::string Filename;
-    int Line;
+    xUnitpp::LineInfo LineInfo;
 };
 
 }

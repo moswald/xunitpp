@@ -26,6 +26,7 @@ namespace xUnitpp
 {
 
 TestDetails::TestDetails()
+    : LineInfo(xUnitpp::LineInfo::empty())
 {
 }
 
@@ -37,8 +38,7 @@ TestDetails::TestDetails(const std::string &name, const std::string &suite, cons
     , Suite(suite)
     , Attributes(attributes)
     , TimeLimit(timeLimit)
-    , Filename(filename)
-    , Line(line)
+    , LineInfo(filename, line)
 {
 }
 
@@ -49,12 +49,12 @@ TestDetails::TestDetails(const TestDetails &other)
     , Suite(other.Suite)
     , Attributes(other.Attributes)
     , TimeLimit(other.TimeLimit)
-    , Filename(other.Filename)
-    , Line(other.Line)
+    , LineInfo(other.LineInfo)
 {
 }
 
 TestDetails::TestDetails(TestDetails &&other)
+    : LineInfo(xUnitpp::LineInfo::empty())
 {
     swap(*this, other);
 }
@@ -75,8 +75,7 @@ void swap(TestDetails &td0, TestDetails &td1)
     swap(td0.Suite, td1.Suite);
     swap(td0.Attributes, td1.Attributes);
     swap(td0.TimeLimit, td1.TimeLimit);
-    swap(td0.Filename, td1.Filename);
-    swap(td0.Line, td1.Line);
+    swap(td0.LineInfo, td1.LineInfo);
 }
 
 }

@@ -25,7 +25,7 @@ const std::string &to_string(EventLevel level);
 class TestEvent
 {
 public:
-    TestEvent(EventLevel level, const std::string &message);
+    TestEvent(EventLevel level, const std::string &message, const LineInfo &lineInfo = LineInfo::empty());
     TestEvent(EventLevel level, const xUnitAssert &assert);
     TestEvent(const std::exception &e);
 

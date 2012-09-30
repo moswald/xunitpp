@@ -3,14 +3,14 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CommandLine.cpp" />
-    <ClCompile Include="StdOutReporter.cpp" />
     <ClCompile Include="XmlReporter.cpp" />
     <ClCompile Include="TestAssembly.cpp" />
+    <ClCompile Include="ConsoleReporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandLine.h" />
-    <ClInclude Include="StdOutReporter.h" />
     <ClInclude Include="XmlReporter.h" />
     <ClInclude Include="TestAssembly.h" />
+    <ClInclude Include="ConsoleReporter.h" />
   </ItemGroup>
 </Project>
