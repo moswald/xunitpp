@@ -6,7 +6,7 @@
 #include "xUnit++/ExportApi.h"
 #include "xUnit++/TestDetails.h"
 #include "CommandLine.h"
-#include "StdOutReporter.h"
+#include "ConsoleReporter.h"
 #include "TestAssembly.h"
 #include "XmlReporter.h"
 
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
             std::sort(activeTestIds.begin(), activeTestIds.end());
 
             std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
-                (xUnitpp::IOutput *)new xUnitpp::StdOutReporter(options.verbose, options.veryVerbose) :
+                (xUnitpp::IOutput *)new xUnitpp::ConsoleReporter(options.verbose, options.veryVerbose) :
                 (xUnitpp::IOutput *)new xUnitpp::XmlReporter(options.xmlOutput));
             totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)

@@ -1,15 +1,15 @@
-#ifndef STDOUTREPORTER_H_
-#define STDOUTREPORTER_H_
+#ifndef CONSOLEREPORTER_H_
+#define CONSOLEREPORTER_H_
 
 #include "xUnit++/IOutput.h"
 
 namespace xUnitpp
 {
 
-class StdOutReporter : public IOutput
+class ConsoleReporter : public IOutput
 {
 public:
-    StdOutReporter(bool verbose, bool veryVerbose);
+    ConsoleReporter(bool verbose, bool veryVerbose);
 
     virtual void ReportStart(const TestDetails &) override;
     virtual void ReportEvent(const TestDetails &testDetails, const TestEvent &evt) override;

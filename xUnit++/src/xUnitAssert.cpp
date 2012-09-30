@@ -34,8 +34,6 @@ namespace
             msg += "\n       Actual: " + actual;
         }
 
-        msg += "\n";
-
         return msg;
     }
 }

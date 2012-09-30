@@ -19,4 +19,14 @@ const LineInfo &LineInfo::empty()
     return empty;
 }
 
+std::string to_string(const LineInfo &lineInfo)
+{
+    if (lineInfo.file.empty())
+    {
+        return std::string();
+    }
+
+    return lineInfo.file + "(" + std::to_string(lineInfo.line) + ")";
+}
+
 }

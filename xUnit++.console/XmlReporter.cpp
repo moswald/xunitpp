@@ -177,14 +177,14 @@ namespace
             " />\n";
     }
 
-    std::string XmlTestFailed(const std::string &file, int line, const std::vector<std::string> &messages)
+    std::string XmlTestFailed(const std::string &fileAndLine, const std::vector<std::string> &messages)
     {
         std::string result;
         for (const auto &message : messages)
         {
             result += std::string("         ") +
                 "<failure" +
-                    XmlAttribute("message", file + "(" + std::to_string(line) + "): " + XmlEscape(message)) +
+                    XmlAttribute("message", fileAndLine + ": " + XmlEscape(message)) +
                 "</failure>\n";
         }
 
@@ -242,7 +242,7 @@ void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failur
 
                     if (test.status == TestResult::Failure)
                     {
-                        stream << XmlTestFailed(test.testDetails.Filename, test.testDetails.Line, test.messages);
+                        stream << XmlTestFailed(to_string(test.testDetails.LineInfo), test.messages);
                     }
                     else if (test.status == TestResult::Skipped)
                     {

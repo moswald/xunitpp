@@ -18,7 +18,7 @@ class Log
         class Message
         {
         public:
-            Message(std::function<void(const std::string &)> recordMessage);
+            Message(std::function<void(const std::string &, const LineInfo &)> recordMessage, const LineInfo &lineInfo = LineInfo::empty());
             Message(const Message &other);
             ~Message();
 
@@ -34,11 +34,12 @@ class Log
 
         private:
             size_t &refCount;
-            std::function<void(const std::string &)> recordMessage;
+            std::function<void(const std::string &, const LineInfo &)> recordMessage;
             std::stringstream message;
+            LineInfo lineInfo;
         };
     public:
-        Logger(std::function<void(const std::string &)> recordMessage);
+        Logger(std::function<void(const std::string &, const LineInfo &)> recordMessage);
 
         template<typename T>
         Message operator <<(const T &value) const
@@ -46,8 +47,10 @@ class Log
             return (Message(recordMessage) << value);
         }
 
+        Message operator()(const LineInfo &lineInfo) const;
+
     private:
-        std::function<void(const std::string &)> recordMessage;
+        std::function<void(const std::string &, const LineInfo &)> recordMessage;
     };
 
 public:
