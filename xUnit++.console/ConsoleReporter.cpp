@@ -156,7 +156,7 @@ void ConsoleReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, s
 
     CachedOutput::Instant(header + total + failures + skips);
 
-    header = "Test time: ";
+    header = "\nTest time: ";
 
     auto ms = Time::ToMilliseconds(totalTime);
 
