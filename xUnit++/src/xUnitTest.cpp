@@ -10,8 +10,8 @@ xUnitTest::xUnitTest(std::function<void()> test, const std::string &name, const 
                      const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
     : test(test)
     , testDetails(name, suite, attributes, timeLimit, filename, line)
-    , failureEventLogged(false)
     , testEventRecorders(testEventRecorders)
+    , failureEventLogged(false)
 {
 }
 
