@@ -10,6 +10,7 @@
 #include "xUnit++/LineInfo.h"
 #include "xUnit++/TestDetails.h"
 #include "xUnit++/TestEvent.h"
+#include "TestAssembly.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -130,64 +131,17 @@ namespace
         gcroot<ManagedReporter ^> reporter;
     };
 
-    class TestAssembly
+    class ManagedTestAssembly : public xUnitpp::Utilities::TestAssembly
     {
-    private:
-        typedef bool (TestAssembly::*bool_type)() const;
-        bool is_valid() const
-        {
-            return EnumerateTestDetails != nullptr && FilteredTestsRunner != nullptr;
-        }
-
     public:
-        TestAssembly(const std::string &file)
-            : EnumerateTestDetails(nullptr)
-            , FilteredTestsRunner(nullptr)
-            , module(nullptr)
+        ManagedTestAssembly(const std::string &file)
+            : TestAssembly(file)
         {
-            char tempPath[MAX_PATH] = {0};
-            if (GetTempPath(MAX_PATH, tempPath) > 0)
-            {
-                if (GetTempFileName(tempPath, "xU+", 0, tempPath) != 0)
-                {
-                    if (CopyFile(file.c_str(), tempPath, FALSE))
-                    {
-                        tempFile = tempPath;
-                        if ((module = LoadLibrary(tempPath)) != nullptr)
-                        {
-                            EnumerateTestDetails = (xUnitpp::EnumerateTestDetails)GetProcAddress(module, "EnumerateTestDetails");
-                            FilteredTestsRunner = (xUnitpp::FilteredTestsRunner)GetProcAddress(module, "FilteredTestsRunner");
-                        }
-                    }
-                }
-            }
         }
 
-        ~TestAssembly()
+        ~ManagedTestAssembly()
         {
-            if (module)
-            {
-                FreeLibrary(module);
-            }
-
-            if (!tempFile.empty())
-            {
-                DeleteFile(tempFile.c_str());
-            }
         }
-
-        // !!!VS enable this when Visual Studio supports it
-        //explicit operator bool() const
-        //{
-        //    return module != nullptr;
-        //}
-
-        operator bool_type() const
-        {
-            return is_valid() ? &TestAssembly::is_valid : nullptr;
-        }
-
-        xUnitpp::EnumerateTestDetails EnumerateTestDetails;
 
         void AddTestCase(TestCase ^test)
         {
@@ -209,9 +163,6 @@ namespace
         }
 
     private:
-        xUnitpp::FilteredTestsRunner FilteredTestsRunner;
-        std::string tempFile;
-        HMODULE module;
         std::vector<gcroot<TestCase ^>> tests;
     };
 
@@ -220,7 +171,7 @@ namespace
         auto result = gcnew Dictionary<String ^, TestCase ^>();
 
         auto source = marshal_as<std::string>(_source);
-        if (auto assembly = TestAssembly(source))
+        if (auto assembly = ManagedTestAssembly(source))
         {
             auto uri = gcroot<Uri ^>(_uri);
             auto dict = gcroot<Dictionary<String ^, TestCase ^> ^>(result);
@@ -289,14 +240,14 @@ void VsRunner::Cancel()
 
 bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, ITestExecutionRecorder ^recorder)
 {
-    std::map<std::string, std::shared_ptr<TestAssembly>> assemblies;
+    std::map<std::string, std::shared_ptr<ManagedTestAssembly>> assemblies;
 
     for each (TestCase ^test in tests)
     {
         auto source = marshal_as<std::string>(test->Source);
         if (assemblies.find(source) == assemblies.end())
         {
-            if (auto assembly = std::make_shared<TestAssembly>(source))
+            if (auto assembly = std::make_shared<ManagedTestAssembly>(source))
             {
                 assemblies.insert(std::make_pair(source, assembly));
             }

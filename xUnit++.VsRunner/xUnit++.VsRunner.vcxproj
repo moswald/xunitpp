@@ -51,9 +51,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUnit++.Utility</AdditionalIncludeDirectories>
       <SmallerTypeCheck>false</SmallerTypeCheck>
     </ClCompile>
     <Link>
@@ -62,9 +61,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>../xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../xUnit++;../xUnit++.Utility</AdditionalIncludeDirectories>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,7 +72,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="System" />
@@ -93,6 +92,9 @@
     <ClCompile Include="xUnit++.VsRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\xUnit++.Utility\xUnit++.Utility.vcxproj">
+      <Project>{c40c9047-855e-45d8-ada8-9b98f3be0f6c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xUnit++\xUnit++.vcxproj">
       <Project>{25df3961-f288-4a96-ae6b-a4950a00ab8e}</Project>
     </ProjectReference>
