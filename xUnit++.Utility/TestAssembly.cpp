@@ -61,7 +61,7 @@ namespace
 #endif
 }
 
-namespace xUnitpp
+namespace xUnitpp { namespace Utilities
 {
 
 TestAssembly::TestAssembly(const std::string &file)
@@ -122,4 +122,4 @@ TestAssembly::operator bool_type() const
     return is_valid() ? &TestAssembly::is_valid : nullptr;
 }
 
-}
+}}
