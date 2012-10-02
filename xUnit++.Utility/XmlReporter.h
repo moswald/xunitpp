@@ -4,7 +4,7 @@
 #include <map>
 #include "xUnit++/IOutput.h"
 
-namespace xUnitpp
+namespace xUnitpp { namespace Utilities
 {
 
 class XmlReporter : public IOutput
@@ -26,6 +26,6 @@ private:
     std::map<std::string, SuiteResult> suiteResults;
 };
 
-}
+}}
 
 #endif

@@ -34,7 +34,7 @@ namespace
     };
 }
 
-struct xUnitpp::XmlReporter::SuiteResult
+struct xUnitpp::Utilities::XmlReporter::SuiteResult
 {
     SuiteResult()
     {
@@ -58,7 +58,7 @@ struct xUnitpp::XmlReporter::SuiteResult
 
 namespace
 {
-    float SuiteTime(const xUnitpp::XmlReporter::SuiteResult &suiteResult)
+    float SuiteTime(const xUnitpp::Utilities::XmlReporter::SuiteResult &suiteResult)
     {
         xUnitpp::Time::Duration timeTaken = xUnitpp::Time::Duration::zero();
 
@@ -131,7 +131,7 @@ namespace
         return "</testsuites>\n";
     }
 
-    std::string XmlBeginSuite(const xUnitpp::XmlReporter::SuiteResult &suite)
+    std::string XmlBeginSuite(const xUnitpp::Utilities::XmlReporter::SuiteResult &suite)
     {
         return std::string("   ") +
             "<testsuite" +
@@ -200,7 +200,7 @@ namespace
     }
 }
 
-namespace xUnitpp
+namespace xUnitpp { namespace Utilities
 {
 
 XmlReporter::XmlReporter(const std::string &filename)
@@ -307,4 +307,4 @@ void XmlReporter::ReportFinish(const TestDetails &testDetails, Time::Duration ti
     suiteResults[testDetails.Suite].testResults[testDetails.Name].time = timeTaken;
 }
 
-}
+}}

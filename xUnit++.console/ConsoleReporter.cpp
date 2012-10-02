@@ -117,7 +117,7 @@ void ConsoleReporter::ReportEvent(const TestDetails &testDetails, const TestEven
 
 void ConsoleReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
-    CachedOutput::Instant(FileAndLine(testDetails, LineInfo::empty()) +
+    CachedOutput::Instant(to_string(testDetails.LineInfo) +
         ": skipping " + testDetails.Name + ": " + reason);
 }
 
