@@ -327,7 +327,7 @@ public:
     {
         using std::to_string;
 
-        auto found = std::find_if(std::begin(sequence), std::end(sequence), predicate);
+        auto found = std::find_if(std::begin(sequence), std::end(sequence), std::forward<TPredicate>(predicate));
         if (found != std::end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo)
@@ -353,7 +353,7 @@ public:
     {
         using namespace std;
 
-        if (find_if(begin(sequence), end(sequence), predicate) == end(sequence))
+        if (find_if(begin(sequence), end(sequence), std::forward<TPredicate>(predicate)) == end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "Contains", lineInfo));
         }
@@ -543,7 +543,7 @@ public:
     template<typename TException, typename TFunc>
     TException Throws(TFunc &&fn, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        return Throws<TException>(fn, "", lineInfo);
+        return Throws<TException>(std::forward<TFunc>(fn), "", lineInfo);
     }
 } Assert;
 
