@@ -60,9 +60,9 @@ void xUnitTest::AddEvent(TestEvent &&evt)
 {
     std::lock_guard<std::mutex> lock(eventLock);
 
-    testEvents.emplace_back(evt);
+    testEvents.push_back(std::move(evt));
 
-    if (evt.IsFailure())
+    if (testEvents.back().IsFailure())
     {
         failureEventLogged = true;
     }
