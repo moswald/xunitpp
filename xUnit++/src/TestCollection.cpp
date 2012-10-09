@@ -39,7 +39,7 @@ TestCollection &TestCollection::Instance()
 TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
                                    const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorder)
 {
-    collection.mTests.emplace_back(std::make_shared<xUnitTest>(fn, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorder));
+    collection.mTests.push_back(std::make_shared<xUnitTest>(fn, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorder));
 }
 
 const std::vector<std::shared_ptr<xUnitTest>> &TestCollection::Tests()

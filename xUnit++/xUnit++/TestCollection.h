@@ -21,7 +21,7 @@ static std::function<std::vector<TTuple>()> TheoryData(int count, TTuple tuples[
 
     for (int i = 0; i != count; ++i)
     {
-        data.emplace_back(tuples[i]);
+        data.push_back(tuples[i]);
     }
 
     return [=]() { return data; };
@@ -95,7 +95,7 @@ public:
                 // not sure how feasible that is in C++, since it's lacking the type reflection of C# :(
                 auto theoryName = name + "(" + std::to_string(++id) + ")";
 
-                collection.mTests.emplace_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
+                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
                     attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorders));
             }
         }

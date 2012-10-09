@@ -192,7 +192,7 @@ DATA_THEORY("TestingLambdasAsData", (std::function<void()> fn),
 ([]() -> std::vector<std::tuple<std::function<void()>>>
 {
     std::vector<std::tuple<std::function<void()>>> data;
-    data.emplace_back(std::make_tuple([]() { }));
+    data.emplace_back([]() { });
     return data;
 })
 )
