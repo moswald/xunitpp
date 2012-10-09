@@ -36,7 +36,7 @@ class TestCollection
 public:
     class Register
     {
-        // !!!VS someday, Visual Studio will understand variadic macros
+        // !!!VS someday, Visual Studio will understand variadic templates
         // when it does, fix this collection
 
         // !!! should use a macro system to automate this
