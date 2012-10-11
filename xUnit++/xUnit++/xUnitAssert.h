@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <vector>
 #include "LineInfo.h"
+#include "xUnitToString.h"
 
 namespace xUnitpp
 {
@@ -24,7 +25,7 @@ class xUnitAssert : public std::exception
     typedef std::exception base;
 
 public:
-    xUnitAssert(const std::string &call, const LineInfo &lineInfo);
+    xUnitAssert(std::string &&call, const LineInfo &lineInfo);
 
     xUnitAssert &CustomMessage(const std::string &message);
     xUnitAssert &Expected(const std::string &expected);
@@ -92,12 +93,13 @@ protected:
     static double round(double value, size_t precision);
 
     template<typename T>
-    static std::string RangeToString(const T &begin, const T &end)
+    static std::string RangeToString(T &&begin, T &&end)
     {
-        using std::to_string;
+        typedef decltype(*begin) val_type;
+
         std::string result = "[ ";
 
-        std::for_each(begin, end, [&result](decltype(*begin) val) { result += to_string(val) + ", "; });
+        std::for_each(std::forward<T>(begin), std::forward<T>(end), [&result](val_type &&val) { result += ToString(std::forward<val_type>(val)) + ", "; });
 
         result[result.size() - 2] = ' ';
         result[result.size() - 1] = ']';
@@ -132,11 +134,9 @@ public:
     template<typename TExpected, typename TActual, typename TComparer>
     xUnitFailure Equal(TExpected expected, TActual actual, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using std::to_string;
-
         if (!comparer(expected, actual))
         {
-            return OnFailure(xUnitAssert(callPrefix + "Equal", lineInfo).Expected(to_string(expected)).Actual(to_string(actual)));
+            return OnFailure(xUnitAssert(callPrefix + "Equal", lineInfo).Expected(ToString(expected)).Actual(ToString(actual)));
         }
 
         return OnSuccess();
@@ -156,7 +156,7 @@ public:
     xUnitFailure Equal(double expected, double actual, int precision, const LineInfo &lineInfo = LineInfo::empty()) const;
 
     template<typename TExpected, typename TActual, typename TComparer>
-    xUnitFailure Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, TComparer comparer, const LineInfo &lineInfo = LineInfo::empty()) const
+    xUnitFailure Equal(TExpected &&expectedBegin, TExpected &&expectedEnd, TActual &&actualBegin, TActual &&actualEnd, TComparer &&comparer, const LineInfo &lineInfo = LineInfo::empty()) const
     {
         auto expected = expectedBegin;
         auto actual = actualBegin;
@@ -177,9 +177,9 @@ public:
         if (expected != expectedEnd || actual != actualEnd)
         {
             return OnFailure(xUnitAssert(callPrefix + "Equal", lineInfo)
-                .CustomMessage("Sequence unequal at location " + std::to_string(index) + ".")
-                .Expected(RangeToString(expectedBegin, expectedEnd))
-                .Actual(RangeToString(actualBegin, actualEnd)));
+                .CustomMessage("Sequence unequal at location " + ToString(index) + ".")
+                .Expected(RangeToString(std::forward<TExpected>(expectedBegin), std::forward<TExpected>(expectedEnd)))
+                .Actual(RangeToString(std::forward<TActual>(actualBegin), std::forward<TActual>(actualEnd))));
         }
 
         return OnSuccess();
@@ -325,13 +325,11 @@ public:
     template<typename TSequence, typename TPredicate>
     xUnitFailure DoesNotContainPred(const TSequence &sequence, TPredicate &&predicate, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using std::to_string;
-
         auto found = std::find_if(std::begin(sequence), std::end(sequence), std::forward<TPredicate>(predicate));
         if (found != std::end(sequence))
         {
             return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo)
-                .CustomMessage("Found: matching value at position " + to_string(std::distance(std::begin(sequence), found)) + "."));
+                .CustomMessage("Found: matching value at position " + ToString(std::distance(std::begin(sequence), found)) + "."));
         }
 
         return OnSuccess();
@@ -375,18 +373,16 @@ public:
     template<typename TActual, typename TRange>
     xUnitFailure InRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using std::to_string;
-
         if (min >= max)
         {
-            throw std::invalid_argument("Assert.InRange argument error: min (" + to_string(min) + ") must be strictly less than max (" + to_string(max) + ").");
+            throw std::invalid_argument("Assert.InRange argument error: min (" + ToString(min) + ") must be strictly less than max (" + ToString(max) + ").");
         }
 
         if (actual < min || actual >= max)
         {
             return OnFailure(xUnitAssert(callPrefix + "InRange", lineInfo)
-                .Expected("[" + to_string(min) + " - " + to_string(max) + ")")
-                .Actual(to_string(actual)));
+                .Expected("[" + ToString(min) + " - " + ToString(max) + ")")
+                .Actual(ToString(actual)));
         }
 
         return OnSuccess();
@@ -395,18 +391,16 @@ public:
     template<typename TActual, typename TRange>
     xUnitFailure NotInRange(TActual actual, TRange min, TRange max, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        using std::to_string;
-
         if (min >= max)
         {
-            throw std::invalid_argument("Assert.NotInRange argument error: min (" + to_string(min) + ") must be strictly less than max (" + to_string(max) + ").");
+            throw std::invalid_argument("Assert.NotInRange argument error: min (" + ToString(min) + ") must be strictly less than max (" + ToString(max) + ").");
         }
 
         if (actual >= min && actual < max)
         {
             return OnFailure(xUnitAssert(callPrefix + "NotInRange", lineInfo)
-                .Expected("[" + to_string(min) + " - " + to_string(max) + ")")
-                .Actual(to_string(actual)));
+                .Expected("[" + ToString(min) + " - " + ToString(max) + ")")
+                .Actual(ToString(actual)));
         }
 
         return OnSuccess();

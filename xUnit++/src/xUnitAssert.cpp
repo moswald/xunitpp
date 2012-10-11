@@ -47,9 +47,9 @@ const xUnitAssert &xUnitAssert::None()
     return none;
 }
 
-xUnitAssert::xUnitAssert(const std::string &call, const xUnitpp::LineInfo &lineInfo)
+xUnitAssert::xUnitAssert(std::string &&call, const xUnitpp::LineInfo &lineInfo)
     : lineInfo(lineInfo)
-    , call(call)
+    , call(std::move(call))
 {
 }
 
@@ -260,7 +260,7 @@ xUnitFailure Assert::DoesNotContain(const std::string &actualString, const std::
     auto found = actualString.find(value);
     if (found != std::string::npos)
     {
-        return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo).CustomMessage("Found: \"" + value + "\" at position " + std::to_string(found) + "."));
+        return OnFailure(xUnitAssert(callPrefix + "DoesNotContain", lineInfo).CustomMessage("Found: \"" + value + "\" at position " + ToString(found) + "."));
     }
 
     return OnSuccess();

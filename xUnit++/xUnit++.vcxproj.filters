@@ -35,5 +35,6 @@
     <ClInclude Include="xUnit++\xUnitWarn.h" />
     <ClInclude Include="xUnit++\TestEventRecorder.h" />
     <ClInclude Include="xUnit++\xUnitLog.h" />
+    <ClInclude Include="xUnit++\xUnitToString.h" />
   </ItemGroup>
 </Project>

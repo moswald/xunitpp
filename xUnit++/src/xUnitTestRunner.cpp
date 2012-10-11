@@ -272,7 +272,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                     if (threadStarted->wait_for(gate, std::chrono::duration_cast<std::chrono::nanoseconds>(testTimeLimit)) == std::cv_status::timeout)
                     {
                         attachedOutput->Detach();
-                        sharedOutput.ReportEvent(test->TestDetails(), TestEvent(EventLevel::Fatal, "Test failed to complete within " + std::to_string(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds."));
+                        sharedOutput.ReportEvent(test->TestDetails(), TestEvent(EventLevel::Fatal, "Test failed to complete within " + ToString(Time::ToMilliseconds(testTimeLimit).count()) + " milliseconds."));
                         sharedOutput.ReportFinish(test->TestDetails(), testTimeLimit);
                         ++failedTests;
                     }
