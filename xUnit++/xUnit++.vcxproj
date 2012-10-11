@@ -52,6 +52,7 @@
     <ClInclude Include="xUnit++/TestEvent.h" />
     <ClInclude Include="xUnit++/xUnitCheck.h" />
     <ClInclude Include="xUnit++\xUnitLog.h" />
+    <ClInclude Include="xUnit++\xUnitToString.h" />
     <ClInclude Include="xUnit++\xUnitWarn.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -124,19 +125,19 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
-        <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
-        <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>xUnit++</AdditionalIncludeDirectories>
-        <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
