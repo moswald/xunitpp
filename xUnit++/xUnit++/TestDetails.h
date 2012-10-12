@@ -19,7 +19,7 @@ typedef std::multimap<std::string, std::string> AttributeCollection;
 struct TestDetails
 {
     TestDetails();
-    TestDetails(const std::string &name, const std::string &suite,
+    TestDetails(const std::string &name, const std::string &shortName, const std::string &suite,
         const AttributeCollection &attributes, Time::Duration timeLimit,
         const std::string &filename, int line);
     TestDetails(const TestDetails &other);

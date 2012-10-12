@@ -87,7 +87,7 @@ namespace xUnitpp { struct NoFixture {}; }
         const xUnitpp::Log &Log = *detail::pLog; \
         void XU_UNIQUE_TEST params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), \
+            XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), #params, \
             xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
@@ -107,7 +107,7 @@ namespace xUnitpp { struct NoFixture {}; }
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), TheoryDetails, \
-            xUnitSuite::Name(), xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
+            xUnitSuite::Name(), #params, xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 

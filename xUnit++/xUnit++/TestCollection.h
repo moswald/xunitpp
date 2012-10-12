@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <deque>
 #include <vector>
 #include "xUnitTest.h"
 
@@ -80,22 +81,73 @@ public:
                                          std::get<4>(t)); };
         }
 
+        static std::deque<std::string> SplitParams(const std::string &params);
+
+        // !!!VS something else that can be simplified once VS understands variadic macros...
+        template<typename TArg0>
+        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, const std::tuple<TArg0> &t) const
+        {
+            name += params[0] + ": " + ToString(std::get<0>(t)) + ")";
+
+            return name;
+        }
+
+        template<typename TArg0, typename TArg1>
+        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, const std::tuple<TArg0, TArg1> &t) const
+        {
+            name += params[0] + ": " + ToString(std::get<0>(t)) + ", ";
+            name += params[1] + ": " + ToString(std::get<1>(t)) + ")";
+
+            return name;
+        }
+
+        template<typename TArg0, typename TArg1, typename TArg2>
+        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, const std::tuple<TArg0, TArg1, TArg2> &t) const
+        {
+            name += params[0] + ": " + ToString(std::get<0>(t)) + ", ";
+            name += params[1] + ": " + ToString(std::get<1>(t)) + ", ";
+            name += params[2] + ": " + ToString(std::get<2>(t)) + ")";
+
+            return name;
+        }
+
+        template<typename TArg0, typename TArg1, typename TArg2, typename TArg3>
+        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, const std::tuple<TArg0, TArg1, TArg2, TArg3> &t) const
+        {
+            name += params[0] + ": " + ToString(std::get<0>(t)) + ", ";
+            name += params[1] + ": " + ToString(std::get<1>(t)) + ", ";
+            name += params[2] + ": " + ToString(std::get<2>(t)) + ", ";
+            name += params[3] + ": " + ToString(std::get<3>(t)) + ")";
+
+            return name;
+        }
+
+        template<typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4>
+        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, const std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4> &t) const
+        {
+            name += params[0] + ": " + ToString(std::get<0>(t)) + ", ";
+            name += params[1] + ": " + ToString(std::get<1>(t)) + ", ";
+            name += params[2] + ": " + ToString(std::get<2>(t)) + ", ";
+            name += params[3] + ": " + ToString(std::get<3>(t)) + ", ";
+            name += params[4] + ": " + ToString(std::get<4>(t)) + ")";
+
+            return name;
+        }
+
     public:
         Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
             const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
         template<typename TTheory, typename TTheoryData>
-        Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite,
+        Register(TestCollection &collection, TTheory theory, TTheoryData theoryData, const std::string &name, const std::string &suite, const std::string &params,
             const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
         {
             int id = 0;
             for (auto t : theoryData())
             {
-                // !!! someday, I'd like to embed the actual parameter values, rather than the theory data index
-                // not sure how feasible that is in C++, since it's lacking the type reflection of C# :(
-                auto theoryName = name + "(" + std::to_string(++id) + ")";
+                auto theoryName = GetLongTheoryName(name + " [" + ToString(id++) + "] (", SplitParams(params), t);
 
-                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, suite,
+                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(theory, std::move(t)), theoryName, name, suite,
                     attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorders));
             }
         }

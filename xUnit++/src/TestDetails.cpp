@@ -9,17 +9,6 @@ namespace
         static int id = 0;
         return id++;
     }
-
-    std::string shorten(const std::string &name)
-    {
-        auto idx = name.rfind('(');
-        if (idx == std::string::npos)
-        {
-            return name;
-        }
-
-        return name.substr(0, idx);
-    }
 }
 
 namespace xUnitpp
@@ -30,11 +19,11 @@ TestDetails::TestDetails()
 {
 }
 
-TestDetails::TestDetails(const std::string &name, const std::string &suite, const AttributeCollection &attributes,
+TestDetails::TestDetails(const std::string &name, const std::string &shortName, const std::string &suite, const AttributeCollection &attributes,
                          Time::Duration timeLimit, const std::string &filename, int line)
     : Id(NextId())
     , Name(name)
-    , ShortName(shorten(name))
+    , ShortName(shortName)
     , Suite(suite)
     , Attributes(attributes)
     , TimeLimit(timeLimit)
