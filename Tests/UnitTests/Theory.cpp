@@ -25,10 +25,10 @@ public:
     }
 
     template<typename TTheoryData>
-    void Register(const std::string &name, TTheoryData &&theoryData)
+    void Register(const std::string &name, const std::string &params, TTheoryData &&theoryData)
     {
         xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, std::forward<TTheoryData>(theoryData),
-            name, "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+            name, "Theory", params, attributes, -1, __FILE__, __LINE__, localEventRecorders);
     }
 
     void Run()
@@ -38,9 +38,9 @@ public:
     }
 
     template<typename TTheoryData>
-    void RegisterAndRun(const std::string &name, TTheoryData &&theoryData)
+    void RegisterAndRun(const std::string &name, const std::string &params, TTheoryData &&theoryData)
     {
-        Register(name, std::forward<TTheoryData>(theoryData));
+        Register(name, params, std::forward<TTheoryData>(theoryData));
 
         Run();
     }
@@ -67,14 +67,14 @@ std::vector<std::tuple<int>> RawFunctionProvider()
 
 FACT_FIXTURE("TheoriesAcceptRawFunctions", TheoryFixture)
 {
-    RegisterAndRun("TheoriesAcceptRawFunctions", RawFunctionProvider);
+    RegisterAndRun("TheoriesAcceptRawFunctions", "(int x)", RawFunctionProvider);
 }
 
 FACT_FIXTURE("TheoriesAcceptStdFunction", TheoryFixture)
 {
     std::function<std::vector<std::tuple<int>>()> provider = &RawFunctionProvider;
 
-    RegisterAndRun("TheoriesAcceptStdFunction", provider);
+    RegisterAndRun("TheoriesAcceptStdFunction", "(int x)", provider);
 }
 
 FACT_FIXTURE("TheoriesAcceptFunctors", TheoryFixture)
@@ -87,7 +87,7 @@ FACT_FIXTURE("TheoriesAcceptFunctors", TheoryFixture)
         }
     } functor;
 
-    RegisterAndRun("TheoriesAcceptFunctors", functor);
+    RegisterAndRun("TheoriesAcceptFunctors", "(int x)", functor);
 }
 
 FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
@@ -97,7 +97,7 @@ FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
 
     auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
 
     Run();
 
@@ -114,7 +114,7 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
     auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
 
     Run();
 }

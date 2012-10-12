@@ -113,7 +113,7 @@ FACT_FIXTURE("TestEventSources should be usable within Theories", Fixture)
     }
     
     xUnitpp::TestCollection::Register reg(collection, theoryWithChecks, [&]() { return theoryData; },
-        "Name", "Suite", xUnitpp::AttributeCollection(), -1, "file", 0, localEventRecorders);
+        "Name", "Suite", "(int x)", xUnitpp::AttributeCollection(), -1, "file", 0, localEventRecorders);
 
     Run();
 
