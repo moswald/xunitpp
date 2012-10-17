@@ -1,0 +1,12 @@
+Import('env')
+
+targetFile = env['getTargetFile']('xUnit++.Utility', 'static')
+intDir = env['getIntDir']('xUnit++.Utility')
+
+local = env.Clone()
+local.VariantDir(intDir, './', duplicate = 0)
+local.Append(CPPPATH = ['../xUnit++'])
+
+target = local.StaticLibrary(targetFile, Glob(intDir + '*.cpp'))
+
+Return('target')

@@ -8,6 +8,7 @@
 #include <deque>
 #include <vector>
 #include "xUnitTest.h"
+#include "xUnitToString.h"
 
 namespace xUnitpp
 {

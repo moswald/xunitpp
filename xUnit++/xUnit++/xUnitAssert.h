@@ -186,9 +186,9 @@ public:
     }
 
     template<typename TExpected, typename TActual>
-    xUnitFailure Equal(const TExpected &expectedBegin, const TExpected &expectedEnd, const TActual &actualBegin, const TActual &actualEnd, const LineInfo &lineInfo = LineInfo::empty()) const
+    xUnitFailure Equal(TExpected &&expectedBegin, TExpected &&expectedEnd, TActual &&actualBegin, TActual &&actualEnd, const LineInfo &lineInfo = LineInfo::empty()) const
     {
-        return Equal(expectedBegin, expectedEnd, actualBegin, actualEnd, [](decltype(*expectedBegin) a, decltype(*actualBegin) b) { return a == b; }, lineInfo);
+        return Equal(std::forward<TExpected>(expectedBegin), std::forward<TExpected>(expectedEnd), std::forward<TActual>(actualBegin), std::forward<TActual>(actualEnd), [](decltype(*expectedBegin) a, decltype(*actualBegin) b) { return a == b; }, lineInfo);
     }
 
     template<typename TExpected, typename TActual, typename TComparer>

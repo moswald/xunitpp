@@ -5,9 +5,9 @@ intDir = env['getIntDir']('xUnit++.console')
 
 local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
-local.Append(CPPPATH = ['../xUnit++'])
+local.Append(CPPPATH = ['../xUnit++', '../xUnit++.Utility'])
 
-libs = env['xUnit']
+libs = [env['xUnitUtility'], env['xUnit']]
 
 if env['windows'] == False:
     libs = libs + [ 'dl', 'pthread' ]
