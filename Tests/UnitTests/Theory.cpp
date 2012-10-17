@@ -25,10 +25,10 @@ public:
     }
 
     template<typename TTheoryData>
-    void Register(const std::string &name, const std::string &params, TTheoryData &&theoryData)
+    void Register(std::string &&name, std::string &&params, TTheoryData &&theoryData)
     {
         xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, std::forward<TTheoryData>(theoryData),
-            name, "Theory", params, attributes, -1, __FILE__, __LINE__, localEventRecorders);
+            std::move(name), "Theory", std::move(params), attributes, -1, __FILE__, __LINE__, localEventRecorders);
     }
 
     void Run()
@@ -38,9 +38,9 @@ public:
     }
 
     template<typename TTheoryData>
-    void RegisterAndRun(const std::string &name, const std::string &params, TTheoryData &&theoryData)
+    void RegisterAndRun(std::string &&name, std::string &&params, TTheoryData &&theoryData)
     {
-        Register(name, params, std::forward<TTheoryData>(theoryData));
+        Register(std::move(name), std::move(params), std::forward<TTheoryData>(theoryData));
 
         Run();
     }

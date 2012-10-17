@@ -37,10 +37,10 @@ TestCollection &TestCollection::Instance()
     return collection;
 }
 
-TestCollection::Register::Register(TestCollection &collection, const std::function<void()> &fn, const std::string &name, const std::string &suite,
-                                   const AttributeCollection &attributes, int milliseconds, const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorder)
+TestCollection::Register::Register(TestCollection &collection, std::function<void()> &&fn, std::string &&name, const std::string &suite,
+            AttributeCollection &&attributes, int milliseconds, std::string &&filename, int line, std::vector<std::shared_ptr<TestEventRecorder>> &&testEventRecorders)
 {
-    collection.mTests.push_back(std::make_shared<xUnitTest>(fn, name, name, suite, attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), filename, line, testEventRecorder));
+    collection.mTests.push_back(std::make_shared<xUnitTest>(std::move(fn), std::move(name), std::move(name), suite, std::move(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, std::move(testEventRecorders)));
 }
 
 const std::vector<std::shared_ptr<xUnitTest>> &TestCollection::Tests()
@@ -48,7 +48,7 @@ const std::vector<std::shared_ptr<xUnitTest>> &TestCollection::Tests()
     return mTests;
 }
 
-std::deque<std::string> TestCollection::Register::SplitParams(const std::string &params)
+std::deque<std::string> TestCollection::Register::SplitParams(std::string &&params)
 {
     // hopefully simple rules:
     //

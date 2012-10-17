@@ -8,17 +8,13 @@ namespace xUnitpp
 
 struct LineInfo
 {
-    LineInfo(const std::string &file, int line);
-
-    static const LineInfo &empty();
+    LineInfo();
+    LineInfo(std::string &&file, int line);
 
     std::string file;
     int line;
 
     friend std::string to_string(const LineInfo &lineInfo);
-
-private:
-    LineInfo();
 };
 
 }

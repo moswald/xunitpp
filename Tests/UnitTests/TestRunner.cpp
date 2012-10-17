@@ -60,9 +60,9 @@ struct TestFactory
         return *this;
     }
 
-    operator std::shared_ptr<xUnitTest>() const
+    operator std::shared_ptr<xUnitTest>()
     {
-        return std::make_shared<xUnitTest>(testFn, name, name, suite, attributes, timeLimit, file, line, testEventRecorders);
+        return std::make_shared<xUnitTest>(std::move(testFn), std::move(name), std::move(name), suite, attributes, timeLimit, std::move(file), line, testEventRecorders);
     }
 
 private:
