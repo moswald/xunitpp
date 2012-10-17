@@ -48,6 +48,9 @@ def buildProjects(env):
     xUnit = SConscript('xUnit++/sconscript', exports = 'env')
     env['xUnit'] = xUnit
 
+    xUnitUtility = SConscript('xUnit++.Utility/sconscript', exports = 'env')
+    env['xUnitUtility'] = xUnitUtility
+
     console = SConscript('xUnit++.console/sconscript', exports = 'env')
     Depends(console, xUnit)
 
