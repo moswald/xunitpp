@@ -18,7 +18,7 @@ class Log
         class Message
         {
         public:
-            Message(std::function<void(const std::string &, const LineInfo &)> recordMessage, const LineInfo &lineInfo = LineInfo::empty());
+            Message(std::function<void(const std::string &, const LineInfo &)> recordMessage, const LineInfo &lineInfo = LineInfo());
             Message(const Message &other);
             ~Message();
 

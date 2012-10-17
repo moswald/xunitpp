@@ -15,19 +15,19 @@ namespace xUnitpp
 {
 
 TestDetails::TestDetails()
-    : LineInfo(xUnitpp::LineInfo::empty())
+    : LineInfo()
 {
 }
 
-TestDetails::TestDetails(const std::string &name, const std::string &shortName, const std::string &suite, const AttributeCollection &attributes,
-                         Time::Duration timeLimit, const std::string &filename, int line)
+TestDetails::TestDetails(std::string &&name, std::string &&shortName, const std::string &suite, const AttributeCollection &attributes,
+                         Time::Duration timeLimit, std::string &&filename, int line)
     : Id(NextId())
-    , Name(name)
-    , ShortName(shortName)
+    , Name(std::move(name))
+    , ShortName(std::move(shortName))
     , Suite(suite)
-    , Attributes(attributes)
+    , Attributes(std::move(attributes))
     , TimeLimit(timeLimit)
-    , LineInfo(filename, line)
+    , LineInfo(std::move(filename), line)
 {
 }
 
@@ -43,7 +43,6 @@ TestDetails::TestDetails(const TestDetails &other)
 }
 
 TestDetails::TestDetails(TestDetails &&other)
-    : LineInfo(xUnitpp::LineInfo::empty())
 {
     swap(*this, other);
 }

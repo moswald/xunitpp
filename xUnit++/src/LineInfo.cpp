@@ -7,16 +7,10 @@ LineInfo::LineInfo()
 {
 }
 
-LineInfo::LineInfo(const std::string &file, int line)
-    : file(file)
+LineInfo::LineInfo(std::string &&file, int line)
+    : file(std::move(file))
     , line(line)
 {
-}
-
-const LineInfo &LineInfo::empty()
-{
-    static LineInfo empty;
-    return empty;
 }
 
 std::string to_string(const LineInfo &lineInfo)

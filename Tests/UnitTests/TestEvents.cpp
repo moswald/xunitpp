@@ -66,7 +66,7 @@ FACT_FIXTURE("All TestEvents should be ordered", Fixture)
         LocalLog().Warn << "warning message";
     };
 
-    xUnitpp::TestCollection::Register reg(collection, factWithEvents, "Name", "Suite", xUnitpp::AttributeCollection(), -1, "file", 0, localEventRecorders);
+    xUnitpp::TestCollection::Register reg(collection, factWithEvents, "Name", "Suite", xUnitpp::AttributeCollection(), -1, "file", 0, std::forward<decltype(localEventRecorders)>(localEventRecorders));
 
     Run();
 
@@ -82,24 +82,11 @@ FACT_FIXTURE("All TestEvents should be ordered", Fixture)
         xUnitpp::EventLevel::Debug, xUnitpp::EventLevel::Info, xUnitpp::EventLevel::Warning
     };
 
-    // This is what I *want* to do, but there's one problem:
-    // if a type doesn't have an associated `to_string`, many Assert methods (such as Equal)
-    // will fail to compile. I should fix it with SFINAE and just print the type name when
-    // to_string doesn't exist.
-    //Assert.Equal(std::begin(expectedLevels), std::end(expectedLevels), outputRecord.events.begin(), outputRecord.events.end(),
-    //    [](xUnitpp::EventLevel lvl, const std::tuple<xUnitpp::TestDetails, xUnitpp::TestEvent> &result)
-    //    {
-    //        return lvl == std::get<1>(result).Level();
-    //    });
-
-    std::vector<xUnitpp::EventLevel> actualLevels;
-    std::transform(outputRecord.events.begin(), outputRecord.events.end(), std::back_inserter(actualLevels),
-        [](const std::tuple<xUnitpp::TestDetails, xUnitpp::TestEvent> &result)
+    Assert.Equal(std::begin(expectedLevels), std::end(expectedLevels), outputRecord.events.begin(), outputRecord.events.end(),
+        [](xUnitpp::EventLevel lvl, const std::tuple<xUnitpp::TestDetails, xUnitpp::TestEvent> &result)
         {
-            return std::get<1>(result).Level();
+            return lvl == std::get<1>(result).Level();
         });
-
-    Assert.Equal(std::begin(expectedLevels), std::end(expectedLevels), std::begin(actualLevels), std::end(actualLevels));
 }
 
 FACT_FIXTURE("TestEventSources should be usable within Theories", Fixture)

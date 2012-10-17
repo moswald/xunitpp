@@ -50,8 +50,8 @@ FACT("SkippedTestsShouldNotBeInstantiated")
     xUnitpp::TestCollection collection;
     std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> localEventRecorders;
     xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); },
-        "SkippedTest", "Attributes", attributes, -1, __FILE__, __LINE__, localEventRecorders);
-
+        "SkippedTest", "Attributes", std::forward<decltype(attributes)>(attributes), -1, __FILE__, __LINE__, std::forward<decltype(localEventRecorders)>(localEventRecorders));
+    
     xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
         collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }

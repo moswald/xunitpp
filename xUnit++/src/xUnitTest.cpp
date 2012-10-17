@@ -5,11 +5,11 @@
 namespace xUnitpp
 {
 
-xUnitTest::xUnitTest(std::function<void()> test, const std::string &name, const std::string &shortName, const std::string &suite,
+xUnitTest::xUnitTest(std::function<void()> &&test, std::string &&name, std::string &&shortName, const std::string &suite,
                      const AttributeCollection &attributes, Time::Duration timeLimit,
-                     const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
-    : test(test)
-    , testDetails(name, shortName, suite, attributes, timeLimit, filename, line)
+                     std::string &&filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
+    : test(std::move(test))
+    , testDetails(std::move(name), std::move(shortName), suite, attributes, timeLimit, std::move(filename), line)
     , testEventRecorders(testEventRecorders)
     , failureEventLogged(false)
 {

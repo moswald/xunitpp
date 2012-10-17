@@ -41,7 +41,6 @@ TestEvent::TestEvent(EventLevel level, const xUnitAssert &assert)
 TestEvent::TestEvent(const std::exception &e)
     : level(EventLevel::Fatal)
     , message(e.what())
-    , lineInfo(LineInfo::empty())
 {
 }
 

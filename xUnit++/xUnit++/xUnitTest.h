@@ -24,9 +24,9 @@ enum class TestResult
 class xUnitTest
 {
 public:
-    xUnitTest(std::function<void()> test, const std::string &name, const std::string &shortName,
+    xUnitTest(std::function<void()> &&test, std::string &&name, std::string &&shortName,
         const std::string &suite, const AttributeCollection &attributes, Time::Duration timeLimit,
-        const std::string &filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
+        std::string &&filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
     const xUnitpp::TestDetails &TestDetails() const;
 

@@ -63,8 +63,8 @@ namespace xUnitpp { struct NoFixture {}; }
         }; \
         void XU_UNIQUE_RUNNER() { XU_UNIQUE_FIXTURE().XU_UNIQUE_TEST(); } \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            &XU_UNIQUE_RUNNER, FactDetails, xUnitSuite::Name(), \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
+            &XU_UNIQUE_RUNNER, std::string(FactDetails), xUnitSuite::Name(), \
+            xUnitAttributes::Attributes(), timeout, std::string(__FILE__), __LINE__, std::move(eventRecorders)); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_FIXTURE :: XU_UNIQUE_TEST()
 
@@ -87,8 +87,8 @@ namespace xUnitpp { struct NoFixture {}; }
         const xUnitpp::Log &Log = *detail::pLog; \
         void XU_UNIQUE_TEST params; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            XU_UNIQUE_TEST, DataProvider, TheoryDetails, xUnitSuite::Name(), #params, \
-            xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
+            &XU_UNIQUE_TEST, DataProvider, std::string(TheoryDetails), xUnitSuite::Name(), std::string(#params), \
+            xUnitAttributes::Attributes(), timeout, std::string(__FILE__), __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
@@ -106,8 +106,8 @@ namespace xUnitpp { struct NoFixture {}; }
         void XU_UNIQUE_TEST params; \
         decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
-            XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), TheoryDetails, \
-            xUnitSuite::Name(), #params, xUnitAttributes::Attributes(), timeout, __FILE__, __LINE__, eventRecorders); \
+            &XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), std::string(TheoryDetails), \
+            xUnitSuite::Name(), std::string(#params), xUnitAttributes::Attributes(), timeout, std::string(__FILE__), __LINE__, eventRecorders); \
     } \
     void XU_UNIQUE_NS :: XU_UNIQUE_TEST params
 
@@ -115,6 +115,6 @@ namespace xUnitpp { struct NoFixture {}; }
 
 #define THEORY(TheoryDetails, params, ...) TIMED_THEORY(TheoryDetails, params, -1, __VA_ARGS__)
 
-#define LI xUnitpp::LineInfo(__FILE__, __LINE__)
+#define LI xUnitpp::LineInfo(std::string(__FILE__), __LINE__)
 
 #endif
