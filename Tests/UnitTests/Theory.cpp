@@ -186,19 +186,16 @@ THEORY("TestingFailingInlineTheory", (int, const std::string &str),
     Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Empty(str); });
 }
 
-// !!!g++ figure out why g++ barfs on this one
-#if defined(WIN32)
-DATA_THEORY("TestingLambdasAsData", (std::function<void()> fn),
-([]() -> std::vector<std::tuple<std::function<void()>>>
+DATA_THEORY("TestingLambdasAsData", (std::function<void()> fn, int),
+([]() -> std::vector<std::tuple<std::function<void()>, int>>
 {
-    std::vector<std::tuple<std::function<void()>>> data;
-    data.emplace_back([]() { });
+    std::vector<std::tuple<std::function<void()>, int>> data;
+    data.emplace_back([]() { }, 0);
     return data;
 })
 )
 {
     Assert.DoesNotThrow(fn);
 }
-#endif
 
 }
