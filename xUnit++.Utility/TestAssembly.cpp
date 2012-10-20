@@ -64,11 +64,12 @@ namespace
 namespace xUnitpp { namespace Utilities
 {
 
-TestAssembly::TestAssembly(const std::string &file)
+TestAssembly::TestAssembly(const std::string &file, bool shadowCopy)
     : EnumerateTestDetails(nullptr)
     , FilteredTestsRunner(nullptr)
-    , tempFile(CopyFile(file))
     , module(nullptr)
+    , tempFile(shadowCopy ? CopyFile(file) : file)
+    , shadowCopied(shadowCopy)
 {
     if (!tempFile.empty())
     {
@@ -102,7 +103,7 @@ TestAssembly::~TestAssembly()
 #endif
     }
 
-    if (!tempFile.empty())
+    if (!tempFile.empty() && shadowCopied)
     {
 #if defined(WIN32)
         DeleteFile(tempFile.c_str());

@@ -25,6 +25,7 @@ namespace CommandLine
         std::string xmlOutput;
         int timeLimit;
         int threadLimit;
+        bool shadowCopy;
     };
 
     std::string Parse(int argc, char **argv, Options &options);

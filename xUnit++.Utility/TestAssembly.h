@@ -26,7 +26,7 @@ private:
 #endif
 
 public:
-    TestAssembly(const std::string &file);
+    TestAssembly(const std::string &file, bool shadowCopy);
     ~TestAssembly();
 
     // !!!VS enable this when Visual Studio supports it
@@ -41,8 +41,9 @@ public:
     xUnitpp::FilteredTestsRunner FilteredTestsRunner;
 
 private:
-    std::string tempFile;
     HMODULE module;
+    std::string tempFile;
+    bool shadowCopied;
 };
 
 }}
