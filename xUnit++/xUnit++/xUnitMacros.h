@@ -15,6 +15,7 @@
 #include "xUnitMacroHelpers.h"
 #include "xUnitWarn.h"
 
+// !!!VS initializer lists can make this faster...
 #define ATTRIBUTES(...) \
     namespace XU_UNIQUE_ATT_NS { \
         namespace xUnitAttributes { \
@@ -22,6 +23,7 @@
             { \
                 xUnitpp::AttributeCollection attributes; \
                 XU_ATTRIBUTES(__VA_ARGS__) \
+                attributes.sort(); \
                 return attributes; \
             } \
         } \
@@ -104,7 +106,7 @@ namespace xUnitpp { struct NoFixture {}; }
         const xUnitpp::Warn &Warn = *detail::pWarn; \
         const xUnitpp::Log &Log = *detail::pLog; \
         void XU_UNIQUE_TEST params; \
-        decltype(FIRST_ARG(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
+        decltype(CAR(__VA_ARGS__)) args[] = { __VA_ARGS__ }; \
         xUnitpp::TestCollection::Register reg(xUnitpp::TestCollection::Instance(), \
             &XU_UNIQUE_TEST, xUnitpp::TheoryData(PP_NARGS(__VA_ARGS__), args), std::string(TheoryDetails), \
             xUnitSuite::Name(), std::string(#params), xUnitAttributes::Attributes(), timeout, std::string(__FILE__), __LINE__, eventRecorders); \

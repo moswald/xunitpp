@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "Attributes.h"
 #include "LineInfo.h"
 #include "xUnitTime.h"
 
@@ -14,13 +15,12 @@ namespace xUnitpp
 {
 
 class xUnitAssert;
-typedef std::multimap<std::string, std::string> AttributeCollection;
 
 struct TestDetails
 {
     TestDetails();
     TestDetails(std::string &&name, std::string &&shortName, const std::string &suite,
-        const AttributeCollection &attributes, Time::Duration timeLimit,
+        AttributeCollection &&attributes, Time::Duration timeLimit,
         std::string &&filename, int line);
     TestDetails(const TestDetails &other);
     TestDetails(TestDetails &&other);

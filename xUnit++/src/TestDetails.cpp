@@ -19,7 +19,7 @@ TestDetails::TestDetails()
 {
 }
 
-TestDetails::TestDetails(std::string &&name, std::string &&shortName, const std::string &suite, const AttributeCollection &attributes,
+TestDetails::TestDetails(std::string &&name, std::string &&shortName, const std::string &suite, AttributeCollection &&attributes,
                          Time::Duration timeLimit, std::string &&filename, int line)
     : Id(NextId())
     , Name(std::move(name))

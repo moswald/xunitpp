@@ -152,7 +152,7 @@ public:
                 auto theoryName = GetLongTheoryName(name + " [" + ToString(id++) + "] (", SplitParams(std::move(params)), std::forward<decltype(t)>(t));
 
                 collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(std::forward<TTheory>(theory), std::move(t)), std::move(theoryName), std::move(name), suite,
-                    attributes, Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, testEventRecorders));
+                    AttributeCollection(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, testEventRecorders));
             }
         }
     };
