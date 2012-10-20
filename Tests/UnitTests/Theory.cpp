@@ -127,7 +127,7 @@ DATA_THEORY("TheoriesCanHaveAttributes", (int), RawFunctionProvider)
     {
         if (test->TestDetails().ShortName == "TheoriesCanHaveAttributes")
         {
-            auto it = test->TestDetails().Attributes.find("Cats");
+            auto it = std::find_if(test->TestDetails().Attributes.begin(), test->TestDetails().Attributes.end(), [](const std::pair<std::string, std::string> &item) { return item.first == "Cats"; });
             Assert.True(it != test->TestDetails().Attributes.end());
             Assert.True(it->second == "Meow");
             return;

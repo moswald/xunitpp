@@ -103,16 +103,25 @@ int main(int argc, char **argv)
                 {
                     bool included = false;
 
-                    for (auto att = td.Attributes.begin(); !included && att != td.Attributes.end(); ++att)
+                    for (auto test = options.inclusiveAttributes.begin(); !included && test != options.inclusiveAttributes.end(); ++test)
                     {
-                        auto it = options.inclusiveAttributes.equal_range(att->first);
+                        auto range = td.Attributes.find(*test);
 
-                        for (auto test = it.first; test != it.second; ++test)
+                        if (range.first != range.second)
                         {
-                            if (test->second == "" || test->second == att->second)
+                            if (test->second == "")
                             {
                                 included = true;
                                 break;
+                            }
+
+                            for (auto it = range.first; it != range.second; ++it)
+                            {
+                                if (range.first->second == test->second)
+                                {
+                                    included = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -127,25 +136,36 @@ int main(int argc, char **argv)
                 // if a test has *all* matching keys, it is excluded
                 if (!options.exclusiveAttributes.empty())
                 {
-                    for (auto test = options.exclusiveAttributes.begin(); test != options.exclusiveAttributes.end(); ++test)
+                    bool matchFailed = false;
+                    for (auto test = options.exclusiveAttributes.begin(); !matchFailed && test != options.exclusiveAttributes.end(); ++test)
                     {
-                        auto range = td.Attributes.equal_range(test->first);
+                        auto range = td.Attributes.find(*test);
 
                         if (range.first != range.second)
                         {
-                            if (test->second == "")
+                            // key matched, and we want to exclude all tests with a specific value
+                            if (test->second != "")
                             {
-                                return;
-                            }
-
-                            for (auto att = range.first; att != range.second; ++att)
-                            {
-                                if (att->second == test->second)
+                                auto it = range.first;
+                                for (; it != range.second; ++it)
                                 {
-                                    return;
+                                    if (it->second == test->second)
+                                    {
+                                        break;
+                                    }
+                                }
+
+                                if (it == range.second)
+                                {
+                                    matchFailed = true;
                                 }
                             }
                         }
+                    }
+
+                    if (!matchFailed)
+                    {
+                        return;
                     }
                 }
 

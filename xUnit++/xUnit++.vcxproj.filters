@@ -13,6 +13,7 @@
     <ClCompile Include="src/xUnitWarn.cpp" />
     <ClCompile Include="src/TestEventRecorder.cpp" />
     <ClCompile Include="src/xUnitLog.cpp" />
+    <ClCompile Include="src\Attributes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xUnit++/xUnitAssert.h" />

@@ -192,11 +192,11 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
     for (auto &test : activeTests)
     {
         {
-            auto skip = test->TestDetails().Attributes.find("Skip");
-            if (skip != test->TestDetails().Attributes.end())
+            auto skip = test->TestDetails().Attributes.Skipped();
+            if (skip.first)
             {
                 skippedTests++;
-                sharedOutput.ReportSkip(test->TestDetails(), skip->second);
+                sharedOutput.ReportSkip(test->TestDetails(), skip.second);
                 continue;
             }
         }
