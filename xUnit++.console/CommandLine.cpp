@@ -59,6 +59,7 @@ namespace CommandLine
         , list(false)
         , timeLimit(0)
         , threadLimit(0)
+        , shadowCopy(true)
     {
     }
 
@@ -164,6 +165,10 @@ namespace CommandLine
                         return opt + " expects a following test limit count." + Usage(exe());
                     }
                 }
+                else if (opt == "--no-shadow")
+                {
+                    options.shadowCopy = false;
+                }
                 else
                 {
                     return "Unrecognized option " + opt + "." + Usage(exe());
@@ -199,6 +204,7 @@ namespace CommandLine
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
             "  -c --concurrent <max tests>    : Set maximum number of concurrent tests\n"
+            "     --no-shadow                 : Disable shadow copying the test binaries\n"
             "\n"
             "Tests are selected with an OR operation for inclusive attributes.\n"
             "Tests are excluded with an AND operation for exclusive attributes.\n"

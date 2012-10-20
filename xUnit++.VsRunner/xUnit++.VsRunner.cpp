@@ -135,7 +135,7 @@ namespace
     {
     public:
         ManagedTestAssembly(const std::string &file)
-            : TestAssembly(file)
+            : TestAssembly(file, true)
         {
         }
 

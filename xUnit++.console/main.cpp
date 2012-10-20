@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
     for (const auto &lib : options.libraries)
     {
-        auto testAssembly = xUnitpp::Utilities::TestAssembly(lib.c_str());
+        auto testAssembly = xUnitpp::Utilities::TestAssembly(lib.c_str(), options.shadowCopy);
 
         if (!testAssembly)
         {
