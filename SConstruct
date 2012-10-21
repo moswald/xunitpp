@@ -1,7 +1,7 @@
-env = Environment()
-
 import platform
 import os
+
+env = Environment()
 
 cpus = 0
 if platform.system() == 'Windows':
@@ -9,7 +9,12 @@ if platform.system() == 'Windows':
     cpus = os.environ['NUMBER_OF_PROCESSORS']
 else:
     env['windows'] = False
+    env['CXX'] = os.environ['CXX']
+    env['ENV']['TERM'] = os.environ['TERM']
     cpus = os.sysconf('SC_NPROCESSORS_ONLN')
+
+    if len(env['CXX']) == 0 :
+        env['CXX'] = 'g++-4.7'
 
 # max jobs?
 if cpus <= 0:

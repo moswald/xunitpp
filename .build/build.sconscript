@@ -3,6 +3,5 @@ Import('env')
 if env['windows'] == True:
     SConscript('msvc.sconscript', exports = 'env')
 else:
-    env['CXX'] = 'g++-4.7'
     env.Append(CCFLAGS = [ '-pthread', '-fPIC', '-Wall', '-Wextra', '-pedantic', '-std=c++11' ])
     env.Append(CCFLAGS = [ '-Wno-comment' ])
