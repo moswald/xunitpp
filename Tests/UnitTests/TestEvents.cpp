@@ -1,3 +1,7 @@
+// !!!clang Clang crashes while building this file.
+// waiting for http://llvm.org/bugs/show_bug.cgi?id=14136
+#if !defined(__clang__)
+
 #include <vector>
 #include <memory>
 #include "xUnit++/xUnit++.h"
@@ -67,6 +71,7 @@ FACT_FIXTURE("All TestEvents should be ordered", Fixture)
     };
 
     xUnitpp::TestCollection::Register reg(collection, factWithEvents, "Name", "Suite", xUnitpp::AttributeCollection(), -1, "file", 0, std::forward<decltype(localEventRecorders)>(localEventRecorders));
+    (void)reg;
 
     Run();
 
@@ -98,9 +103,10 @@ FACT_FIXTURE("TestEventSources should be usable within Theories", Fixture)
     {
         theoryData.push_back(std::make_tuple(i));
     }
-    
+
     xUnitpp::TestCollection::Register reg(collection, theoryWithChecks, [&]() { return theoryData; },
         "Name", "Suite", "(int x)", xUnitpp::AttributeCollection(), -1, "file", 0, localEventRecorders);
+    (void)reg;
 
     Run();
 
@@ -111,3 +117,5 @@ FACT_FIXTURE("TestEventSources should be usable within Theories", Fixture)
 }
 
 }
+
+#endif

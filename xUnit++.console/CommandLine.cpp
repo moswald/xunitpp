@@ -65,7 +65,7 @@ namespace CommandLine
 
     std::string Parse(int argc, char **argv, Options &options)
     {
-        auto exe = [=]()
+        auto exe = [=]() -> std::string
         {
             std::string path = argv[0];
             std::replace(path.begin(), path.end(), '\\', '/');

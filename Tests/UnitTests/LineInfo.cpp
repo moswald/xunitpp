@@ -22,6 +22,7 @@ FACT("LineInfoOverridesDefaultTestLineInfo")
     xUnitpp::TestCollection::Register reg(collection, test,
         "LineInfoOverridesDefaultTestLineInfo", "LineInfo", std::forward<decltype(attributes)>(attributes),
         -1, __FILE__, __LINE__, std::forward<decltype(localEventRecorders)>(localEventRecorders));
+    (void)reg;
 
     xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 
