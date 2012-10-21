@@ -29,6 +29,7 @@ public:
     {
         xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, std::forward<TTheoryData>(theoryData),
             std::move(name), "Theory", std::move(params), attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        (void)reg;
     }
 
     void Run()
@@ -98,6 +99,7 @@ FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
     auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
         "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+    (void)reg;
 
     Run();
 
@@ -115,6 +117,7 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
         "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+    (void)reg;
 
     Run();
 }

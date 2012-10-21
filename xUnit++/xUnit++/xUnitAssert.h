@@ -475,10 +475,10 @@ public:
         {
             return OnFailure(std::move(xUnitAssert(callPrefix + "NotSame", std::move(lineInfo))));
         }
-    
+
         return OnSuccess();
     }
-    
+
     template<typename T>
     xUnitFailure NotSame(T *expected, T *actual, LineInfo &&lineInfo = LineInfo()) const
     {
@@ -486,7 +486,7 @@ public:
         {
             return OnFailure(std::move(xUnitAssert(callPrefix + "NotSame", std::move(lineInfo))));
         }
-    
+
         return OnSuccess();
     }
 
@@ -508,10 +508,10 @@ public:
         {
             return OnFailure(std::move(xUnitAssert("Same", std::move(lineInfo))));
         }
-    
+
         return OnSuccess();
     }
-    
+
     template<typename T>
     xUnitFailure Same(const T *expected, const T *actual, LineInfo &&lineInfo = LineInfo()) const
     {
@@ -519,7 +519,7 @@ public:
         {
             return OnFailure(std::move(xUnitAssert("Same", std::move(lineInfo))));
         }
-    
+
         return OnSuccess();
     }
 
@@ -567,7 +567,11 @@ public:
     {
         return Throws<TException>(std::forward<TFunc>(fn), "", std::move(lineInfo));
     }
-} Assert;
+} Assert
+#if !defined(_MSC_VER) // !!!VS remove the #if/#endif when VS can compile this code
+    = {}    // constant instance of class requires user-defined default constructor, or initializer list
+ #endif
+ ;
 
 }
 

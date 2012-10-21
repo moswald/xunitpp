@@ -35,7 +35,7 @@ FACT("SkippedTestsShouldNotBeInstantiated")
         {
             Assert.Fail() << "Should not be instantiated.";
         }
-    
+
         void RunTest()
         {
             Assert.Fail() << "Should not be run.";
@@ -51,7 +51,8 @@ FACT("SkippedTestsShouldNotBeInstantiated")
     std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> localEventRecorders;
     xUnitpp::TestCollection::Register reg(collection, []() { SkippedTest().RunTest(); },
         "SkippedTest", "Attributes", std::forward<decltype(attributes)>(attributes), -1, __FILE__, __LINE__, std::forward<decltype(localEventRecorders)>(localEventRecorders));
-    
+    (void)reg;
+
     xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
         collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }
