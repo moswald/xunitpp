@@ -1,7 +1,3 @@
-// !!!clang Clang crashes while building this file.
-// waiting for http://llvm.org/bugs/show_bug.cgi?id=14136
-#if !defined(__clang__)
-
 #include <vector>
 #include <memory>
 #include "xUnit++/xUnit++.h"
@@ -117,5 +113,3 @@ FACT_FIXTURE("TestEventSources should be usable within Theories", Fixture)
 }
 
 }
-
-#endif
