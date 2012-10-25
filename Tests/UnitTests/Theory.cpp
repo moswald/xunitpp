@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <mutex>
 #include <string>
 #include <tuple>
@@ -27,8 +28,17 @@ public:
     template<typename TTheoryData>
     void Register(std::string &&name, std::string &&params, TTheoryData &&theoryData)
     {
-        xUnitpp::TestCollection::Register reg(collection, &TheoryUnderTest, std::forward<TTheoryData>(theoryData),
-            std::move(name), "Theory", std::move(params), attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        xUnitpp::TestCollection::Register reg(
+            collection,
+            &TheoryUnderTest,
+            std::forward<TTheoryData>(theoryData),
+            std::move(name),
+            "Theory",
+            std::move(params),
+            attributes,
+            -1,
+            __FILE__, __LINE__,
+            localEventRecorders);
         (void)reg;
     }
 
@@ -199,6 +209,49 @@ DATA_THEORY("TestingLambdasAsData", (std::function<void()> fn, int),
 )
 {
     Assert.DoesNotThrow(fn);
+}
+
+struct ArrayProvider
+{
+    const std::array<std::tuple<int>, 1> &operator ()() const
+    {
+        static std::array<std::tuple<int>, 1> tuples;
+        tuples[0] = std::make_tuple(0);
+        return tuples;
+    }
+};
+
+struct CustomProvider
+{
+    CustomProvider()
+    {
+        tuples[0] = std::make_tuple(0);
+    }
+
+    const CustomProvider &operator ()() const
+    {
+        return *this;
+    }
+
+    friend const std::tuple<int> *begin(const CustomProvider &cp)
+    {
+        return &cp.tuples[0];
+    }
+
+    friend const std::tuple<int> *end(const CustomProvider &cp)
+    {
+        return &cp.tuples[1];
+    }
+
+    std::tuple<int> tuples[1];
+};
+
+FACT_FIXTURE("DATA_THEORY accepts anything that has begin/end", TheoryFixture)
+{
+    Register("Array", "(int)", ArrayProvider());
+    Register("Custom", "(int)", CustomProvider());
+
+    Run();
 }
 
 }
