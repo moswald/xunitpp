@@ -1,4 +1,5 @@
 #include "xUnitAssert.h"
+#include <cmath>
 
 namespace
 {
