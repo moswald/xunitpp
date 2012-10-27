@@ -141,7 +141,7 @@ namespace xUnitpp
 
 int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<std::shared_ptr<xUnitTest>> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
 {
-    auto timeStart = std::chrono::system_clock::now();
+    auto timeStart = Time::Clock::now();
 
     if (maxConcurrent == 0)
     {
@@ -229,7 +229,7 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
                 auto actualTest = [](std::shared_ptr<xUnitTest> runningTest, std::shared_ptr<AttachedOutput> output) -> TestResult
                     {
                         output->ReportStart(runningTest->TestDetails());
-                        
+
                         auto result = runningTest->Run();
 
                         for (auto &event : runningTest->TestEvents())
