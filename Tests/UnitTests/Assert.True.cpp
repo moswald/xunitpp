@@ -21,7 +21,7 @@ FACT("TrueAppendsCustomMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([]() { Assert.True(false) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 }

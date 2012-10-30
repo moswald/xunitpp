@@ -28,7 +28,7 @@ FACT("DoesNotContainForSequenceAppendsUserMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(v, 0) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 FACT("DoesNotContainForStringSuccess")
@@ -52,7 +52,7 @@ FACT("DoesNotContainForStringAppendsUserMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.DoesNotContain(actual, "ab") << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 }

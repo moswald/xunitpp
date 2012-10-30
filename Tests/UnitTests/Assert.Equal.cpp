@@ -31,7 +31,7 @@ FACT("AssertEqualAppendsUserMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([]() { Assert.Equal(0, 1) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 FACT("AssertEqualForFloatsWithinPrecision")
@@ -67,7 +67,7 @@ FACT("AssertSequenceEqualDefaultComparerWithSuccess")
     Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end());
 }
 
-FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToLength")
+FACT("SequenceEqual should assert with differing lengths")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -81,10 +81,10 @@ FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToLength")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end()); });
 
-    Assert.Contains(assert.what(), "at location 2");
+    Assert.Contains(assert.CustomMessage(), "at location 2");
 }
 
-FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToMismatch")
+FACT("SequenceEqual should assert due to element mismatch")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -98,7 +98,7 @@ FACT("AssertSequenceEqualDefaultComparerAssertsOnFailureDueToMismatch")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end()); });
 
-    Assert.Contains(assert.what(), "at location 1");
+    Assert.Contains(assert.CustomMessage(), "at location 1");
 }
 
 FACT("AssertSequenceEqualCustomComparerWithSuccess")
@@ -118,7 +118,7 @@ FACT("AssertSequenceEqualCustomComparerWithSuccess")
     Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; });
 }
 
-FACT("AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength")
+FACT("SequenceEqual should assert with differing lengths (custom comparer)")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -132,10 +132,10 @@ FACT("AssertSequenceEqualCustomComparerAssertsOnFailureDueToLength")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return true; }); });
 
-    Assert.Contains(assert.what(), "at location 2");
+    Assert.Contains(assert.CustomMessage(), "at location 2");
 }
 
-FACT("AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch")
+FACT("SequenceEqual should assert due to element mismatch (custom comparer)")
 {
     std::vector<int> v0;
     v0.push_back(0);
@@ -149,7 +149,7 @@ FACT("AssertSequenceEqualDefaultAssertsOnFailureDueToMismatch")
 
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Equal(v0.begin(), v0.end(), v1.begin(), v1.end(), [](int, long long) { return false; }); });
 
-    Assert.Contains(assert.what(), "at location 0");
+    Assert.Contains(assert.CustomMessage(), "at location 0");
 }
 
 FACT("EqualForStrings")

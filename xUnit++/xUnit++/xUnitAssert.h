@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -20,10 +21,8 @@
 namespace xUnitpp
 {
 
-class xUnitAssert : public std::exception
+class xUnitAssert
 {
-    typedef std::exception base;
-
 public:
     xUnitAssert(std::string &&call, LineInfo &&lineInfo);
 
@@ -34,18 +33,19 @@ public:
     template<typename T>
     xUnitAssert &AppendUserMessage(T &&value)
     {
-        std::stringstream str;
-        str << std::forward<T>(value);
-        userMessage.push_back(str.str());
-
+        *userMessage << value;
         return *this;
     }
+
+    const std::string &Call() const;
+    std::string UserMessage() const;
+    const std::string &CustomMessage() const;
+    const std::string &Expected() const;
+    const std::string &Actual() const;
 
     const xUnitpp::LineInfo &LineInfo() const;
 
     static const xUnitAssert &None();
-
-    virtual const char *what() const noexcept(true) override;
 
 private:
     xUnitpp::LineInfo lineInfo;
@@ -53,9 +53,7 @@ private:
     std::string customMessage;
     std::string expected;
     std::string actual;
-    std::vector<std::string> userMessage;
-
-    mutable std::string whatMessage;
+    std::shared_ptr<std::stringstream> userMessage;
 };
 
 class xUnitFailure

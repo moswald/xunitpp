@@ -15,7 +15,6 @@ namespace CommandLine
         Options();
 
         bool verbose;
-        bool veryVerbose;
         bool list;
         std::vector<std::string> suites;
         std::vector<std::string> testNames;

@@ -18,7 +18,7 @@ FACT("DoesNotThrowSuccess")
     }
 }
 
-FACT("DoesNotThrowAssertsOnFailure")
+FACT("DoesNotThrow should assert when something is thrown")
 {
     static const std::string msg = "xUnit++";
 
@@ -34,7 +34,7 @@ FACT("DoesNotThrowAssertsOnFailure")
     Assert.Fail();
 }
 
-FACT("DoesNotThrowAppendsMessages")
+FACT("DoesNotThrow should append any user messages")
 {
     static const std::string exceptionMessage = "xUnit++";
     static const std::string userMessage = "custom";
@@ -45,8 +45,8 @@ FACT("DoesNotThrowAppendsMessages")
     }
     catch(const xUnitAssert &assert)
     {
-        Assert.Contains(assert.what(), exceptionMessage.c_str());
-        Assert.Contains(assert.what(), userMessage.c_str());
+        Assert.Contains(assert.Actual(), exceptionMessage.c_str());
+        Assert.Contains(assert.UserMessage(), userMessage.c_str());
         return;
     }
 

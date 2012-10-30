@@ -41,7 +41,7 @@ FACT("NullAppendsUserMessage")
     auto x = std::make_shared<int>(0);
     auto assert = Assert.Throws<xUnitAssert>([&]() { Assert.Null(x) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 }

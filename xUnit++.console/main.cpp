@@ -177,7 +177,7 @@ int main(int argc, char **argv)
             std::sort(activeTestIds.begin(), activeTestIds.end());
 
             std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
-                (xUnitpp::IOutput *)new xUnitpp::ConsoleReporter(options.verbose, options.veryVerbose) :
+                (xUnitpp::IOutput *)new xUnitpp::ConsoleReporter(options.verbose) :
                 (xUnitpp::IOutput *)new xUnitpp::Utilities::XmlReporter(options.xmlOutput));
             totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, *reporter,
                 [&](const xUnitpp::TestDetails &testDetails)

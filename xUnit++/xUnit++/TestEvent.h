@@ -4,11 +4,10 @@
 #include <exception>
 #include <string>
 #include "LineInfo.h"
+#include "xUnitAssert.h"
 
 namespace xUnitpp
 {
-
-class xUnitAssert;
 
 enum class EventLevel
 {
@@ -30,14 +29,19 @@ public:
     TestEvent(const std::exception &e);
 
     bool IsFailure() const;
+    bool IsAssertType() const;
+
+    const xUnitAssert &Assert() const;
+    const std::string &Message() const;
 
     EventLevel Level() const;
     const xUnitpp::LineInfo &LineInfo() const;
 
-    friend const std::string &to_string(const TestEvent &evt);
+    friend std::string to_string(const TestEvent &event);
 
 private:
     EventLevel level;
+    xUnitAssert assert;
     std::string message;
     xUnitpp::LineInfo lineInfo;
 };

@@ -42,6 +42,25 @@ inline Duration ToDuration(int ns)
     return Duration(ns);
 }
 
+inline std::string to_string(Duration time)
+{
+    using std::to_string;
+
+    auto ms = ToMilliseconds(time);
+
+    if (ms.count() < 1)
+    {
+        return to_string(time.count()) + " nanoseconds";
+    }
+
+    if (ms.count() > 500)
+    {
+        return to_string(ToSeconds(time).count()) + " seconds";
+    }
+
+    return to_string(ms.count()) + " milliseconds";
+}
+
 }}
 
 #endif

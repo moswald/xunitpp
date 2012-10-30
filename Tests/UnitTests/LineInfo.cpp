@@ -6,7 +6,7 @@
 SUITE("LineInfo")
 {
 
-FACT("LineInfoOverridesDefaultTestLineInfo")
+FACT("Passed-in LineInfo should override the test's LineInfo")
 {
     auto file = "filename";
     auto line = 1;

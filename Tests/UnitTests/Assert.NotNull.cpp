@@ -43,7 +43,7 @@ FACT("NotNullAppendsUserMessage")
     static const std::string msg = "xUnit++";
     auto assert = Assert.Throws<xUnitAssert>([]() { Assert.NotNull(nullptr) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 }
