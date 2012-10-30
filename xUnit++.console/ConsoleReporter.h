@@ -1,6 +1,7 @@
 #ifndef CONSOLEREPORTER_H_
 #define CONSOLEREPORTER_H_
 
+#include <memory>
 #include "xUnit++/IOutput.h"
 
 namespace xUnitpp
@@ -9,7 +10,7 @@ namespace xUnitpp
 class ConsoleReporter : public IOutput
 {
 public:
-    ConsoleReporter(bool verbose, bool veryVerbose);
+    ConsoleReporter(bool verbose);
 
     virtual void ReportStart(const TestDetails &) override;
     virtual void ReportEvent(const TestDetails &testDetails, const TestEvent &evt) override;
@@ -18,8 +19,8 @@ public:
     virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime) override;
 
 private:
-    bool mVerbose;
-    bool mVeryVerbose;
+    class ReportCache;
+    std::unique_ptr<ReportCache> cache;
 };
 
 }

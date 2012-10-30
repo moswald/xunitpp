@@ -55,7 +55,6 @@ namespace CommandLine
 {
     Options::Options()
         : verbose(false)
-        , veryVerbose(false)
         , list(false)
         , timeLimit(0)
         , threadLimit(0)
@@ -96,11 +95,6 @@ namespace CommandLine
                 if (opt == "-v")
                 {
                     options.verbose = true;
-                }
-                else if (opt == "-vv")
-                {
-                    options.verbose = true;
-                    options.veryVerbose = true;
                 }
                 else if (opt == "-l" || opt == "--list")
                 {
@@ -195,7 +189,6 @@ namespace CommandLine
             "\n"
             "options:\n\n"
             "  -v                             : Verbose mode: include successful test timing\n"
-            "  -vv                            : Very verbose: write test start message\n"
             "  -l --list                      : Do not run tests, just list the ones that pass the filters\n"
             "  -s --suite <SUITE>+            : Suite(s) of tests to run (substring match)\n"
             "  -n --name <TEST>+              : Test(s) to run (substring match)\n"

@@ -52,7 +52,7 @@ FACT("SameAppendsUserMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.Same(x, y) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 }

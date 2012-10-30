@@ -4,13 +4,151 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
+
+#if defined (_WIN32)
+#include <Windows.h>
+#undef ReportEvent
+
+namespace
+{
+    class ResetConsoleColors
+    {
+    public:
+        ResetConsoleColors()
+            : stdOut(GetStdHandle(STD_OUTPUT_HANDLE))
+        {
+            CONSOLE_SCREEN_BUFFER_INFO info;
+            GetConsoleScreenBufferInfo(stdOut, &info);
+            attributes = info.wAttributes;
+        }
+
+        ~ResetConsoleColors()
+        {
+            Reset();
+        }
+
+        void Reset()
+        {
+            SetConsoleTextAttribute(stdOut, attributes);
+        }
+
+    private:
+        HANDLE stdOut;
+        WORD attributes;
+    } resetConsoleColors;
+}
+
+#else
+#endif
+
 #include "xUnit++/LineInfo.h"
 #include "xUnit++/TestDetails.h"
 #include "xUnit++/TestEvent.h"
 
-
 namespace
 {
+    static const std::string TestSeparator = "\n            ";
+
+    enum class Color : unsigned short
+    {
+        Default = 65535,
+
+        Black = 0,
+        DarkBlue,
+        DarkGreen,
+        DarkCyan,
+        DarkRed,
+        DarkMagenta,
+        DarkYellow,
+        LightGray,
+        DarkGray,
+        Blue,
+        Green,
+        Cyan,
+        Red,
+        Magenta,
+        Yellow,
+        White,
+
+        Debug = DarkMagenta,
+        Info = DarkCyan,
+        Warning = Yellow,
+        Check = Red,
+        Assert = Red,
+        Skip = Yellow,
+        Suite = White,
+        Separator = DarkGray,
+        TestName = White,
+        FileAndLine = Default,
+        Success = Green,
+        Failure = Red,
+        TimeSummary = DarkGray,
+        Call = White,
+        Expected = Cyan,
+        Actual = Cyan,
+
+        // this value is to match the Win32 value
+        // there is a special test in to_ansicode
+        Fatal = (0x40 + White),
+    };
+
+    Color to_color(xUnitpp::EventLevel level)
+    {
+        switch (level)
+        {
+        case xUnitpp::EventLevel::Debug:
+            return Color::Debug;
+        case xUnitpp::EventLevel::Info:
+            return Color::Info;
+        case xUnitpp::EventLevel::Warning:
+            return Color::Warning;
+        case xUnitpp::EventLevel::Check:
+            return Color::Check;
+        case xUnitpp::EventLevel::Assert:
+            return Color::Assert;
+        case xUnitpp::EventLevel::Fatal:
+            return Color::Fatal;
+        }
+
+        return Color::Default;
+    }
+
+    std::string to_ansicode(Color color)
+    {
+        static const std::string codes[] =
+        {
+            "\033[0;30m",
+            "\033[0;34m",
+            "\033[0;32m",
+            "\033[0;36m",
+            "\033[0;31m",
+            "\033[0;35m",
+            "\033[0;33m",
+            "\033[0;37m",
+            "\033[0;1;30m", // the 0 at the start clears the background color
+            "\033[0;1;34m", // then the 1 sets the color to bold
+            "\033[0;1;32m",
+            "\033[0;1;36m",
+            "\033[0;1;31m",
+            "\033[0;1;35m",
+            "\033[0;1;33m",
+            "\033[0;1;37m",
+        };
+
+        if (color == Color::Fatal)
+        {
+            return "\033[1;37;41m";
+        }
+
+        if (color != Color::Default)
+        {
+            return codes[(int)color];
+        }
+
+        return "\033[m";
+    }
+
     std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo &lineInfo)
     {
         auto result = to_string(lineInfo);
@@ -22,51 +160,197 @@ namespace
         return result;
     }
 
-    class CachedOutput
+    template<typename TStream>
+    TStream &operator <<(TStream &stream, Color color)
     {
-        typedef std::map<int, std::shared_ptr<CachedOutput>> OutputCache;
+#if defined (_WIN32)
+        stream.flush();
+        if (color != Color::Default)
+        {
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (unsigned short)color);
+        }
+        else
+        {
+            resetConsoleColors.Reset();
+        }
+#else
+        stream << to_ansicode(color);
+#endif
 
+        return stream;
+    }
+}
+
+namespace xUnitpp
+{
+
+class ConsoleReporter::ReportCache
+{
+    class TestOutput
+    {
     public:
-        CachedOutput(const std::string &name)
-            : name(name)
+        struct Fragment
+        {
+            Fragment(Color color, const std::string &message)
+                : color(color)
+                , message(message)
         {
         }
 
-        ~CachedOutput()
+            friend std::ostream &operator <<(std::ostream &stream, const Fragment &fragment)
         {
-            if (!messages.empty())
-            {
-                std::cout << "\n[" << name << "]\n";
+                return stream << fragment.color << fragment.message;
+        }
 
-                for (const auto &msg : messages)
+            Color color;
+            std::string message;
+        }; 
+
+        TestOutput(const xUnitpp::TestDetails &td, bool verbose)
+            : testDetails(td)
+            , failed(false)
+            , verbose(verbose)
+        {
+        }
+
+        ~TestOutput()
+        {
+            if (failed || verbose)
+            {
+                if (failed)
                 {
-                    std::cout << msg << std::endl;
+                    std::cout << Fragment(Color::Failure, "\n[ Failure ] ");
+                }
+                else
+                {
+                    std::cout << Fragment(Color::Success, "\n[ Success ] ");
+                }
+
+                if (!testDetails.Suite.empty())
+                {
+                    std::cout << Fragment(Color::Suite, testDetails.Suite);
+                    std::cout << Fragment(Color::Separator, TestSeparator);
+                }
+
+                std::cout << Fragment(Color::TestName, testDetails.Name + "\n");
+            }
+
+            if (!fragments.empty())
+            {
+                for (auto &&msg : fragments)
+                {
+                    std::cout << msg;
+                }
+            } 
+        }
+
+        TestOutput &operator <<(const xUnitpp::TestEvent &event)
+        {
+            if (event.IsFailure())
+            {
+                failed = true;
+            }
+
+            fragments.emplace_back(Color::FileAndLine, FileAndLine(testDetails, event.LineInfo()));
+            fragments.emplace_back(Color::Separator, ": ");
+            fragments.emplace_back(to_color(event.Level()), to_string(event.Level()));
+            fragments.emplace_back(Color::Separator, ": ");
+
+            // unfortunately, this code should almost completely match the to_string(const TestEvent &)
+            // function found in TestEvent.cpp, but is kept separate because of the color coding
+            if (event.IsAssertType())
+            {
+                auto &&assert = event.Assert();
+
+                fragments.emplace_back(Color::Call, assert.Call() + "()");
+
+                std::string message = " failure";
+
+                std::string userMessage = assert.UserMessage();
+                if (!userMessage.empty())
+                {
+                    message += ": " + userMessage;
+
+                    if (!assert.CustomMessage().empty())
+                    {
+                        message += "\n     " + assert.CustomMessage();
+                    }
+                }
+                else if (!assert.CustomMessage().empty())
+                {
+                    message += ": " + assert.CustomMessage();
+                }
+                else
+                {
+                    message += ".";
+                }
+
+                fragments.emplace_back(Color::Default, message);
+
+                if (!assert.Expected().empty() || !assert.Actual().empty())
+                {
+                    fragments.emplace_back(Color::Expected, "\n     Expected: ");
+                    fragments.emplace_back(Color::Default, assert.Expected());
+                    fragments.emplace_back(Color::Actual, "\n       Actual: ");
+                    fragments.emplace_back(Color::Default, assert.Actual());
                 }
             }
+            else
+            {
+                fragments.emplace_back(Color::Default, event.Message());
+            }
+
+            fragments.emplace_back(Color::Default, "\n");
+            return *this;
         }
 
-        static void Instant(const std::string &output)
+        TestOutput &operator <<(xUnitpp::Time::Duration time)
         {
-            std::cout << output;
+            if (verbose)
+            {
+                fragments.emplace_back(Color::TimeSummary, "Test completed in " + xUnitpp::Time::to_string(time) + ".\n");
+            }
+
+            return *this;
         }
 
-        static CachedOutput &Cache(const xUnitpp::TestDetails &td)
-        {
-            auto &cache = Cache();
+    private:
+        TestOutput(const TestOutput &) /* = delete */;
+        TestOutput &operator =(TestOutput) /* = delete */;
 
+    private:
+        const xUnitpp::TestDetails &testDetails;
+        std::vector<Fragment> fragments;
+        bool failed;
+        bool verbose;
+    };
+
+    typedef std::unordered_map<int, std::shared_ptr<TestOutput>> OutputCache;
+    
+public:
+    ReportCache(bool verbose)
+        : verbose(verbose)
+    {
+    }
+
+    void Instant(Color color, const std::string &message)
+    {
+        std::cout << TestOutput::Fragment(color, message);
+    }
+
+    TestOutput &Cache(const xUnitpp::TestDetails &td)
+    {
             auto it = cache.find(td.Id);
             if (it == cache.end())
             {
-                cache.insert(std::make_pair(td.Id, std::make_shared<CachedOutput>(td.Name)));
+            cache.insert(std::make_pair(td.Id, std::make_shared<TestOutput>(td, verbose)));
             }
 
             return *cache[td.Id];
         }
 
-        static void Finish(const xUnitpp::TestDetails &td)
+    void Finish(const xUnitpp::TestDetails &td)
         {
-            auto &cache = Cache();
-
             auto it = cache.find(td.Id);
             if (it != cache.end())
             {
@@ -74,100 +358,87 @@ namespace
             }
         }
 
-        CachedOutput &operator <<(const std::string &output)
-        {
-            messages.push_back(output);
-            return *this;
-        }
-
     private:
-        static OutputCache &Cache()
-        {
-            static OutputCache cache;
-            return cache;
-        }
-
-        std::string name;
-        std::vector<std::string> messages;
+    OutputCache cache;
+    bool verbose;
     };
-}
 
-namespace xUnitpp
-{
-
-ConsoleReporter::ConsoleReporter(bool verbose, bool veryVerbose)
-    : mVerbose(verbose)
-    , mVeryVerbose(veryVerbose)
+ConsoleReporter::ConsoleReporter(bool verbose)
+    : cache(new ReportCache(verbose))
 {
 }
 
-void ConsoleReporter::ReportStart(const TestDetails &testDetails)
+void ConsoleReporter::ReportStart(const TestDetails &)
 {
-    if (mVeryVerbose)
-    {
-        CachedOutput::Instant("Starting test " + testDetails.Name + ".");
-    }
 }
 
 void ConsoleReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
 {
-    CachedOutput::Cache(testDetails) << (FileAndLine(testDetails, evt.LineInfo()) +
-        ": " + to_string(evt.Level()) + ": " + to_string(evt));
+    cache->Cache(testDetails) << evt;
 }
 
 void ConsoleReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
-    CachedOutput::Instant(to_string(testDetails.LineInfo) +
-        ": skipping " + testDetails.Name + ": " + reason);
+    cache->Instant(Color::Skip, "\n[ Skipped ] ");
+
+    if (!testDetails.Suite.empty())
+    {
+        cache->Instant(Color::Suite, testDetails.Suite);
+        cache->Instant(Color::Separator, TestSeparator);
+    }
+
+    cache->Instant(Color::TestName, testDetails.ShortName + "\n");
+    cache->Instant(Color::FileAndLine, to_string(testDetails.LineInfo) + ": ");
+    cache->Instant(Color::Skip, reason);
+    cache->Instant(Color::Default, "\n");
 }
 
 void ConsoleReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
 {
-    if (mVerbose)
-    {
-        auto ms = Time::ToMilliseconds(timeTaken);
-        CachedOutput::Cache(testDetails) << (testDetails.Name + ": Completed in " +
-            (ms.count() == 0 ? (std::to_string(timeTaken.count()) + " nanoseconds.\n") : (std::to_string(ms.count()) + " milliseconds.\n")));
-    }
-
-    CachedOutput::Finish(testDetails);
+    cache->Cache(testDetails) << timeTaken;
+    cache->Finish(testDetails);
 }
 
 void ConsoleReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime)
 {
-    std::string total = std::to_string(testCount) + " tests, ";
-    std::string failures = std::to_string(failureCount) + " failed, ";
-    std::string skips = std::to_string(skipped) + " skipped.";
-
-    std::string header;
-
+    Color failColor = Color::Default;
+    Color skipColor = Color::Default;
     if (failureCount > 0)
     {
-        header = "\nFAILURE: ";
+        failColor = Color::Failure;
+        cache->Instant(failColor, "\nFAILURE");
     }
     else if (skipped > 0)
     {
-        header = "\nWARNING: ";
+        skipColor = Color::Warning;
+        cache->Instant(skipColor, "\nWARNING");
     }
     else
     {
-        header = "\nSuccess: ";
+        cache->Instant(Color::Success, "\nSuccess");
     }
 
-    CachedOutput::Instant(header + total + failures + skips);
+    cache->Instant(Color::Default, ": " + std::to_string(testCount) + " tests, ");
+    cache->Instant(failColor, std::to_string(failureCount) + " failed");
+    cache->Instant(Color::Default, ", ");
+    cache->Instant(skipColor, std::to_string(skipped) + " skipped");
+    cache->Instant(Color::Default, ".");
 
-    header = "\nTest time: ";
+    std::string report = "\nTest time: ";
 
     auto ms = Time::ToMilliseconds(totalTime);
 
     if (ms.count() > 500)
     {
-        CachedOutput::Instant(header + std::to_string(Time::ToSeconds(totalTime).count()) + " seconds.");
+        report += std::to_string(Time::ToSeconds(totalTime).count()) + " seconds.";
     }
     else
     {
-        CachedOutput::Instant(header + std::to_string(ms.count()) + " milliseconds.");
+        report += std::to_string(ms.count()) + " milliseconds.";
     }
+
+    cache->Instant(Color::TimeSummary, report);
+    cache->Instant(Color::Default, "\n");
 }
 
 }

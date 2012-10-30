@@ -1,44 +1,6 @@
 #include "xUnitAssert.h"
 #include <cmath>
 
-namespace
-{
-    std::string AssembleWhat(const std::string &call, const std::vector<std::string> &userMsg, const std::string &customMsg,
-                             const std::string &expected, const std::string &actual)
-    {
-        std::string msg = call + "() failure";
-        if (!userMsg.empty())
-        {
-            msg += ": ";
-
-            for (const auto &s : userMsg)
-            {
-                msg += s;
-            }
-
-            if (!customMsg.empty())
-            {
-                msg += "\n     " + customMsg;
-            }
-        }
-        else
-        {
-            if (!customMsg.empty())
-            {
-                msg += ": " + customMsg;
-            }
-        }
-
-        if (!expected.empty())
-        {
-            msg += "\n     Expected: " + expected;
-            msg += "\n       Actual: " + actual;
-        }
-
-        return msg;
-    }
-}
-
 namespace xUnitpp
 {
 
@@ -51,6 +13,7 @@ const xUnitAssert &xUnitAssert::None()
 xUnitAssert::xUnitAssert(std::string &&call, xUnitpp::LineInfo &&lineInfo)
     : lineInfo(std::move(lineInfo))
     , call(std::move(call))
+    , userMessage(std::make_shared<std::stringstream>())
 {
 }
 
@@ -72,19 +35,34 @@ xUnitAssert &xUnitAssert::Actual(std::string &&str)
     return *this;
 }
 
+const std::string &xUnitAssert::Call() const
+{
+    return call;
+}
+
+std::string xUnitAssert::UserMessage() const
+{
+    return userMessage->str();
+}
+
+const std::string &xUnitAssert::CustomMessage() const
+{
+    return customMessage;
+}
+
+const std::string &xUnitAssert::Expected() const
+{
+    return expected;
+}
+
+const std::string &xUnitAssert::Actual() const
+{
+    return actual;
+}
+
 const LineInfo &xUnitAssert::LineInfo() const
 {
     return lineInfo;
-}
-
-const char *xUnitAssert::what() const noexcept(true)
-{
-    if (whatMessage.empty())
-    {
-        whatMessage = AssembleWhat(call, userMessage, customMessage, expected, actual);
-    }
-
-    return whatMessage.c_str();
 }
 
 xUnitFailure::xUnitFailure()
@@ -296,8 +274,8 @@ xUnitFailure Assert::Contains(const std::string &actualString, const std::string
     if (actualString.find(value) == std::string::npos)
     {
         return OnFailure(std::move(xUnitAssert(callPrefix + "Contains", std::move(lineInfo))
-            .Expected(std::string(actualString))    // can't assume actualString or value can be moved
-            .Actual(std::string(value))));
+            .Expected(std::string(value))    // can't assume actualString or value can be moved
+            .Actual(std::string(actualString))));
     }
 
     return OnSuccess();

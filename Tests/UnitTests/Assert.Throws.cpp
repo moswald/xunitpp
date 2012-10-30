@@ -46,7 +46,7 @@ FACT("ThrowAppendsMessages")
     }
     catch(const xUnitAssert &assert)
     {
-        Assert.Contains(assert.what(), userMessage.c_str());
+        Assert.Contains(assert.UserMessage(), userMessage.c_str());
         return;
     }
 

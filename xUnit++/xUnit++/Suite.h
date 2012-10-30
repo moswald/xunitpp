@@ -7,7 +7,7 @@ namespace xUnitSuite
 {
     inline const std::string &Name()
     {
-        static std::string name = "xUnit++ Default Suite";
+        static std::string name = "";
         return name;
     }
 

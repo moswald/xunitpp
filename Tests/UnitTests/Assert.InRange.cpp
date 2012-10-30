@@ -49,7 +49,7 @@ FACT("InRangeAppendsUserMessage")
 
     auto assert = Assert.Throws<xUnitAssert>([=]() { Assert.InRange(1, 0, 1) << msg; });
 
-    Assert.Contains(assert.what(), msg.c_str());
+    Assert.Contains(assert.UserMessage(), msg.c_str());
 }
 
 FACT("InRangeNeedsValidRange")
