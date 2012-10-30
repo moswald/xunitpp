@@ -60,7 +60,12 @@ namespace ToStringImpl
         template<typename T>
         static std::string to_string(T &&)
         {
-            return typeid(T).name();
+            // going to truncate the type if it is longer than 20 characters
+            std::string type = typeid(T).name();
+
+            return type.size() > 20 ?
+                type.substr(0, 20) + "..." :
+                type;
         }
     };
 }
