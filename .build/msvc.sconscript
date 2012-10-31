@@ -1,6 +1,6 @@
 Import('env')
 
-env.Append(CPPDEFINES = ['WIN32', '_VARIADIC_MAX=8'])
+env.Append(CPPDEFINES = ['WIN32', '_VARIADIC_MAX=10'])
 env.Append(CCFLAGS = [ '/EHsc' ])
 
 if env['debug'] == True:
