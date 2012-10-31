@@ -77,7 +77,7 @@ TestEvent::TestEvent(EventLevel level, const xUnitAssert &assert)
 TestEvent::TestEvent(const std::exception &e)
     : level(EventLevel::Fatal)
     , assert(xUnitAssert::None())
-    , message(e.what())
+    , message(std::string("Uncaught std::exception: ") + e.what())
 {
 }
 
