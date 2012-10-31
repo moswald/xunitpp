@@ -140,19 +140,16 @@ public:
             AttributeCollection &&attributes, int milliseconds, std::string &&filename, int line, std::vector<std::shared_ptr<TestEventRecorder>> &&testEventRecorders);
 
         template<typename TTheory, typename TTheoryData>
-        Register(TestCollection &collection, TTheory &&theory_, TTheoryData &&theoryData_, std::string &&name, const std::string &suite, std::string &&params,
+        Register(TestCollection &collection, TTheory &&theory, TTheoryData &&theoryData, std::string &&name, const std::string &suite, std::string &&params,
             const AttributeCollection &attributes, int milliseconds, std::string &&filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders)
         {
-            auto theory = theory_;
-            auto theoryData = theoryData_;
-
             int id = 0;
             for (auto t : theoryData())
             {
                 auto theoryName = GetLongTheoryName(name + " [" + ToString(id++) + "] (", SplitParams(std::move(params)), std::forward<decltype(t)>(t));
 
-                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(std::forward<TTheory>(theory), std::move(t)), std::move(theoryName), std::move(name), suite,
-                    AttributeCollection(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, testEventRecorders));
+                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(std::forward<TTheory>(theory), std::move(t)), std::string(theoryName), std::string(name), suite,
+                    AttributeCollection(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::string(filename), line, testEventRecorders));
             }
         }
     };

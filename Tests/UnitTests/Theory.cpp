@@ -22,6 +22,7 @@ struct TheoryFixture
 {
 public:
     TheoryFixture()
+        : fakeFileName("FakeFile.cpp")
     {
     }
 
@@ -37,7 +38,7 @@ public:
             std::move(params),
             attributes,
             -1,
-            __FILE__, __LINE__,
+            GetFakeFileName(), __LINE__,
             localEventRecorders);
         (void)reg;
     }
@@ -55,6 +56,13 @@ public:
 
         Run();
     }
+
+    std::string GetFakeFileName() const
+    {
+        return fakeFileName;
+    }
+
+    std::string fakeFileName;
 
     xUnitpp::Tests::OutputRecord record;
     xUnitpp::AttributeCollection attributes;
@@ -108,7 +116,7 @@ FACT_FIXTURE("TheoriesGetAllDataPassedToThem", TheoryFixture)
 
     auto doTheory = [&](int x) { std::lock_guard<std::mutex> guard(lock); dataProvided.push_back(x); };
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, GetFakeFileName(), __LINE__, localEventRecorders);
     (void)reg;
 
     Run();
@@ -126,29 +134,10 @@ FACT_FIXTURE("TheoriesCanBeSkipped", TheoryFixture)
     auto doTheory = [](int) { Assert.Fail() << "Should not be run."; };
 
     xUnitpp::TestCollection::Register reg(collection, doTheory, RawFunctionProvider,
-        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, __FILE__, __LINE__, localEventRecorders);
+        "TheoriesGetAllDataPassedToThem", "Theory", "(int x)", attributes, -1, GetFakeFileName(), __LINE__, localEventRecorders);
     (void)reg;
 
     Run();
-}
-
-ATTRIBUTES(("Cats", "Meow"))
-{
-DATA_THEORY("TheoriesCanHaveAttributes", (int), RawFunctionProvider)
-{
-    for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
-    {
-        if (test->TestDetails().ShortName == "TheoriesCanHaveAttributes")
-        {
-            auto it = std::find_if(test->TestDetails().Attributes.begin(), test->TestDetails().Attributes.end(), [](const std::pair<std::string, std::string> &item) { return item.first == "Cats"; });
-            Assert.True(it != test->TestDetails().Attributes.end());
-            Assert.True(it->second == "Meow");
-            return;
-        }
-    }
-
-    Assert.Fail() << "Could not find self in test list.";
-}
 }
 
 std::vector<std::tuple<std::string, std::vector<std::tuple<int, std::string>>>> ComplexProvider()
@@ -252,6 +241,94 @@ FACT_FIXTURE("DATA_THEORY accepts anything that has begin/end", TheoryFixture)
     Register("Custom", "(int)", CustomProvider());
 
     Run();
+}
+
+FACT_FIXTURE("Every theory instance should have a name", TheoryFixture)
+{
+    auto dataProvider =
+        []()
+        {
+            std::vector<std::tuple<int>> dataProvider;
+            dataProvider.emplace_back(10);
+            dataProvider.emplace_back(20);
+            return dataProvider;
+        };
+    
+    RegisterAndRun("TheoryName", "(int x)", std::move(dataProvider));
+
+    Assert.Equal(2U, record.events.size());
+
+    for (auto &&t: record.events)
+    {
+        auto test = std::get<0>(t);
+
+        Assert.True(test.Name.substr(0, 10) == "TheoryName");
+    }
+}
+
+FACT_FIXTURE("Every theory instance should have a short name", TheoryFixture)
+{
+    auto dataProvider =
+        []()
+        {
+            std::vector<std::tuple<int>> dataProvider;
+            dataProvider.emplace_back(10);
+            dataProvider.emplace_back(20);
+            return dataProvider;
+        };
+    
+    RegisterAndRun("TheoryName", "(int x)", std::move(dataProvider));
+
+    Assert.Equal(2U, record.events.size());
+
+    for (auto &&t: record.events)
+    {
+        auto test = std::get<0>(t);
+
+        Assert.Equal("TheoryName", test.ShortName);
+    }
+}
+
+FACT_FIXTURE("Every theory instance should know the file it is in", TheoryFixture)
+{
+    auto dataProvider =
+        []()
+        {
+            std::vector<std::tuple<int>> dataProvider;
+            dataProvider.emplace_back(10);
+            dataProvider.emplace_back(20);
+            return dataProvider;
+        };
+    
+    RegisterAndRun("TheoryName", "(int x)", std::move(dataProvider));
+
+    Assert.Equal(2U, record.events.size());
+
+    for (auto &&t: record.events)
+    {
+        auto test = std::get<0>(t);
+
+        Assert.Equal(fakeFileName, test.LineInfo.file);
+    }
+}
+
+ATTRIBUTES(("Cats", "Meow"))
+{
+DATA_THEORY("TheoriesCanHaveAttributes", (int), RawFunctionProvider)
+{
+    for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
+    {
+        if (test->TestDetails().ShortName == "TheoriesCanHaveAttributes")
+        {
+            auto it = std::find_if(test->TestDetails().Attributes.begin(), test->TestDetails().Attributes.end(), [](const std::pair<std::string, std::string> &item) { return item.first == "Cats"; });
+            Assert.True(it != test->TestDetails().Attributes.end());
+            Assert.True(it->second == "Meow");
+            return;
+        }
+    }
+
+    Assert.Fail() << "Could not find self in test list.";
+}
 }
 
 }
