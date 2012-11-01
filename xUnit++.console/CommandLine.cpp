@@ -59,6 +59,8 @@ namespace CommandLine
         , timeLimit(0)
         , threadLimit(0)
         , shadowCopy(true)
+        , sort(false)
+        , group(false)
     {
     }
 
@@ -92,7 +94,7 @@ namespace CommandLine
 
             if (opt[0] == '-')
             {
-                if (opt == "-v")
+                if (opt == "-v" || opt == "--verbose")
                 {
                     options.verbose = true;
                 }
@@ -159,6 +161,15 @@ namespace CommandLine
                         return opt + " expects a following test limit count." + Usage(exe());
                     }
                 }
+                else if (opt == "-o" || opt == "--sort")
+                {
+                    options.sort = true;
+                }
+                else if (opt == "-g" || opt == "--group")
+                {
+                    options.sort = true;
+                    options.group = true;
+                }
                 else if (opt == "--no-shadow")
                 {
                     options.shadowCopy = false;
@@ -188,7 +199,7 @@ namespace CommandLine
             " <testLibrary>+ [option]+\n"
             "\n"
             "options:\n\n"
-            "  -v                             : Verbose mode: include successful test timing\n"
+            "  -v --verbose                   : Verbose mode: include successful test timing\n"
             "  -l --list                      : Do not run tests, just list the ones that pass the filters\n"
             "  -s --suite <SUITE>+            : Suite(s) of tests to run (substring match)\n"
             "  -n --name <TEST>+              : Test(s) to run (substring match)\n"
@@ -197,11 +208,16 @@ namespace CommandLine
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
             "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
             "  -c --concurrent <max tests>    : Set maximum number of concurrent tests\n"
+            "  -o --sort                      : Sort tests by suite and then by test name\n"
+            "  -g --group                     : Group test output under suite headers (implies --sort)\n"
             "     --no-shadow                 : Disable shadow copying the test binaries\n"
             "\n"
             "Tests are selected with an OR operation for inclusive attributes.\n"
             "Tests are excluded with an AND operation for exclusive attributes.\n"
-            "When VALUE is omitted, any attribute with name NAME is matched.\n";
+            "When VALUE is omitted, any attribute with name NAME is matched.\n"
+            "\n"
+            "Sorting and grouping test output causes test results to be cached until after all tests have completed.\n"
+            "Normally, test results are printed as soon as the test is complete.\n";
 
         return "\nusage: " + exe + usage;
     }
