@@ -25,6 +25,8 @@ namespace CommandLine
         int timeLimit;
         int threadLimit;
         bool shadowCopy;
+        bool sort;
+        bool group;
     };
 
     std::string Parse(int argc, char **argv, Options &options);

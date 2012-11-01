@@ -10,7 +10,7 @@ namespace xUnitpp
 class ConsoleReporter : public IOutput
 {
 public:
-    ConsoleReporter(bool verbose);
+    ConsoleReporter(bool verbose, bool sort, bool group);
 
     virtual void ReportStart(const TestDetails &) override;
     virtual void ReportEvent(const TestDetails &testDetails, const TestEvent &evt) override;

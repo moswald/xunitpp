@@ -194,17 +194,17 @@ class ConsoleReporter::ReportCache
             Fragment(Color color, const std::string &message)
                 : color(color)
                 , message(message)
-        {
-        }
+            {
+            }
 
             friend std::ostream &operator <<(std::ostream &stream, const Fragment &fragment)
-        {
+            {
                 return stream << fragment.color << fragment.message;
-        }
+            }
 
             Color color;
             std::string message;
-        }; 
+        };
 
         TestOutput(const xUnitpp::TestDetails &td, bool verbose)
             : testDetails(td)
@@ -213,23 +213,31 @@ class ConsoleReporter::ReportCache
         {
         }
 
-        ~TestOutput()
+        void Print(bool grouped)
         {
             if (failed || verbose)
             {
+                if (!grouped)
+                {
+                    std::cout << "\n";
+                }
+
                 if (failed)
                 {
-                    std::cout << Fragment(Color::Failure, "\n[ Failure ] ");
+                    std::cout << Fragment(Color::Failure, "[ Failure ] ");
                 }
                 else
                 {
-                    std::cout << Fragment(Color::Success, "\n[ Success ] ");
+                    std::cout << Fragment(Color::Success, "[ Success ] ");
                 }
 
-                if (!testDetails.Suite.empty())
+                if (!grouped)
                 {
-                    std::cout << Fragment(Color::Suite, testDetails.Suite);
-                    std::cout << Fragment(Color::Separator, TestSeparator);
+                    if (!testDetails.Suite.empty())
+                    {
+                        std::cout << Fragment(Color::Suite, testDetails.Suite);
+                        std::cout << Fragment(Color::Separator, TestSeparator);
+                    }
                 }
 
                 std::cout << Fragment(Color::TestName, testDetails.Name + "\n");
@@ -241,7 +249,15 @@ class ConsoleReporter::ReportCache
                 {
                     std::cout << msg;
                 }
-            } 
+            }
+        }
+
+        void Skip(const std::string &reason)
+        {
+            fragments.emplace_back(Color::FileAndLine, to_string(testDetails.LineInfo));
+            fragments.emplace_back(Color::Separator, ": ");
+            fragments.emplace_back(Color::Skip, reason);
+            fragments.emplace_back(Color::Default, "\n");
         }
 
         TestOutput &operator <<(const xUnitpp::TestEvent &event)
@@ -314,6 +330,11 @@ class ConsoleReporter::ReportCache
             return *this;
         }
 
+        const xUnitpp::TestDetails &TestDetails() const
+        {
+            return testDetails;
+        }
+
     private:
         TestOutput(const TestOutput &) /* = delete */;
         TestOutput &operator =(TestOutput) /* = delete */;
@@ -326,10 +347,12 @@ class ConsoleReporter::ReportCache
     };
 
     typedef std::unordered_map<int, std::shared_ptr<TestOutput>> OutputCache;
-    
+
 public:
-    ReportCache(bool verbose)
+    ReportCache(bool verbose, bool sort, bool group)
         : verbose(verbose)
+        , sort(sort)
+        , group(group)
     {
     }
 
@@ -340,32 +363,103 @@ public:
 
     TestOutput &Cache(const xUnitpp::TestDetails &td)
     {
-            auto it = cache.find(td.Id);
-            if (it == cache.end())
-            {
+        auto it = cache.find(td.Id);
+        if (it == cache.end())
+        {
             cache.insert(std::make_pair(td.Id, std::make_shared<TestOutput>(td, verbose)));
-            }
-
-            return *cache[td.Id];
         }
 
+        return *cache[td.Id];
+    }
+
+    void Skip(const xUnitpp::TestDetails &testDetails, const std::string &reason)
+    {
+        if (!sort)
+        {
+            Instant(Color::Skip, "\n[ Skipped ] ");
+
+            if (!testDetails.Suite.empty())
+            {
+                Instant(Color::Suite, testDetails.Suite);
+                Instant(Color::Separator, TestSeparator);
+            }
+
+            Instant(Color::TestName, testDetails.ShortName + "\n");
+            Instant(Color::FileAndLine, to_string(testDetails.LineInfo) + ": ");
+            Instant(Color::Skip, reason);
+            Instant(Color::Default, "\n");
+        }
+        else
+        {
+            Cache(testDetails).Skip(reason);
+        }
+    }
+
     void Finish(const xUnitpp::TestDetails &td)
+    {
+        if (!sort)
         {
             auto it = cache.find(td.Id);
             if (it != cache.end())
             {
+                it->second->Print(false);
                 cache.erase(it);
             }
         }
+    }
 
-    private:
+    void Finish()
+    {
+        if (sort)
+        {
+            std::vector<std::shared_ptr<TestOutput>> finalResults;
+            finalResults.reserve(cache.size());
+
+            for (auto x : cache)
+            {
+                finalResults.push_back(x.second);
+            }
+
+            std::sort(finalResults.begin(), finalResults.end(),
+                [](const std::shared_ptr<TestOutput> &lhs, const std::shared_ptr<TestOutput> &rhs)
+                {
+                    if (lhs->TestDetails().Suite != rhs->TestDetails().Suite)
+                    {
+                        return lhs->TestDetails().Suite < rhs->TestDetails().Suite;
+                    }
+
+                    return lhs->TestDetails().Name < rhs->TestDetails().Name;
+                });
+
+            std::string curSuite = "";
+            for (auto result : finalResults)
+            {
+                if (group)
+                {
+                    if (curSuite != result->TestDetails().Suite)
+                    {
+                        curSuite = result->TestDetails().Suite;
+
+                        std::cout << TestOutput::Fragment(Color::Suite, "\n\n==========\n[ " + curSuite + " ]\n==========\n");
+                    }
+                }
+
+                result->Print(group);
+            }
+        }
+    }
+
+private:
     OutputCache cache;
     bool verbose;
-    };
+    bool sort;
+    bool group;
+};
 
-ConsoleReporter::ConsoleReporter(bool verbose)
-    : cache(new ReportCache(verbose))
+ConsoleReporter::ConsoleReporter(bool verbose, bool sort, bool group)
+    : cache(new ReportCache(verbose, sort, group))
 {
+    std::cout.sync_with_stdio(false);
 }
 
 void ConsoleReporter::ReportStart(const TestDetails &)
@@ -379,18 +473,7 @@ void ConsoleReporter::ReportEvent(const TestDetails &testDetails, const TestEven
 
 void ConsoleReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
 {
-    cache->Instant(Color::Skip, "\n[ Skipped ] ");
-
-    if (!testDetails.Suite.empty())
-    {
-        cache->Instant(Color::Suite, testDetails.Suite);
-        cache->Instant(Color::Separator, TestSeparator);
-    }
-
-    cache->Instant(Color::TestName, testDetails.ShortName + "\n");
-    cache->Instant(Color::FileAndLine, to_string(testDetails.LineInfo) + ": ");
-    cache->Instant(Color::Skip, reason);
-    cache->Instant(Color::Default, "\n");
+    cache->Skip(testDetails, reason);
 }
 
 void ConsoleReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
@@ -401,6 +484,8 @@ void ConsoleReporter::ReportFinish(const TestDetails &testDetails, Time::Duratio
 
 void ConsoleReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime)
 {
+    cache->Finish();
+
     Color failColor = Color::Default;
     Color skipColor = Color::Default;
     if (failureCount > 0)
