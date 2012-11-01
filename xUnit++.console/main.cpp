@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <regex>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -65,7 +66,9 @@ int main(int argc, char **argv)
                     bool included = false;
                     for (const auto &suite : options.suites)
                     {
-                        if (td.Suite.find(suite) != std::string::npos)
+                        std::regex regex(suite, std::regex_constants::icase);
+
+                        if (std::regex_search(td.Suite, regex))
                         {
                             included = true;
                             break;
@@ -84,7 +87,9 @@ int main(int argc, char **argv)
                     bool included = false;
                     for (const auto &name : options.testNames)
                     {
-                        if (td.ShortName.find(name) != std::string::npos)
+                        std::regex regex(name, std::regex_constants::icase);
+
+                        if (std::regex_search(td.ShortName, regex))
                         {
                             included = true;
                             break;
