@@ -13,10 +13,10 @@ Log::Logger::Message::Message(std::function<void(const std::string &, const Line
 
 Log::Logger::Message::Message(const Message &other)
     : refCount(other.refCount)
-    , recordMessage(std::move(other.recordMessage))
-    , message(other.message.str())
+    , recordMessage(other.recordMessage)
     , lineInfo(other.lineInfo)
 {
+    message << other.message.str();
     ++refCount;
 }
 
