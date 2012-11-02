@@ -459,7 +459,7 @@ private:
 ConsoleReporter::ConsoleReporter(bool verbose, bool sort, bool group)
     : cache(new ReportCache(verbose, sort, group))
 {
-    std::cout.sync_with_stdio(false);
+    //std::cout.sync_with_stdio(false);
 }
 
 void ConsoleReporter::ReportStart(const TestDetails &)
