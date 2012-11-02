@@ -215,7 +215,7 @@ class ConsoleReporter::ReportCache
 
         void Print(bool grouped)
         {
-            if (failed || verbose)
+            if (failed || verbose || !fragments.empty())
             {
                 if (!grouped)
                 {
