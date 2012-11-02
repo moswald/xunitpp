@@ -35,8 +35,8 @@ namespace
 
         void ReportStart(const xUnitpp::TestDetails &td)
         {
-            auto key = marshal_as<String ^>(td.Name);
-            auto name = marshal_as<String ^>(td.ShortName);
+            auto key = marshal_as<String ^>(td.FullName());
+            auto name = marshal_as<String ^>(td.Name);
             recorder->RecordStart(testCases[name]);
 
             auto result = gcnew TestResult(testCases[name]);
@@ -61,10 +61,10 @@ namespace
 
         void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
         {
-            auto testCase = testCases[marshal_as<String ^>(td.ShortName)];
+            auto testCase = testCases[marshal_as<String ^>(td.FullName())];
             auto result = gcnew TestResult(testCase);
             result->ComputerName = Environment::MachineName;
-            result->DisplayName = marshal_as<String ^>(td.ShortName);
+            result->DisplayName = marshal_as<String ^>(td.Name);
             result->Duration = TimeSpan::FromSeconds(0);
             result->Outcome = TestOutcome::Skipped;
             recorder->RecordEnd(testCase, result->Outcome);
@@ -81,7 +81,7 @@ namespace
                 result->Outcome = TestOutcome::Passed;
             }
 
-            recorder->RecordEnd(testCases[marshal_as<String ^>(td.ShortName)], result->Outcome);
+            recorder->RecordEnd(testCases[marshal_as<String ^>(td.FullName())], result->Outcome);
             recorder->RecordResult(result);
         }
 
@@ -157,7 +157,7 @@ namespace
                     return !cancelled && std::find_if(tests.begin(), tests.end(),
                         [&](gcroot<TestCase ^> test)
                         {
-                            return marshal_as<std::string>(test->DisplayName) == testDetails.ShortName;
+                            return marshal_as<std::string>(test->DisplayName) == testDetails.Name;
                         }) != tests.end();
                 });
         }
@@ -177,14 +177,14 @@ namespace
             auto dict = gcroot<Dictionary<String ^, TestCase ^> ^>(result);
             assembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
                 {
-                    if (!dict->ContainsKey(marshal_as<String ^>(td.ShortName)))
+                    if (!dict->ContainsKey(marshal_as<String ^>(td.Name)))
                     {
-                        TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.ShortName), uri, marshal_as<String ^>(source));
-                        testCase->DisplayName = marshal_as<String ^>(td.ShortName);
+                        TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.Name), uri, marshal_as<String ^>(source));
+                        testCase->DisplayName = marshal_as<String ^>(td.Name);
                         testCase->CodeFilePath = marshal_as<String ^>(td.LineInfo.file);
                         testCase->LineNumber = td.LineInfo.line;
 
-                        dict->Add(marshal_as<String ^>(td.ShortName), testCase);
+                        dict->Add(marshal_as<String ^>(td.FullName()), testCase);
                     }
                 });
         }

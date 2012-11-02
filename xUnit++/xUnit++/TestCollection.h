@@ -86,53 +86,43 @@ public:
 
         // !!!VS something else that can be simplified once VS understands variadic macros...
         template<typename TArg0>
-        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, std::tuple<TArg0> &&t) const
+        std::string GetTheoryParams(const std::deque<std::string> &params, std::tuple<TArg0> &&t) const
         {
-            name += params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0>>(t))) + ")";
-
-            return name;
+            return "(" + params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0>>(t))) + ")";
         }
 
         template<typename TArg0, typename TArg1>
-        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, std::tuple<TArg0, TArg1> &&t) const
+        std::string GetTheoryParams(const std::deque<std::string> &params, std::tuple<TArg0, TArg1> &&t) const
         {
-            name += params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1>>(t))) + ", ";
-            name += params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1>>(t))) + ")";
-
-            return name;
+            return "(" + params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1>>(t))) + ", " +
+                params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1>>(t))) + ")";
         }
 
         template<typename TArg0, typename TArg1, typename TArg2>
-        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2> &&t) const
+        std::string GetTheoryParams(const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2> &&t) const
         {
-            name += params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ", ";
-            name += params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ", ";
-            name += params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ")";
-
-            return name;
+            return "(" + params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ", " +
+                params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ", " +
+                params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2>>(t))) + ")";
         }
 
         template<typename TArg0, typename TArg1, typename TArg2, typename TArg3>
-        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2, TArg3> &&t) const
+        std::string GetTheoryParams(const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2, TArg3> &&t) const
         {
-            name += params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", ";
-            name += params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", ";
-            name += params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", ";
-            name += params[3] + ": " + ToString(std::get<3>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ")";
-
-            return name;
+            return "(" + params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", " +
+                params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", " +
+                params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ", " +
+                params[3] + ": " + ToString(std::get<3>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3>>(t))) + ")";
         }
 
         template<typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4>
-        std::string GetLongTheoryName(std::string name, const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4> &&t) const
+        std::string GetTheoryParams(const std::deque<std::string> &params, std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4> &&t) const
         {
-            name += params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", ";
-            name += params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", ";
-            name += params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", ";
-            name += params[3] + ": " + ToString(std::get<3>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", ";
-            name += params[4] + ": " + ToString(std::get<4>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ")";
-
-            return name;
+            return "(" + params[0] + ": " + ToString(std::get<0>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", " +
+                params[1] + ": " + ToString(std::get<1>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", " +
+                params[2] + ": " + ToString(std::get<2>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", " +
+                params[3] + ": " + ToString(std::get<3>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ", " +
+                params[4] + ": " + ToString(std::get<4>(std::forward<std::tuple<TArg0, TArg1, TArg2, TArg3, TArg4>>(t))) + ")";
         }
 
     public:
@@ -146,10 +136,21 @@ public:
             int id = 0;
             for (auto t : theoryData())
             {
-                auto theoryName = GetLongTheoryName(name + " [" + ToString(id++) + "] (", SplitParams(std::move(params)), std::forward<decltype(t)>(t));
+                auto fullParams = GetTheoryParams(SplitParams(std::move(params)), std::forward<decltype(t)>(t));
 
-                collection.mTests.push_back(std::make_shared<xUnitTest>(TheoryHelper(std::forward<TTheory>(theory), std::move(t)), std::string(theoryName), std::string(name), suite,
-                    AttributeCollection(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::string(filename), line, testEventRecorders));
+                collection.mTests.push_back(
+                    std::make_shared<xUnitTest>(
+                        TheoryHelper(std::forward<TTheory>(theory), std::move(t)),
+                        std::string(name),
+                        id++,
+                        std::move(fullParams),
+                        suite,
+                        AttributeCollection(attributes),
+                        Time::ToDuration(Time::ToMilliseconds(milliseconds)),
+                        std::string(filename),
+                        line,
+                        testEventRecorders)
+                    );
             }
         }
     };

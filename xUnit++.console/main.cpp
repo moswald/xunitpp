@@ -89,7 +89,7 @@ int main(int argc, char **argv)
                     {
                         std::regex regex(name, std::regex_constants::icase);
 
-                        if (std::regex_search(td.ShortName, regex))
+                        if (std::regex_search(td.Name, regex))
                         {
                             included = true;
                             break;

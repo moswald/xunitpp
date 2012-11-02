@@ -285,7 +285,7 @@ FACT_FIXTURE("Every theory instance should have a short name", TheoryFixture)
     {
         auto test = std::get<0>(t);
 
-        Assert.Equal("TheoryName", test.ShortName);
+        Assert.Equal("TheoryName", test.Name);
     }
 }
 
@@ -318,7 +318,7 @@ DATA_THEORY("TheoriesCanHaveAttributes", (int), RawFunctionProvider)
 {
     for (const auto &test : xUnitpp::TestCollection::Instance().Tests())
     {
-        if (test->TestDetails().ShortName == "TheoriesCanHaveAttributes")
+        if (test->TestDetails().Name == "TheoriesCanHaveAttributes")
         {
             auto it = std::find_if(test->TestDetails().Attributes.begin(), test->TestDetails().Attributes.end(), [](const std::pair<std::string, std::string> &item) { return item.first == "Cats"; });
             Assert.True(it != test->TestDetails().Attributes.end());
