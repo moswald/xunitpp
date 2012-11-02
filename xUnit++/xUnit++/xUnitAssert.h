@@ -33,7 +33,7 @@ public:
     template<typename T>
     xUnitAssert &AppendUserMessage(T &&value)
     {
-        *userMessage << value;
+        *userMessage << std::forward<T>(value);
         return *this;
     }
 
@@ -72,6 +72,13 @@ public:
     xUnitFailure &operator <<(T &&value)
     {
         assert.AppendUserMessage(std::forward<T>(value));
+        return *this;
+    }
+
+    template<typename T>
+    xUnitFailure &operator <<(const T &value)
+    {
+        assert.AppendUserMessage(value);
         return *this;
     }
 
