@@ -40,8 +40,7 @@ TestCollection &TestCollection::Instance()
 TestCollection::Register::Register(TestCollection &collection, std::function<void()> &&fn, std::string &&name, const std::string &suite,
             AttributeCollection &&attributes, int milliseconds, std::string &&filename, int line, std::vector<std::shared_ptr<TestEventRecorder>> &&testEventRecorders)
 {
-    auto shortName = name;
-    collection.mTests.push_back(std::make_shared<xUnitTest>(std::move(fn), std::move(shortName), std::move(name), suite, std::move(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, std::move(testEventRecorders)));
+    collection.mTests.push_back(std::make_shared<xUnitTest>(std::move(fn), std::move(name), 0, "", suite, std::move(attributes), Time::ToDuration(Time::ToMilliseconds(milliseconds)), std::move(filename), line, std::move(testEventRecorders)));
 }
 
 const std::vector<std::shared_ptr<xUnitTest>> &TestCollection::Tests()

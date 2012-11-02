@@ -62,7 +62,7 @@ struct TestFactory
 
     operator std::shared_ptr<xUnitTest>()
     {
-        return std::make_shared<xUnitTest>(std::move(testFn), std::move(name), std::move(name), suite, std::move(attributes), timeLimit, std::move(file), line, testEventRecorders);
+        return std::make_shared<xUnitTest>(std::move(testFn), std::string(name), 0, "", suite, std::move(attributes), timeLimit, std::move(file), line, testEventRecorders);
     }
 
 private:

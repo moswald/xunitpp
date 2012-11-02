@@ -240,7 +240,7 @@ class ConsoleReporter::ReportCache
                     }
                 }
 
-                std::cout << Fragment(Color::TestName, testDetails.Name + "\n");
+                std::cout << Fragment(Color::TestName, testDetails.FullName() + "\n");
             }
 
             if (!fragments.empty())
@@ -384,7 +384,7 @@ public:
                 Instant(Color::Separator, TestSeparator);
             }
 
-            Instant(Color::TestName, testDetails.ShortName + "\n");
+            Instant(Color::TestName, testDetails.Name + "\n");
             Instant(Color::FileAndLine, to_string(testDetails.LineInfo) + ": ");
             Instant(Color::Skip, reason);
             Instant(Color::Default, "\n");

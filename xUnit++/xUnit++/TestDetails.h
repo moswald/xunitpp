@@ -19,7 +19,7 @@ class xUnitAssert;
 struct TestDetails
 {
     TestDetails();
-    TestDetails(std::string &&name, std::string &&shortName, const std::string &suite,
+    TestDetails(std::string &&name, int testInstance, std::string &&params, const std::string &suite,
         AttributeCollection &&attributes, Time::Duration timeLimit,
         std::string &&filename, int line);
     TestDetails(const TestDetails &other);
@@ -27,9 +27,12 @@ struct TestDetails
     TestDetails &operator =(TestDetails other);
     friend void swap(TestDetails &td0, TestDetails &td1);
 
+    std::string FullName() const;
+
     int Id;
+    int TestInstance;
     std::string Name;
-    std::string ShortName;
+    std::string Params;
     std::string Suite;
     AttributeCollection Attributes;
     Time::Duration TimeLimit;
