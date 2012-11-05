@@ -5,7 +5,7 @@
     <UsingTask
         AssemblyFile=".build\MSBuild.ExtensionPack.dll"
         TaskName="MSBuild.ExtensionPack.UI.Console" />
-    
+
     <UsingTask
         AssemblyFile=".build\MSBuild.ExtensionPack.dll"
         TaskName="MSBuild.ExtensionPack.Compression.Zip"/>
@@ -73,9 +73,6 @@
               DestinationFolder="package\xUnit++\" />
         <Copy SourceFiles="License.txt"
               DestinationFolder="package\TestAdapter\" />
-
-        <!-- get build number -->
-        <CallTarget Condition="'$(VersionString)' == ''" Targets="GetVersion" />
     </Target>
 
     <Target Name="GetVersion">
@@ -106,7 +103,7 @@
              ZipFileName="package\xunit++.testadapter.vsix" />
     </Target>
 
-    <Target Name="All" DependsOnTargets="Zip;Vsix">
+    <Target Name="All" DependsOnTargets="GetVersion;Zip;Vsix">
         <RemoveDir Directories="package/TestAdapter;package/xUnit++" />
     </Target>
 
