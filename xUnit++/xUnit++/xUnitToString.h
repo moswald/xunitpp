@@ -45,12 +45,12 @@ namespace ToStringImpl
     struct to_string_impl<true>
     {
         template<typename T>
-        static std::string to_string(T &&t)
+        static std::string to_string(const T &t)
         {
             using fallback::to_string;
             using std::to_string;
 
-            return to_string(std::forward<T>(t));
+            return to_string(t);
         }
     };
 
@@ -76,13 +76,12 @@ std::string ToString(T &&t)
     using ToStringImpl::fallback::to_string;
     using std::to_string;
 
-    return ToStringImpl::to_string_impl<(sizeof (ToStringImpl::fallback::flag(), to_string(t), ToStringImpl::fallback::flag()) != sizeof(char))>::to_string(std::forward<T>(t));
+    return ToStringImpl::to_string_impl<(sizeof (ToStringImpl::fallback::flag(), to_string(t), ToStringImpl::fallback::flag()) != sizeof(char))>::to_string(t);
 }
 
 template<typename T>
-bool has_to_string(T &&t)
+bool has_to_string(T &&)
 {
-    (void)t;
     return has_to_string<typename std::remove_reference<T>::type>();
 }
 

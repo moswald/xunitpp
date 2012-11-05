@@ -138,6 +138,7 @@
     <ClCompile Include="TestRunner.cpp" />
     <ClCompile Include="TestsCanOutputAnythingWithToString.cpp" />
     <ClCompile Include="Theory.cpp" />
+    <ClCompile Include="ToString.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\xUnit++\xUnit++.vcxproj">
