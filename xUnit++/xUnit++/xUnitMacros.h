@@ -30,6 +30,20 @@
     } \
     namespace XU_UNIQUE_ATT_NS
 
+#define SKIP(reason) \
+    namespace XU_UNIQUE_ATT_NS { \
+        namespace xUnitAttributes { \
+            inline xUnitpp::AttributeCollection Attributes() \
+            { \
+                xUnitpp::AttributeCollection attributes; \
+                XU_ATTRIBUTES(("Skip", reason)) \
+                attributes.sort(); \
+                return attributes; \
+            } \
+        } \
+    } \
+    namespace XU_UNIQUE_ATT_NS
+
 #define SUITE(SuiteName) \
     namespace { \
         namespace xUnitSuite { \
