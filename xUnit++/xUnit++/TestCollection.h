@@ -136,7 +136,7 @@ public:
             int id = 0;
             for (auto t : theoryData())
             {
-                auto fullParams = GetTheoryParams(SplitParams(std::move(params)), std::forward<decltype(t)>(t));
+                auto fullParams = GetTheoryParams(SplitParams(std::string(params)), std::forward<decltype(t)>(t));
 
                 collection.mTests.push_back(
                     std::make_shared<xUnitTest>(
