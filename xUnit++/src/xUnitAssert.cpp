@@ -139,21 +139,6 @@ xUnitFailure Assert::Equal(const std::string &expected, const std::string &actua
     return OnSuccess();
 }
 
-xUnitFailure Assert::Equal(const char *expected, const char *actual, LineInfo &&lineInfo) const
-{
-    return Equal(std::string(expected), std::string(actual), std::move(lineInfo));
-}
-
-xUnitFailure Assert::Equal(const char *expected, const std::string &actual, LineInfo &&lineInfo) const
-{
-    return Equal(std::string(expected), actual, std::move(lineInfo));
-}
-
-xUnitFailure Assert::Equal(const std::string &expected, const char *actual, LineInfo &&lineInfo) const
-{
-    return Equal(expected, std::string(actual), std::move(lineInfo));
-}
-
 xUnitFailure Assert::Equal(float expected, float actual, int precision, LineInfo &&lineInfo) const
 {
     return Equal((double)expected, (double)actual, precision, std::move(lineInfo));
@@ -177,21 +162,6 @@ xUnitFailure Assert::NotEqual(const std::string &expected, const std::string &ac
     }
 
     return OnSuccess();
-}
-
-xUnitFailure Assert::NotEqual(const char *expected, const char *actual, LineInfo &&lineInfo) const
-{
-    return NotEqual(std::string(expected), std::string(actual), std::move(lineInfo));
-}
-
-xUnitFailure Assert::NotEqual(const char *expected, const std::string &actual, LineInfo &&lineInfo) const
-{
-    return NotEqual(std::string(expected), actual, std::move(lineInfo));
-}
-
-xUnitFailure Assert::NotEqual(const std::string &expected, const char *actual, LineInfo &&lineInfo) const
-{
-    return NotEqual(expected, std::string(actual), std::move(lineInfo));
 }
 
 xUnitFailure Assert::Fail(LineInfo &&lineInfo) const
@@ -219,25 +189,6 @@ xUnitFailure Assert::True(bool b, LineInfo &&lineInfo) const
     return OnSuccess();
 }
 
-xUnitFailure Assert::DoesNotContain(const char *actualString, const char *value, LineInfo &&lineInfo) const
-{
-    const auto a = std::string(actualString);
-    const auto v = std::string(value);
-    return DoesNotContain(a, v, std::move(lineInfo));
-}
-
-xUnitFailure Assert::DoesNotContain(const char *actualString, const std::string &value, LineInfo &&lineInfo) const
-{
-    const auto a = std::string(actualString);
-    return DoesNotContain(a, value, std::move(lineInfo));
-}
-
-xUnitFailure Assert::DoesNotContain(const std::string &actualString, const char *value, LineInfo &&lineInfo) const
-{
-    const auto v = std::string(value);
-    return DoesNotContain(actualString, v, std::move(lineInfo));
-}
-
 xUnitFailure Assert::DoesNotContain(const std::string &actualString, const std::string &value, LineInfo &&lineInfo) const
 {
     auto found = actualString.find(value);
@@ -248,25 +199,6 @@ xUnitFailure Assert::DoesNotContain(const std::string &actualString, const std::
     }
 
     return OnSuccess();
-}
-
-xUnitFailure Assert::Contains(const char *actualString, const char *value, LineInfo &&lineInfo) const
-{
-    const auto a = std::string(actualString);
-    const auto v = std::string(value);
-    return Contains(a, v, std::move(lineInfo));
-}
-
-xUnitFailure Assert::Contains(const char *actualString, const std::string &value, LineInfo &&lineInfo) const
-{
-    const auto a = std::string(actualString);
-    return Contains(a, value, std::move(lineInfo));
-}
-
-xUnitFailure Assert::Contains(const std::string &actualString, const char *value, LineInfo &&lineInfo) const
-{
-    const auto v = std::string(value);
-    return Contains(actualString, v, std::move(lineInfo));
 }
 
 xUnitFailure Assert::Contains(const std::string &actualString, const std::string &value, LineInfo &&lineInfo) const

@@ -98,13 +98,13 @@ protected:
     static double round(double value, size_t precision);
 
     template<typename T>
-    static std::string RangeToString(T &&begin, T &&end)
+    static std::string RangeToString(T begin, T end)
     {
         typedef decltype(*begin) val_type;
 
         std::string result = "[ ";
 
-        std::for_each(std::forward<T>(begin), std::forward<T>(end), [&result](val_type &&val) { result += ToString(std::forward<val_type>(val)) + ", "; });
+        std::for_each(std::forward<T>(begin), std::forward<T>(end), [&result](val_type val) { result += ToString(std::forward<val_type>(val)) + ", "; });
 
         result[result.size() - 2] = ' ';
         result[result.size() - 1] = ']';
@@ -150,15 +150,23 @@ public:
     }
 
     template<typename TExpected, typename TActual>
-    xUnitFailure Equal(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
+    typename std::enable_if<
+        !std::is_constructible<std::string, TExpected>::value || !std::is_constructible<std::string, TActual>::value,
+        xUnitFailure>::type Equal(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
     {
         return Equal(std::forward<TExpected>(expected), std::forward<TActual>(actual), [](TExpected &&expected, TActual &&actual) { return expected == actual; }, std::move(lineInfo));
     }
 
-    xUnitFailure Equal(const char *expected, const char *actual, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure Equal(const char *expected, const std::string &actual, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure Equal(const std::string &expected, const char *actual, LineInfo &&lineInfo = LineInfo()) const;
+    template<typename TExpected, typename TActual>
+    typename std::enable_if<
+        std::is_constructible<std::string, TExpected>::value && std::is_constructible<std::string, TActual>::value,
+        xUnitFailure>::type Equal(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
+    {
+        return Equal(std::string(std::forward<TExpected>(expected)), std::string(std::forward<TActual>(actual)), std::move(lineInfo));
+    }
+
     xUnitFailure Equal(const std::string &expected, const std::string &actual, LineInfo &&lineInfo = LineInfo()) const;
+
     xUnitFailure Equal(float expected, float actual, int precision, LineInfo &&lineInfo = LineInfo()) const;
     xUnitFailure Equal(double expected, double actual, int precision, LineInfo &&lineInfo = LineInfo()) const;
 
@@ -212,14 +220,21 @@ public:
     }
 
     template<typename TExpected, typename TActual>
-    xUnitFailure NotEqual(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
+    typename std::enable_if<
+        !std::is_constructible<std::string, TExpected>::value || !std::is_constructible<std::string, TActual>::value,
+        xUnitFailure>::type NotEqual(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
     {
         return NotEqual(std::forward<TExpected>(expected), std::forward<TActual>(actual), [](TExpected &&expected, TActual &&actual) { return expected == actual; }, std::move(lineInfo));
     }
 
-    xUnitFailure NotEqual(const char *expected, const char *actual, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure NotEqual(const char *expected, const std::string &actual, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure NotEqual(const std::string &expected, const char *actual, LineInfo &&lineInfo = LineInfo()) const;
+    template<typename TExpected, typename TActual>
+    typename std::enable_if<
+        std::is_constructible<std::string, TExpected>::value && std::is_constructible<std::string, TActual>::value,
+        xUnitFailure>::type NotEqual(TExpected expected, TActual actual, LineInfo &&lineInfo = LineInfo()) const
+    {
+        return NotEqual(std::string(std::forward<TExpected>(expected)), std::string(std::forward<TActual>(actual)), std::move(lineInfo));
+    }
+
     xUnitFailure NotEqual(const std::string &expected, const std::string &actual, LineInfo &&lineInfo = LineInfo()) const;
 
     template<typename TExpected, typename TActual, typename TComparer>
@@ -352,7 +367,10 @@ public:
     }
 
     template<typename TSequence, typename T>
-    xUnitFailure DoesNotContain(const TSequence &sequence, T &&value, LineInfo &&lineInfo = LineInfo()) const
+    typename std::enable_if<
+        !std::is_constructible<std::string, TSequence>::value || !std::is_constructible<std::string, T>::value,
+        xUnitFailure
+    >::type DoesNotContain(const TSequence &sequence, T &&value, LineInfo &&lineInfo = LineInfo()) const
     {
         using std::begin;
         using std::end;
@@ -365,9 +383,15 @@ public:
         return OnSuccess();
     }
 
-    xUnitFailure DoesNotContain(const char *actualString, const char *value, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure DoesNotContain(const char *actualString, const std::string &value, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure DoesNotContain(const std::string &actualString, const char *value, LineInfo &&lineInfo = LineInfo()) const;
+    template<typename TActualString, typename TValueString>
+    typename std::enable_if<
+        std::is_constructible<std::string, TActualString>::value && std::is_constructible<std::string, TValueString>::value,
+        xUnitFailure
+    >::type DoesNotContain(TActualString actualString, TValueString value, LineInfo &&lineInfo = LineInfo()) const
+    {
+        return DoesNotContain(std::string(std::forward<TActualString>(actualString)), std::string(std::forward<TValueString>(value)), std::move(lineInfo));
+    }
+
     xUnitFailure DoesNotContain(const std::string &actualString, const std::string &value, LineInfo &&lineInfo = LineInfo()) const;
 
     template<typename TSequence, typename TPredicate>
@@ -385,7 +409,10 @@ public:
     }
 
     template<typename TSequence, typename T>
-    xUnitFailure Contains(const TSequence &sequence, T &&value, LineInfo &&lineInfo = LineInfo()) const
+    typename std::enable_if<
+        !std::is_constructible<std::string, TSequence>::value || !std::is_constructible<std::string, T>::value,
+        xUnitFailure
+    >::type Contains(const TSequence &sequence, T &&value, LineInfo &&lineInfo = LineInfo()) const
     {
         using std::begin;
         using std::end;
@@ -398,9 +425,15 @@ public:
         return OnSuccess();
     }
 
-    xUnitFailure Contains(const char *actualString, const char *value, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure Contains(const char *actualString, const std::string &value, LineInfo &&lineInfo = LineInfo()) const;
-    xUnitFailure Contains(const std::string &actualString, const char *value, LineInfo &&lineInfo = LineInfo()) const;
+    template<typename TActualString, typename TValueString>
+    typename std::enable_if<
+        std::is_constructible<std::string, TActualString>::value && std::is_constructible<std::string, TValueString>::value,
+        xUnitFailure
+    >::type Contains(TActualString actualString, TValueString value, LineInfo &&lineInfo = LineInfo()) const
+    {
+        return Contains(std::string(std::forward<TActualString>(actualString)), std::string(std::forward<TValueString>(value)), std::move(lineInfo));
+    }
+
     xUnitFailure Contains(const std::string &actualString, const std::string &value, LineInfo &&lineInfo = LineInfo()) const;
 
     template<typename TActual, typename TRange>
