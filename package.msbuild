@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="All"
+<Project DefaultTargets="Package"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <UsingTask
@@ -10,8 +10,11 @@
         AssemblyFile=".build\MSBuild.ExtensionPack.dll"
         TaskName="MSBuild.ExtensionPack.Compression.Zip"/>
 
-    <Target Name="Rebuild">
-        <CallTarget Targets="Clean;All" />
+    <Target Name="GetVersion">
+        <Console TaskAction="Beep" />
+        <Console TaskAction="ReadLine" UserPrompt="Enter Version String:">
+            <Output TaskParameter="UserResponse" PropertyName="VersionString" />
+        </Console>
     </Target>
 
     <Target Name="Clean">
@@ -34,9 +37,7 @@
         <RemoveDir Directories="package" />
     </Target>
 
-    <Target Name="Package">
-        <RemoveDir Directories="package" />
-
+    <Target Name="Build">
         <MSBuild Projects="xUnit++.sln"
                  Targets="Build"
                  BuildInParallel="true"
@@ -48,11 +49,21 @@
         <MSBuild Projects="xUnit++.sln"
                  Targets="Build"
                  BuildInParallel="true"
-                 Properties="Configuration=Debug;Platform=x64" />
+                 Properties="Configuration=Debug;Platform=x64"
+                 Condition="'$(Platform)'!='Win32'"/>
         <MSBuild Projects="xUnit++.sln"
                  Targets="Build"
                  BuildInParallel="true"
-                 Properties="Configuration=Release;Platform=x64" />
+                 Properties="Configuration=Release;Platform=x64"
+                 Condition="'$(Platform)'!='Win32'"/>
+    </Target>
+
+    <Target Name="Rebuild">
+        <CallTarget Targets="Clean;Build" />
+    </Target>
+
+    <Target Name="PreparePackage" DependsOnTargets="Rebuild">
+        <RemoveDir Directories="package" />
 
         <ItemGroup>
             <IncludeFiles Include="xUnit++\xUnit++\*.h" />
@@ -75,14 +86,7 @@
               DestinationFolder="package\TestAdapter\" />
     </Target>
 
-    <Target Name="GetVersion">
-        <Console TaskAction="Beep" />
-        <Console TaskAction="ReadLine" UserPrompt="Enter Version String:">
-            <Output TaskParameter="UserResponse" PropertyName="VersionString" />
-        </Console>
-    </Target>
-
-    <Target Name="Zip" DependsOnTargets="Package">
+    <Target Name="Package" DependsOnTargets="GetVersion;PreparePackage">
         <ItemGroup>
             <FilesToCompress Include="package\xUnit++\**\*" />
         </ItemGroup>
@@ -91,9 +95,11 @@
              CompressFiles="@(FilesToCompress)"
              RemoveRoot="$(MSBuildThisFileDirectory)package"
              ZipFileName="package\xUnit++.vc.$(VersionString).zip" />
+
+        <RemoveDir Directories="package/TestAdapter;package/xUnit++" />
     </Target>
 
-    <Target Name="Vsix" DependsOnTargets="Package">
+    <Target Name="Vsix" DependsOnTargets="PreparePackage">
         <ItemGroup>
             <VsixItems Include="package\TestAdapter\**\*" />
         </ItemGroup>
@@ -102,9 +108,4 @@
              RemoveRoot="$(MSBuildThisFileDirectory)package\TestAdapter"
              ZipFileName="package\xunit++.testadapter.vsix" />
     </Target>
-
-    <Target Name="All" DependsOnTargets="GetVersion;Zip;Vsix">
-        <RemoveDir Directories="package/TestAdapter;package/xUnit++" />
-    </Target>
-
 </Project>
