@@ -163,5 +163,10 @@ FACT("EqualForStrings")
     Assert.Throws<xUnitAssert>([=]() { Assert.Equal(expected, actual); });
 }
 
+FACT("const char * should be equal to char *")
+{
+    char actual[] = "hi";
+    Check.Equal("hi", actual);
+}
 
 }
