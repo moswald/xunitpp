@@ -45,7 +45,7 @@ public:
 
     const xUnitpp::LineInfo &LineInfo() const;
 
-    static const xUnitAssert &None();
+    static xUnitAssert None();
 
 private:
     xUnitpp::LineInfo lineInfo;

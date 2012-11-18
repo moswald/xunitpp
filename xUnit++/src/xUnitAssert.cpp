@@ -4,10 +4,9 @@
 namespace xUnitpp
 {
 
-const xUnitAssert &xUnitAssert::None()
+xUnitAssert xUnitAssert::None()
 {
-    static xUnitAssert none("", xUnitpp::LineInfo());
-    return none;
+    return xUnitAssert("", xUnitpp::LineInfo());
 }
 
 xUnitAssert::xUnitAssert(std::string &&call, xUnitpp::LineInfo &&lineInfo)
