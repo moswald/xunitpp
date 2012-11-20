@@ -19,24 +19,6 @@ AttributeCollection::AttributeCollection()
 {
 }
 
-AttributeCollection::AttributeCollection(const AttributeCollection &other)
-    : sortedAttributes(other.sortedAttributes)
-    , skipped(other.skipped)
-{
-}
-
-AttributeCollection::AttributeCollection(AttributeCollection &&other)
-    : sortedAttributes(std::move(other.sortedAttributes))
-    , skipped(std::move(other.skipped))
-{
-}
-
-AttributeCollection &AttributeCollection::operator =(AttributeCollection other)
-{
-    swap(*this, other);
-    return *this;
-}
-
 void swap(AttributeCollection &a, AttributeCollection &b)
 {
     using std::swap;

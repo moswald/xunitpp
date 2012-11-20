@@ -32,29 +32,6 @@ TestDetails::TestDetails(std::string &&name, int testInstance, std::string &&par
 {
 }
 
-TestDetails::TestDetails(const TestDetails &other)
-    : Id(other.Id)
-    , TestInstance(other.TestInstance)
-    , Name(other.Name)
-    , Params(other.Params)
-    , Suite(other.Suite)
-    , Attributes(other.Attributes)
-    , TimeLimit(other.TimeLimit)
-    , LineInfo(other.LineInfo)
-{
-}
-
-TestDetails::TestDetails(TestDetails &&other)
-{
-    swap(*this, other);
-}
-
-TestDetails &TestDetails::operator =(TestDetails other)
-{
-    swap(*this, other);
-    return *this;
-}
-
 void swap(TestDetails &td0, TestDetails &td1)
 {
     using std::swap;
