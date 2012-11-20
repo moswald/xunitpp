@@ -22,9 +22,6 @@ struct TestDetails
     TestDetails(std::string &&name, int testInstance, std::string &&params, const std::string &suite,
         AttributeCollection &&attributes, Time::Duration timeLimit,
         std::string &&filename, int line);
-    TestDetails(const TestDetails &other);
-    TestDetails(TestDetails &&other);
-    TestDetails &operator =(TestDetails other);
     friend void swap(TestDetails &td0, TestDetails &td1);
 
     std::string FullName() const;

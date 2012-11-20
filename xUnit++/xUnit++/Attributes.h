@@ -23,9 +23,6 @@ public:
     typedef std::pair<const_iterator, const_iterator> iterator_range;
 
     AttributeCollection();
-    AttributeCollection(const AttributeCollection &other);
-    AttributeCollection(AttributeCollection &&other);
-    AttributeCollection &operator =(AttributeCollection other);
     friend void swap(AttributeCollection &a, AttributeCollection &b);
 
     // !!!VS My kingdom for initialization lists!

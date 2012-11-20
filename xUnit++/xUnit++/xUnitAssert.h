@@ -64,6 +64,11 @@ private:
 public:
     xUnitFailure(xUnitAssert &&assert, std::function<void(const xUnitAssert &)> onFailureComplete);
     xUnitFailure(const xUnitFailure &other);
+
+#if !defined(_MSC_VER) // !!!VS remove the #if/#endif when VS can compile this code
+    xUnitFailure(xUnitFailure &&) = default;
+#endif
+
     ~xUnitFailure() noexcept(false);
 
     static xUnitFailure None();
@@ -83,7 +88,7 @@ public:
     }
 
 private:
-    xUnitFailure &operator =(xUnitFailure other);
+    xUnitFailure &operator =(xUnitFailure other) /* = delete */;
 
 private:
     std::function<void(const xUnitAssert &)> OnFailureComplete;
