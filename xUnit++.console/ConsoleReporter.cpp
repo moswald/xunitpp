@@ -210,12 +210,18 @@ class ConsoleReporter::ReportCache
             : testDetails(td)
             , failed(false)
             , verbose(verbose)
+            , skipped(false)
         {
+        }
+
+        bool WillPrint() const
+        {
+            return failed || verbose || !fragments.empty();
         }
 
         void Print(bool grouped)
         {
-            if (failed || verbose || !fragments.empty())
+            if (WillPrint())
             {
                 if (!grouped)
                 {
@@ -225,6 +231,10 @@ class ConsoleReporter::ReportCache
                 if (failed)
                 {
                     std::cout << Fragment(Color::Failure, "[ Failure ] ");
+                }
+                else if (skipped)
+                {
+                    std::cout << Fragment(Color::Skip, "[ Skipped ] ");
                 }
                 else
                 {
@@ -241,10 +251,7 @@ class ConsoleReporter::ReportCache
                 }
 
                 std::cout << Fragment(Color::TestName, testDetails.FullName() + "\n");
-            }
 
-            if (!fragments.empty())
-            {
                 for (auto &&msg : fragments)
                 {
                     std::cout << msg;
@@ -258,6 +265,7 @@ class ConsoleReporter::ReportCache
             fragments.emplace_back(Color::Separator, ": ");
             fragments.emplace_back(Color::Skip, reason);
             fragments.emplace_back(Color::Default, "\n");
+            skipped = true;
         }
 
         TestOutput &operator <<(const xUnitpp::TestEvent &event)
@@ -344,6 +352,7 @@ class ConsoleReporter::ReportCache
         std::vector<Fragment> fragments;
         bool failed;
         bool verbose;
+        bool skipped;
     };
 
     typedef std::unordered_map<int, std::shared_ptr<TestOutput>> OutputCache;
@@ -432,19 +441,24 @@ public:
                 });
 
             std::string curSuite = "";
-            for (auto result : finalResults)
+            for (auto it = finalResults.begin(); it != finalResults.end(); ++it)
             {
-                if (group)
+                auto &result = *it;
+                if (result->WillPrint())
                 {
-                    if (curSuite != result->TestDetails().Suite)
+                    if (group)
                     {
-                        curSuite = result->TestDetails().Suite;
+                        if (curSuite != result->TestDetails().Suite)
+                        {
+                            curSuite = result->TestDetails().Suite;
 
-                        std::cout << TestOutput::Fragment(Color::Suite, "\n\n==========\n[ " + curSuite + " ]\n==========\n");
+                            std::string sep(curSuite.length() + 4, '=');
+                            std::cout << TestOutput::Fragment(Color::Suite, "\n\n" + sep + "\n[ " + curSuite + " ]\n" + sep + "\n");
+                        }
                     }
-                }
 
-                result->Print(group);
+                    result->Print(group);
+                }
             }
         }
     }
