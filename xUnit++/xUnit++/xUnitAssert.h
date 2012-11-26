@@ -2,7 +2,9 @@
 #define XUNITASSERT_H_
 
 #if defined(_MSC_VER)
-#define _ALLOW_KEYWORD_MACROS
+# if !defined(_ALLOW_KEYWORD_MACROS)
+#  define _ALLOW_KEYWORD_MACROS
+# endif
 #define noexcept(x)
 #endif
 
