@@ -36,7 +36,6 @@
   <ItemGroup>
     <ClInclude Include="xUnit++/Attributes.h" />
     <ClInclude Include="xUnit++/ExportApi.h" />
-    <ClInclude Include="xUnit++/ForceLinkModuleMacros.h" />
     <ClInclude Include="xUnit++/IOutput.h" />
     <ClInclude Include="xUnit++/LineInfo.h" />
     <ClInclude Include="xUnit++/Suite.h" />
