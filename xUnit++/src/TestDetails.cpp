@@ -9,6 +9,16 @@ namespace
         static int id = 0;
         return id++;
     }
+
+    std::string GetFullName(const std::string &name, int testInstance, const std::string &params)
+    {
+        if (params.empty())
+        {
+            return name;
+        }
+
+        return name + "[" + std::to_string(testInstance) + "]" + params;
+    }
 }
 
 namespace xUnitpp
@@ -25,6 +35,7 @@ TestDetails::TestDetails(std::string &&name, int testInstance, std::string &&par
     , TestInstance(testInstance)
     , Name(std::move(name))
     , Params(std::move(params))
+    , FullName(::GetFullName(Name, testInstance, Params))
     , Suite(suite)
     , Attributes(std::move(attributes))
     , TimeLimit(timeLimit)
@@ -32,28 +43,58 @@ TestDetails::TestDetails(std::string &&name, int testInstance, std::string &&par
 {
 }
 
-void swap(TestDetails &td0, TestDetails &td1)
+int __stdcall TestDetails::GetId() const
 {
-    using std::swap;
-
-    swap(td0.Id, td1.Id);
-    swap(td0.TestInstance, td1.TestInstance);
-    swap(td0.Name, td1.Name);
-    swap(td0.Params, td1.Params);
-    swap(td0.Suite, td1.Suite);
-    swap(td0.Attributes, td1.Attributes);
-    swap(td0.TimeLimit, td1.TimeLimit);
-    swap(td0.LineInfo, td1.LineInfo);
+    return Id;
 }
 
-std::string TestDetails::FullName() const
+const char * __stdcall TestDetails::GetName() const 
 {
-    if (Params.empty())
-    {
-        return Name;
-    }
-
-    return Name + "[" + std::to_string(TestInstance) + "]" + Params;
+    return Name.c_str();
 }
+
+const char * __stdcall TestDetails::GetFullName() const 
+{
+    return FullName.c_str();
+}
+
+const char * __stdcall TestDetails::GetSuite() const 
+{
+    return Suite.c_str();
+}
+
+size_t __stdcall TestDetails::GetAttributeCount() const 
+{
+    return Attributes.size();
+}
+
+const char * __stdcall TestDetails::GetAttributeKey(size_t index) const 
+{
+    return std::get<0>(Attributes[index]).c_str();
+}
+
+const char * __stdcall TestDetails::GetAttributeValue(size_t index) const 
+{
+    return std::get<1>(Attributes[index]).c_str();
+}
+
+void __stdcall TestDetails::FindAttributeKey(const char *key, size_t &begin, size_t &end) const
+{
+    auto range = Attributes.find(AttributeCollection::Attribute(key, ""));
+
+    begin = std::distance(Attributes.begin(), range.first);
+    end = std::distance(Attributes.end(), range.second);
+}
+
+const char * __stdcall TestDetails::GetFile() const 
+{
+    return LineInfo.file.c_str();
+}
+
+int __stdcall TestDetails::GetLine() const 
+{
+    return LineInfo.line;
+}
+
 
 }

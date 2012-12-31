@@ -8,10 +8,12 @@
 #include <vector>
 #include "TestDetails.h"
 #include "TestEvent.h"
+#include "xUnitTime.h"
 
 namespace xUnitpp
 {
 
+class AttributeCollection;
 class TestEvent;
 class TestEventRecorder;
 
@@ -28,7 +30,7 @@ public:
         const std::string &suite, AttributeCollection &&attributes, Time::Duration timeLimit,
         std::string &&filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
-    const xUnitpp::TestDetails &TestDetails() const;
+    const TestDetails &TestDetails() const;
 
     TestResult Run();
     Time::Duration Duration() const;

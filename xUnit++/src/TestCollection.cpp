@@ -21,7 +21,7 @@ namespace
         }
     }
 
-    extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, int threadLimit, xUnitpp::IOutput &testReporter, std::function<bool(const xUnitpp::TestDetails &)> filter)
+    extern "C" __declspec(dllexport) int FilteredTestsRunner(int timeLimit, int threadLimit, xUnitpp::IOutput &testReporter, xUnitpp::TestFilterCallback filter)
     {
         return xUnitpp::RunTests(testReporter, filter, xUnitpp::TestCollection::Instance().Tests(),
             xUnitpp::Time::ToDuration(xUnitpp::Time::ToMilliseconds(timeLimit)), threadLimit);

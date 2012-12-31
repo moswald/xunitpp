@@ -7,7 +7,6 @@
 #include "Attributes.h"
 #include "LineInfo.h"
 #include "TestCollection.h"
-#include "TestDetails.h"
 #include "TestEventRecorder.h"
 #include "Suite.h"
 #include "xUnitCheck.h"

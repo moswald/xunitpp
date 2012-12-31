@@ -32,6 +32,8 @@ public:
 
     const_iterator begin() const;
     const_iterator end() const;
+    size_t size() const;
+    const Attribute &operator[](size_t index) const;
 
     void sort();
 

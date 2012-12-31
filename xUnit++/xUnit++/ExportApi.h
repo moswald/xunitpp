@@ -1,5 +1,5 @@
-#ifndef EXPORTSAPI_H_
-#define EXPORTSAPI_H_
+#ifndef EXPORTAPI_H_
+#define EXPORTAPI_H_
 
 #include <functional>
 #include <memory>
@@ -12,12 +12,12 @@
 namespace xUnitpp
 {
     struct IOutput;
-    struct TestDetails;
+    struct ITestDetails;
 
-    typedef std::function<void(const TestDetails &)> EnumerateTestDetailsCallback;
+    typedef std::function<void(const ITestDetails &)> EnumerateTestDetailsCallback;
     typedef void(*EnumerateTestDetails)(EnumerateTestDetailsCallback callback);
 
-    typedef std::function<bool(const TestDetails &)> TestFilterCallback;
+    typedef std::function<bool(const ITestDetails &)> TestFilterCallback;
     typedef int(*FilteredTestsRunner)(int, int, IOutput &, TestFilterCallback);
 }
 

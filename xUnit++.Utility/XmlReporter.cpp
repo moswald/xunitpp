@@ -1,26 +1,25 @@
 #include "XmlReporter.h"
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include "xUnit++/TestDetails.h"
-#include "xUnit++/TestEvent.h"
+#include <vector>
+#include "xUnit++/ITestDetails.h"
+#include "xUnit++/ITestEvent.h"
+#include "xUnit++/LineInfo.h"
 #include "xUnit++/xUnitTime.h"
 
 namespace
 {
     struct TestResult
     {
-        TestResult()
-        {
-        }
-
-        TestResult(const xUnitpp::TestDetails &testDetails)
+        TestResult(const xUnitpp::ITestDetails &testDetails)
             : testDetails(testDetails)
             , status(Success)
         {
         }
 
-        xUnitpp::TestDetails testDetails;
+        const xUnitpp::ITestDetails &testDetails;
 
         enum
         {
@@ -31,6 +30,9 @@ namespace
 
         xUnitpp::Time::Duration time;
         std::vector<std::string> messages;
+
+    private:
+        TestResult &operator =(TestResult other) /* = delete */;
     };
 }
 
@@ -53,18 +55,28 @@ struct xUnitpp::Utilities::XmlReporter::SuiteResult
     int failures;
     int skipped;
 
-    std::map<std::string, TestResult> testResults;
+    std::vector<TestResult> testResults;
 };
 
 namespace
 {
+    TestResult &GetTestResult(std::vector<TestResult> &testResults, const std::string &fullName)
+    {
+        // if fullName isn't found it's a bug: go ahead and crash :P
+        return *std::find_if(testResults.begin(), testResults.end(),
+            [&](const TestResult &test)
+            {
+                return test.testDetails.GetFullName() == fullName;
+            });
+    }
+
     float SuiteTime(const xUnitpp::Utilities::XmlReporter::SuiteResult &suiteResult)
     {
         xUnitpp::Time::Duration timeTaken = xUnitpp::Time::Duration::zero();
 
         for (const auto &test : suiteResult.testResults)
         {
-            timeTaken += test.second.time;
+            timeTaken += test.time;
         }
 
         return xUnitpp::Time::ToSeconds(timeTaken).count();
@@ -116,8 +128,9 @@ namespace
             " ?>\n";
     }
 
-    std::string XmlBeginResults(size_t tests, size_t failures, xUnitpp::Time::Duration totalTime)
+    std::string XmlBeginResults(size_t tests, size_t failures, long long nsTotal)
     {
+        xUnitpp::Time::Duration totalTime(nsTotal);
         return
             "<testsuites" +
                 XmlAttribute("tests", tests) +
@@ -208,48 +221,49 @@ XmlReporter::XmlReporter(const std::string &filename)
 {
 }
 
-void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, Time::Duration totalTime)
+void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, long long nsTotal)
 {
     auto report = [&](std::ostream &stream)
         {
             stream << XmlBeginDoc();
-            stream << XmlBeginResults(testCount, failureCount, totalTime);
+            stream << XmlBeginResults(testCount, failureCount, nsTotal);
 
             for (const auto &itSuite : suiteResults)
             {
                 stream << XmlBeginSuite(itSuite.second);
 
-                for (const auto &itTest : itSuite.second.testResults)
+                for (const auto &test : itSuite.second.testResults)
                 {
-                    const auto &test = itTest.second;
+                    stream << XmlBeginTest(test.testDetails.GetFullName(), test);
 
-                    stream << XmlBeginTest(itTest.first, test);
-
-                    if (test.status != TestResult::Success || !test.testDetails.Attributes.empty())
+                    if (test.status != TestResult::Success || test.testDetails.GetAttributeCount() == 0)
                     {
                         // close <TestCase>
                         stream << ">\n";
                     }
 
-                    for (const auto &att : test.testDetails.Attributes)
+                    for (auto i = 0U; i != test.testDetails.GetAttributeCount(); ++i)
                     {
-                        if (att.first != "Skip")
+                        std::string key = test.testDetails.GetAttributeKey(i);
+                        if (key != "Skip")
                         {
-                            stream << XmlTestAttribute(att.first, att.second);
-                            break;
+                            std::string value = test.testDetails.GetAttributeValue(i);
+
+                            stream << XmlTestAttribute(key, value);
                         }
                     }
 
                     if (test.status == TestResult::Failure)
                     {
-                        stream << XmlTestFailed(to_string(test.testDetails.LineInfo), test.messages);
+                        xUnitpp::LineInfo li(test.testDetails.GetFile(), test.testDetails.GetLine());
+                        stream << XmlTestFailed(to_string(li), test.messages);
                     }
                     else if (test.status == TestResult::Skipped)
                     {
                         stream << XmlTestSkipped(test.messages[0]);
                     }
 
-                    stream << XmlEndTest(test.status == TestResult::Success && test.testDetails.Attributes.empty());
+                    stream << XmlEndTest(test.status == TestResult::Success && test.testDetails.GetAttributeCount() == 0);
                 }
 
                 stream << XmlEndSuite();
@@ -273,38 +287,50 @@ void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failur
     }
 }
 
-void XmlReporter::ReportStart(const TestDetails &testDetails)
+void XmlReporter::ReportStart(const ITestDetails &testDetails)
 {
-    if (suiteResults.find(testDetails.Suite) == suiteResults.end())
+    std::string suite = testDetails.GetSuite();
+    if (suiteResults.find(suite) == suiteResults.end())
     {
-        suiteResults.insert(std::make_pair(testDetails.Suite, SuiteResult(testDetails.Suite)));
+        suiteResults.insert(std::make_pair(suite, SuiteResult(suite)));
     }
 
-    suiteResults[testDetails.Suite].tests++;
-    suiteResults[testDetails.Suite].testResults.insert(std::make_pair(testDetails.Name, TestResult(testDetails)));
+    suiteResults[suite].tests++;
+    suiteResults[suite].testResults.push_back(TestResult(testDetails));
 }
 
-void XmlReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
+void XmlReporter::ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt)
 {
-    if (evt.IsFailure())
+    if (evt.GetIsFailure())
     {
-        suiteResults[testDetails.Suite].failures++;
-        suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(to_string(evt));
-        suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Failure;
+        std::string suite = testDetails.GetSuite();
+        std::string name = testDetails.GetFullName();
+        
+        suiteResults[suite].failures++;
+
+        auto &testResult = GetTestResult(suiteResults[suite].testResults, name);
+        testResult.messages.push_back(evt.GetToString());
+        testResult.status = TestResult::Failure;
     }
 }
 
-void XmlReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
+void XmlReporter::ReportSkip(const ITestDetails &testDetails, const char *reason)
 {
     ReportStart(testDetails);
-    suiteResults[testDetails.Suite].skipped++;
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].messages.push_back(reason);
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].status = TestResult::Skipped;
+
+    std::string suite = testDetails.GetSuite();
+    std::string name = testDetails.GetFullName();
+
+    suiteResults[suite].skipped++;
+
+    auto &testResult = GetTestResult(suiteResults[suite].testResults, name);
+    testResult.messages.push_back(reason);
+    testResult.status = TestResult::Skipped;
 }
 
-void XmlReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
+void XmlReporter::ReportFinish(const ITestDetails &testDetails, long long nsTaken)
 {
-    suiteResults[testDetails.Suite].testResults[testDetails.Name].time = timeTaken;
+    GetTestResult(suiteResults[testDetails.GetSuite()].testResults, testDetails.GetFullName()).time = Time::Duration(nsTaken);
 }
 
 }}

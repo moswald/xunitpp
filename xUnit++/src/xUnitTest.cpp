@@ -1,4 +1,5 @@
 #include "xUnitTest.h"
+#include "EventLevel.h"
 #include "TestEventRecorder.h"
 #include "xUnitAssert.h"
 
@@ -62,7 +63,7 @@ void xUnitTest::AddEvent(TestEvent &&evt)
 
     testEvents.push_back(std::move(evt));
 
-    if (testEvents.back().IsFailure())
+    if (testEvents.back().GetIsFailure())
     {
         failureEventLogged = true;
     }

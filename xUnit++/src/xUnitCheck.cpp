@@ -1,4 +1,5 @@
 #include "xUnitCheck.h"
+#include "EventLevel.h"
 #include "TestEvent.h"
 #include "TestEventRecorder.h"
 

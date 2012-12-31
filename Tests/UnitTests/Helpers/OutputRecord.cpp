@@ -5,36 +5,36 @@
 
 namespace xUnitpp { namespace Tests {
 
-void OutputRecord::ReportStart(const TestDetails &testDetails)
+void OutputRecord::ReportStart(const ITestDetails &testDetails)
 {
     std::lock_guard<std::mutex> guard(lock);
-    orderedTestList.push_back(testDetails);
+    orderedTestList.push_back(static_cast<const TestDetails &>(testDetails));
 }
 
-void OutputRecord::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
+void OutputRecord::ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt)
 {
     std::lock_guard<std::mutex> guard(lock);
-    events.push_back(std::make_tuple(testDetails, evt));
+    events.push_back(std::make_pair(static_cast<const TestDetails &>(testDetails), static_cast<const TestEvent &>(evt)));
 }
 
-void OutputRecord::ReportSkip(const TestDetails &testDetails, const std::string &reason)
+void OutputRecord::ReportSkip(const ITestDetails &testDetails, const char *reason)
 {
     std::lock_guard<std::mutex> guard(lock);
-    skips.push_back(std::make_tuple(testDetails, reason));
+    skips.push_back(std::make_pair(static_cast<const TestDetails &>(testDetails), reason));
 }
 
-void OutputRecord::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
+void OutputRecord::ReportFinish(const ITestDetails &testDetails, long long nsTaken)
 {
     std::lock_guard<std::mutex> guard(lock);
-    finishedTests.push_back(std::make_tuple(testDetails, timeTaken));
+    finishedTests.push_back(std::make_pair(static_cast<const TestDetails &>(testDetails), Time::Duration(nsTaken)));
 }
 
-void OutputRecord::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failed, Time::Duration totalTime)
+void OutputRecord::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failed, long long nsTotal)
 {
     summaryCount = testCount;
     summarySkipped = skipped;
     summaryFailed = failed;
-    summaryDuration = totalTime;
+    summaryDuration = Time::Duration(nsTotal);
 }
 
 }}

@@ -5,11 +5,12 @@
 #include <memory>
 #include <vector>
 #include <msclr/marshal_cppstd.h>
+#include "xUnit++/EventLevel.h"
 #include "xUnit++/ExportApi.h"
 #include "xUnit++/IOutput.h"
 #include "xUnit++/LineInfo.h"
-#include "xUnit++/TestDetails.h"
-#include "xUnit++/TestEvent.h"
+#include "xUnit++/ITestDetails.h"
+#include "xUnit++/ITestEvent.h"
 #include "TestAssembly.h"
 
 using namespace System;
@@ -21,8 +22,9 @@ using namespace msclr::interop;
 
 namespace
 {
-    ref struct ManagedReporter
+    ref class ManagedReporter
     {
+    public:
         ManagedReporter(ITestExecutionRecorder ^recorder, const std::vector<gcroot<TestCase ^>> &testCases)
             : recorder(recorder)
         {
@@ -33,10 +35,10 @@ namespace
             }
         }
 
-        void ReportStart(const xUnitpp::TestDetails &td)
+        void ReportStart(const xUnitpp::ITestDetails &td)
         {
-            auto key = marshal_as<String ^>(td.FullName());
-            auto name = marshal_as<String ^>(td.Name);
+            auto key = marshal_as<String ^>(td.GetFullName());
+            auto name = marshal_as<String ^>(td.GetName());
             recorder->RecordStart(testCases[name]);
 
             auto result = gcnew TestResult(testCases[name]);
@@ -47,33 +49,36 @@ namespace
             testResults.Add(key, result);
         }
 
-        void ReportEvent(const xUnitpp::TestDetails &td, const xUnitpp::TestEvent &evt)
+        void ReportEvent(const xUnitpp::ITestDetails &td, const xUnitpp::ITestEvent &evt)
         {
-            auto result = testResults[marshal_as<String ^>(td.Name)];
+            auto key = marshal_as<String ^>(td.GetName());
+            auto result = testResults[key];
 
-            if (evt.IsFailure())
+            if (evt.GetIsFailure())
             {
                 result->Outcome = TestOutcome::Failed;
             }
 
-            result->Messages->Add(gcnew TestResultMessage(marshal_as<String ^>(to_string(evt.Level())), marshal_as<String ^>(to_string(evt))));
+            result->Messages->Add(gcnew TestResultMessage(marshal_as<String ^>(to_string(evt.GetLevel())), marshal_as<String ^>(evt.GetToString())));
         }
 
-        void ReportSkip(const xUnitpp::TestDetails &td, const std::string &)
+        void ReportSkip(const xUnitpp::ITestDetails &td, const std::string &)
         {
-            auto testCase = testCases[marshal_as<String ^>(td.FullName())];
+            auto key = marshal_as<String ^>(td.GetFullName());
+            auto testCase = testCases[key];
             auto result = gcnew TestResult(testCase);
             result->ComputerName = Environment::MachineName;
-            result->DisplayName = marshal_as<String ^>(td.Name);
+            result->DisplayName = marshal_as<String ^>(td.GetName());
             result->Duration = TimeSpan::FromSeconds(0);
             result->Outcome = TestOutcome::Skipped;
             recorder->RecordEnd(testCase, result->Outcome);
             recorder->RecordResult(result);
         }
 
-        void ReportFinish(const xUnitpp::TestDetails &td, xUnitpp::Time::Duration timeTaken)
+        void ReportFinish(const xUnitpp::ITestDetails &td, xUnitpp::Time::Duration timeTaken)
         {
-            auto result = testResults[marshal_as<String ^>(td.Name)];
+            auto key = marshal_as<String ^>(td.GetFullName());
+            auto result = testResults[key];
             result->Duration = TimeSpan::FromSeconds(xUnitpp::Time::ToSeconds(timeTaken).count());
 
             if (result->Outcome == TestOutcome::None)
@@ -81,7 +86,7 @@ namespace
                 result->Outcome = TestOutcome::Passed;
             }
 
-            recorder->RecordEnd(testCases[marshal_as<String ^>(td.FullName())], result->Outcome);
+            recorder->RecordEnd(testCases[marshal_as<String ^>(td.GetFullName())], result->Outcome);
             recorder->RecordResult(result);
         }
 
@@ -102,29 +107,29 @@ namespace
         {
         }
 
-        virtual void ReportStart(const xUnitpp::TestDetails &td) override
+        virtual void __stdcall ReportStart(const xUnitpp::ITestDetails &td) override
         {
             reporter->ReportStart(td);
         }
 
-        virtual void ReportEvent(const xUnitpp::TestDetails &testDetails, const xUnitpp::TestEvent &evt) override
+        virtual void __stdcall ReportEvent(const xUnitpp::ITestDetails &testDetails, const xUnitpp::ITestEvent &evt) override
         {
             reporter->ReportEvent(testDetails, evt);
         }
 
-        virtual void ReportSkip(const xUnitpp::TestDetails &testDetails, const std::string &reason) override
+        virtual void __stdcall ReportSkip(const xUnitpp::ITestDetails &testDetails, const char *reason) override
         {
             reporter->ReportSkip(testDetails, reason);
         }
 
-        virtual void ReportFinish(const xUnitpp::TestDetails &testDetails, xUnitpp::Time::Duration timeTaken) override
+        virtual void __stdcall ReportFinish(const xUnitpp::ITestDetails &testDetails, long long nsTaken) override
         {
-            reporter->ReportFinish(testDetails, timeTaken);
+            reporter->ReportFinish(testDetails, xUnitpp::Time::Duration(nsTaken));
         }
 
-        virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, xUnitpp::Time::Duration totalTime) override
+        virtual void __stdcall ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, long long nsTotal) override
         {
-            reporter->ReportAllTestsComplete(testCount, skipped, failureCount, totalTime);
+            reporter->ReportAllTestsComplete(testCount, skipped, failureCount, xUnitpp::Time::Duration(nsTotal));
         }
 
     private:
@@ -152,12 +157,12 @@ namespace
         {
             NativeReporter reporter(recorder, tests);
             FilteredTestsRunner(0, 0, reporter,
-                [&](const xUnitpp::TestDetails &testDetails)
+                [&](const xUnitpp::ITestDetails &testDetails)
                 {
                     return !cancelled && std::find_if(tests.begin(), tests.end(),
                         [&](gcroot<TestCase ^> test)
                         {
-                            return marshal_as<std::string>(test->DisplayName) == testDetails.Name;
+                            return marshal_as<std::string>(test->DisplayName) == testDetails.GetName();
                         }) != tests.end();
                 });
         }
@@ -166,60 +171,94 @@ namespace
         std::vector<gcroot<TestCase ^>> tests;
     };
 
-    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^_source, Uri ^_uri)
+    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^_source, Uri ^_uri, IMessageLogger ^logger)
     {
-        auto result = gcnew Dictionary<String ^, TestCase ^>();
+        logger->SendMessage(TestMessageLevel::Informational, "Inside SingleSourceTestCases");
+
+        auto results = gcnew List<TestCase ^>();
+
+        logger->SendMessage(TestMessageLevel::Informational, "SingleSourceTestCases _source: " + _source);
 
         auto source = marshal_as<std::string>(_source);
+
         if (auto assembly = ManagedTestAssembly(source))
         {
-            auto uri = gcroot<Uri ^>(_uri);
-            auto dict = gcroot<Dictionary<String ^, TestCase ^> ^>(result);
-            assembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
-                {
-                    if (!dict->ContainsKey(marshal_as<String ^>(td.Name)))
-                    {
-                        TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(td.Name), uri, marshal_as<String ^>(source));
-                        testCase->DisplayName = marshal_as<String ^>(td.Name);
-                        testCase->CodeFilePath = marshal_as<String ^>(td.LineInfo.file);
-                        testCase->LineNumber = td.LineInfo.line;
+            struct testDetails
+            {
+                std::string fullName;
+                std::string name;
+                std::string file;
+                int line;
+            };
 
-                        dict->Add(marshal_as<String ^>(td.FullName()), testCase);
-                    }
+            std::vector<testDetails> tests;
+
+            assembly.EnumerateTestDetails(
+                [&](const xUnitpp::ITestDetails &td)
+                {
+                    testDetails testDetails = { td.GetFullName(), td.GetName(), td.GetFile(), td.GetLine() };
+                    tests.push_back(testDetails);
                 });
+
+            auto uri = gcroot<Uri ^>(_uri);
+
+            for (const auto &test : tests)
+            {
+                TestCase ^testCase = gcnew TestCase(marshal_as<String ^>(test.fullName), uri, marshal_as<String ^>(source));
+                testCase->DisplayName = marshal_as<String ^>(test.name);
+                testCase->CodeFilePath = marshal_as<String ^>(test.file);
+                testCase->LineNumber = test.line;
+
+                results->Add(testCase);
+            }
         }
 
-        return result->Values;
+        return results;
     }
 }
 
 namespace xUnitpp { namespace VsRunner
 {
 
-VsRunner::VsRunner()
+xUnitppVsRunner::xUnitppVsRunner()
     : mUri(gcnew Uri(VSRUNNER_URI))
     , mCancelled(false)
 {
 }
 
-void VsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^, ITestCaseDiscoverySink ^discoverySink)
+void xUnitppVsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^logger, ITestCaseDiscoverySink ^discoverySink)
 {
+    logger->SendMessage(TestMessageLevel::Informational, "Test discovery starting.");
+
+    try
+    {
+
     for each (String ^source in sources)
     {
-        for each (TestCase ^test in SingleSourceTestCases(source, mUri))
+        logger->SendMessage(TestMessageLevel::Informational, source);
+        logger->SendMessage(TestMessageLevel::Informational, "about to call singlesourcetestcases");
+        for each (TestCase ^test in SingleSourceTestCases(source, mUri, logger))
         {
             discoverySink->SendTestCase(test);
         }
     }
+
+    }
+    catch(Exception ^e)
+    {
+        logger->SendMessage(TestMessageLevel::Error, e->ToString());
+    }
+
+    logger->SendMessage(TestMessageLevel::Informational, "Test discovery finished.");
 }
 
-void VsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IFrameworkHandle ^framework)
+void xUnitppVsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IFrameworkHandle ^framework)
 {
     mCancelled = false;
 
     for each (String ^source in sources)
     {
-        if (RunTests(SingleSourceTestCases(source, mUri), framework))
+        if (RunTests(SingleSourceTestCases(source, mUri, nullptr), framework))
         {
             // cancelled
             break;
@@ -227,18 +266,18 @@ void VsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IFramewor
     }
 }
 
-void VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, IRunContext ^, IFrameworkHandle ^framework)
+void xUnitppVsRunner::RunTests(IEnumerable<TestCase ^> ^tests, IRunContext ^, IFrameworkHandle ^framework)
 {
     mCancelled = false;
     RunTests(tests, framework);
 }
 
-void VsRunner::Cancel()
+void xUnitppVsRunner::Cancel()
 {
     mCancelled = true;
 }
 
-bool VsRunner::RunTests(IEnumerable<TestCase ^> ^tests, ITestExecutionRecorder ^recorder)
+bool xUnitppVsRunner::RunTests(IEnumerable<TestCase ^> ^tests, ITestExecutionRecorder ^recorder)
 {
     std::map<std::string, std::shared_ptr<ManagedTestAssembly>> assemblies;
 

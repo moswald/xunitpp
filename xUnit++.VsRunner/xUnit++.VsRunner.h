@@ -13,10 +13,10 @@ namespace xUnitpp { namespace VsRunner
     [OM::FileExtension(".exe")]
     [OM::DefaultExecutorUri(VSRUNNER_URI)]
     [OM::ExtensionUri(VSRUNNER_URI)]
-    public ref class VsRunner : public A::ITestDiscoverer, public A::ITestExecutor
+    public ref class xUnitppVsRunner : public A::ITestDiscoverer, public A::ITestExecutor
     {
     public:
-        VsRunner();
+        xUnitppVsRunner();
 
         // ITestDiscoverer
         virtual void DiscoverTests(G::IEnumerable<System::String ^> ^sources, A::IDiscoveryContext ^ctx, L::IMessageLogger ^logger, A::ITestCaseDiscoverySink ^discoverySink);

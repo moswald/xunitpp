@@ -12,11 +12,11 @@ class ConsoleReporter : public IOutput
 public:
     ConsoleReporter(bool verbose, bool sort, bool group);
 
-    virtual void ReportStart(const TestDetails &) override;
-    virtual void ReportEvent(const TestDetails &testDetails, const TestEvent &evt) override;
-    virtual void ReportSkip(const TestDetails &testDetails, const std::string &reason) override;
-    virtual void ReportFinish(const TestDetails &, Time::Duration) override;
-    virtual void ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime) override;
+    virtual void __stdcall ReportStart(const ITestDetails &) override;
+    virtual void __stdcall ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt) override;
+    virtual void __stdcall ReportSkip(const ITestDetails &testDetails, const char *reason) override;
+    virtual void __stdcall ReportFinish(const ITestDetails &, long long nsTaken) override;
+    virtual void __stdcall ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, long long nsTotal) override;
 
 private:
     class ReportCache;

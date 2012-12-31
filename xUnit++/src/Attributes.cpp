@@ -57,6 +57,16 @@ AttributeCollection::const_iterator AttributeCollection::end() const
     return sortedAttributes.end();
 }
 
+size_t AttributeCollection::size() const
+{
+    return sortedAttributes.size();
+}
+
+const AttributeCollection::Attribute &AttributeCollection::operator[](size_t index) const
+{
+    return sortedAttributes[index];
+}
+
 void AttributeCollection::sort()
 {
     std::sort(sortedAttributes.begin(), sortedAttributes.end());

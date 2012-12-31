@@ -1,40 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src/xUnitAssert.cpp" />
-    <ClCompile Include="src/TestCollection.cpp" />
-    <ClCompile Include="src/TestDetails.cpp" />
-    <ClCompile Include="src/xUnitTestRunner.cpp" />
-    <ClCompile Include="src/LineInfo.cpp" />
-    <ClCompile Include="src/xUnitTest.cpp" />
-    <ClCompile Include="src/IOutput.cpp" />
-    <ClCompile Include="src/xUnitCheck.cpp" />
-    <ClCompile Include="src/TestEvent.cpp" />
-    <ClCompile Include="src/xUnitWarn.cpp" />
-    <ClCompile Include="src/TestEventRecorder.cpp" />
-    <ClCompile Include="src/xUnitLog.cpp" />
     <ClCompile Include="src\Attributes.cpp" />
+    <ClCompile Include="src\TestEvent.cpp" />
+    <ClCompile Include="src\LineInfo.cpp" />
+    <ClCompile Include="src\TestCollection.cpp" />
+    <ClCompile Include="src\TestDetails.cpp" />
+    <ClCompile Include="src\xUnitAssert.cpp" />
+    <ClCompile Include="src\xUnitTest.cpp" />
+    <ClCompile Include="src\xUnitTestRunner.cpp" />
+    <ClCompile Include="src\TestEventRecorder.cpp" />
+    <ClCompile Include="src\xUnitCheck.cpp" />
+    <ClCompile Include="src\xUnitLog.cpp" />
+    <ClCompile Include="src\xUnitWarn.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xUnit++/xUnitAssert.h" />
-    <ClInclude Include="xUnit++/TestCollection.h" />
-    <ClInclude Include="xUnit++/Suite.h" />
-    <ClInclude Include="xUnit++/TestDetails.h" />
-    <ClInclude Include="xUnit++/xUnitTime.h" />
-    <ClInclude Include="xUnit++/xUnit++.h" />
-    <ClInclude Include="xUnit++/xUnitTestRunner.h" />
-    <ClInclude Include="xUnit++/Attributes.h" />
-    <ClInclude Include="xUnit++/xUnitMacroHelpers.h" />
-    <ClInclude Include="xUnit++/IOutput.h" />
-    <ClInclude Include="xUnit++/ExportApi.h" />
-    <ClInclude Include="xUnit++/LineInfo.h" />
-    <ClInclude Include="xUnit++/xUnitTest.h" />
-    <ClInclude Include="xUnit++/xUnitMacros.h" />
-    <ClInclude Include="xUnit++/xUnitCheck.h" />
-    <ClInclude Include="xUnit++/TestEvent.h" />
     <ClInclude Include="xUnit++\xUnitWarn.h" />
     <ClInclude Include="xUnit++\TestEventRecorder.h" />
     <ClInclude Include="xUnit++\xUnitLog.h" />
     <ClInclude Include="xUnit++\xUnitToString.h" />
+    <ClInclude Include="xUnit++\ITestEvent.h" />
+    <ClInclude Include="xUnit++\ITestDetails.h" />
+    <ClInclude Include="xUnit++\EventLevel.h" />
+    <ClInclude Include="xUnit++\Attributes.h" />
+    <ClInclude Include="xUnit++\ExportApi.h" />
+    <ClInclude Include="xUnit++\IOutput.h" />
+    <ClInclude Include="xUnit++\LineInfo.h" />
+    <ClInclude Include="xUnit++\Suite.h" />
+    <ClInclude Include="xUnit++\TestCollection.h" />
+    <ClInclude Include="xUnit++\xUnitMacros.h" />
+    <ClInclude Include="xUnit++\xUnit++.h" />
+    <ClInclude Include="xUnit++\xUnitAssert.h" />
+    <ClInclude Include="xUnit++\xUnitMacroHelpers.h" />
+    <ClInclude Include="xUnit++\xUnitTestRunner.h" />
+    <ClInclude Include="xUnit++\xUnitTime.h" />
+    <ClInclude Include="xUnit++\xUnitCheck.h" />
+    <ClInclude Include="xUnit++\xUnitTest.h" />
+    <ClInclude Include="xUnit++\TestDetails.h" />
+    <ClInclude Include="xUnit++\TestEvent.h" />
   </ItemGroup>
 </Project>

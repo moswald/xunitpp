@@ -5,7 +5,7 @@
 #include <tuple>
 #include <vector>
 #include "xUnit++/ExportApi.h"
-#include "xUnit++/TestDetails.h"
+#include "xUnit++/ITestDetails.h"
 #include "CommandLine.h"
 #include "ConsoleReporter.h"
 #include "TestAssembly.h"
@@ -39,25 +39,25 @@ int main(int argc, char **argv)
         }
 
         std::vector<int> activeTestIds;
-        auto onList = [&](const xUnitpp::TestDetails &td)
+        auto onList = [&](const xUnitpp::ITestDetails &td)
             {
                 if (options.list)
                 {
                     std::cout << std::endl;
-                    for (const auto &att : td.Attributes)
+                    for (auto i = 0U; i != td.GetAttributeCount(); ++i)
                     {
-                        std::cout << ("[" + att.first + " = " + att.second + "]") << std::endl;
+                        std::cout << (std::string("[") + td.GetAttributeKey(i) + " = " + td.GetAttributeValue(i) + "]") << std::endl;
                     }
 
-                    std::cout << (td.Suite + " :: " + td.Name) << std::endl;
+                    std::cout << (td.GetSuite() + std::string(" :: ") + td.GetName()) << std::endl;
                 }
                 else
                 {
-                    activeTestIds.push_back(td.Id);
+                    activeTestIds.push_back(td.GetId());
                 }
             };
 
-        testAssembly.EnumerateTestDetails([&](const xUnitpp::TestDetails &td)
+        testAssembly.EnumerateTestDetails([&](const xUnitpp::ITestDetails &td)
             {
                 // check suites:
                 // if any suites are specified, a test has to belong to one of them to be run
@@ -68,7 +68,8 @@ int main(int argc, char **argv)
                     {
                         std::regex regex(suite, std::regex_constants::icase);
 
-                        if (std::regex_search(td.Suite, regex))
+                        std::string suite = td.GetSuite() == nullptr ? "" : td.GetSuite();
+                        if (std::regex_search(suite, regex))
                         {
                             included = true;
                             break;
@@ -89,7 +90,7 @@ int main(int argc, char **argv)
                     {
                         std::regex regex(name, std::regex_constants::icase);
 
-                        if (std::regex_search(td.Name, regex))
+                        if (std::regex_search(td.GetName(), regex))
                         {
                             included = true;
                             break;
@@ -110,9 +111,10 @@ int main(int argc, char **argv)
 
                     for (auto test = options.inclusiveAttributes.begin(); !included && test != options.inclusiveAttributes.end(); ++test)
                     {
-                        auto range = td.Attributes.find(*test);
+                        size_t begin, end;
+                        td.FindAttributeKey(test->first.c_str(), begin, end);
 
-                        if (range.first != range.second)
+                        if (begin != end)
                         {
                             if (test->second == "")
                             {
@@ -120,9 +122,9 @@ int main(int argc, char **argv)
                                 break;
                             }
 
-                            for (auto it = range.first; it != range.second; ++it)
+                            for (auto it = begin; it != end; ++it)
                             {
-                                if (range.first->second == test->second)
+                                if (td.GetAttributeValue(it) == test->second)
                                 {
                                     included = true;
                                     break;
@@ -144,23 +146,23 @@ int main(int argc, char **argv)
                     bool matchFailed = false;
                     for (auto test = options.exclusiveAttributes.begin(); !matchFailed && test != options.exclusiveAttributes.end(); ++test)
                     {
-                        auto range = td.Attributes.find(*test);
+                        size_t begin, end;
+                        td.FindAttributeKey(test->first.c_str(), begin, end);
 
-                        if (range.first != range.second)
+                        if (begin != end)
                         {
                             // key matched, and we want to exclude all tests with a specific value
                             if (test->second != "")
                             {
-                                auto it = range.first;
-                                for (; it != range.second; ++it)
+                                for (; begin != end; ++begin)
                                 {
-                                    if (it->second == test->second)
+                                    if (td.GetAttributeValue(begin) == test->second)
                                     {
                                         break;
                                     }
                                 }
 
-                                if (it == range.second)
+                                if (begin == end)
                                 {
                                     matchFailed = true;
                                 }
@@ -185,9 +187,9 @@ int main(int argc, char **argv)
                 (xUnitpp::IOutput *)new xUnitpp::ConsoleReporter(options.verbose, options.sort, options.group) :
                 (xUnitpp::IOutput *)new xUnitpp::Utilities::XmlReporter(options.xmlOutput));
             totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, *reporter,
-                [&](const xUnitpp::TestDetails &testDetails)
+                [&](const xUnitpp::ITestDetails &testDetails)
                 {
-                    return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.Id);
+                    return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.GetId());
                 });
         }
     }

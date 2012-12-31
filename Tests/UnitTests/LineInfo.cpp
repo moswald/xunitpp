@@ -24,7 +24,7 @@ FACT("Passed-in LineInfo should override the test's LineInfo")
         -1, __FILE__, __LINE__, std::forward<decltype(localEventRecorders)>(localEventRecorders));
     (void)reg;
 
-    xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
+    xUnitpp::RunTests(record, [](const xUnitpp::ITestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 
     Assert.Equal(1U, record.events.size());
     Assert.Equal(file, std::get<1>(record.events[0]).LineInfo().file);

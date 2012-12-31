@@ -1,6 +1,7 @@
 #include <vector>
 #include <memory>
 #include "xUnit++/xUnit++.h"
+#include "xUnit++/EventLevel.h"
 #include "xUnit++/TestEvent.h"
 #include "xUnit++/TestEventRecorder.h"
 #include "xUnit++/TestCollection.h"
@@ -25,7 +26,7 @@ struct Fixture
 
     void Run()
     {
-        xUnitpp::RunTests(outputRecord, [](const xUnitpp::TestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
+        xUnitpp::RunTests(outputRecord, [](const xUnitpp::ITestDetails &) { return true; }, collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
     }
 
     const xUnitpp::Check &LocalCheck() const
@@ -71,9 +72,9 @@ FACT_FIXTURE("All TestEvents should be ordered", Fixture)
 
     Run();
 
-    Assert.Equal(xUnitpp::EventLevel::Warning, std::get<1>(outputRecord.events[0]).Level());
-    Assert.Equal(xUnitpp::EventLevel::Check, std::get<1>(outputRecord.events[1]).Level());
-    Assert.Equal(xUnitpp::EventLevel::Warning, std::get<1>(outputRecord.events[2]).Level());
+    Assert.Equal(xUnitpp::EventLevel::Warning, std::get<1>(outputRecord.events[0]).GetLevel());
+    Assert.Equal(xUnitpp::EventLevel::Check, std::get<1>(outputRecord.events[1]).GetLevel());
+    Assert.Equal(xUnitpp::EventLevel::Warning, std::get<1>(outputRecord.events[2]).GetLevel());
 
     Assert.Contains(to_string(std::get<1>(outputRecord.events[0])), "Fail");
     Assert.Contains(to_string(std::get<1>(outputRecord.events[2])), "False");
@@ -86,7 +87,7 @@ FACT_FIXTURE("All TestEvents should be ordered", Fixture)
     Assert.Equal(std::begin(expectedLevels), std::end(expectedLevels), outputRecord.events.begin(), outputRecord.events.end(),
         [](xUnitpp::EventLevel lvl, const std::tuple<xUnitpp::TestDetails, xUnitpp::TestEvent> &result)
         {
-            return lvl == std::get<1>(result).Level();
+            return lvl == std::get<1>(result).GetLevel();
         });
 }
 
