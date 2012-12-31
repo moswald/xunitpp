@@ -68,8 +68,8 @@ int main(int argc, char **argv)
                     {
                         std::regex regex(suite, std::regex_constants::icase);
 
-                        std::string suite = td.GetSuite() == nullptr ? "" : td.GetSuite();
-                        if (std::regex_search(suite, regex))
+                        std::string testSuite = td.GetSuite() == nullptr ? "" : td.GetSuite();
+                        if (std::regex_search(testSuite, regex))
                         {
                             included = true;
                             break;

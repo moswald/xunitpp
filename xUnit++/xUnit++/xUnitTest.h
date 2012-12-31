@@ -30,7 +30,7 @@ public:
         const std::string &suite, AttributeCollection &&attributes, Time::Duration timeLimit,
         std::string &&filename, int line, const std::vector<std::shared_ptr<TestEventRecorder>> &testEventRecorders);
 
-    const TestDetails &TestDetails() const;
+    const xUnitpp::TestDetails &TestDetails() const;
 
     TestResult Run();
     Time::Duration Duration() const;
