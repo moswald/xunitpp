@@ -83,7 +83,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
+      <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)" -g</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Running Unit Tests...</Message>
@@ -99,7 +99,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
+      <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)" -g</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Running Unit Tests...</Message>

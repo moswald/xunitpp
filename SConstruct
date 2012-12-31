@@ -67,7 +67,7 @@ def buildProjects(env):
         Depends(unitTests, [xUnit, console])
 
         AddPostAction(bareTests, Action(str(console[0]) + " " + str(bareTests[0])))
-        AddPostAction(unitTests, Action(str(console[0]) + " " + str(unitTests[0])))
+        AddPostAction(unitTests, Action(str(console[0]) + " " + str(unitTests[0]) + " -g"))
 
 if debug != 0:
     env['debug'] = True
