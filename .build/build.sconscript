@@ -5,3 +5,4 @@ if env['windows'] == True:
 else:
     env.Append(CCFLAGS = [ '-pthread', '-fPIC', '-Wall', '-Wextra', '-pedantic', '-std=c++11' ])
     env.Append(CCFLAGS = [ '-Wno-comment' ])
+    env.Append(CPPDEFINES = [ '__stdcall=' ])

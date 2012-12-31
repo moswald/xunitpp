@@ -20,10 +20,12 @@ class Log
         public:
             Message(std::function<void(const std::string &, const LineInfo &)> recordMessage, const LineInfo &lineInfo = LineInfo());
             Message(const Message &other);
-
+// !!!g++ why does `= default` cause xUnitLog.cpp to fail to compile?
+/*
 #if !defined(_MSC_VER) // !!!VS remove the #if/#endif when VS can compile this code
             Message(Message &&) = default;
 #endif
+*/
 
             ~Message();
 
