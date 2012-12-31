@@ -96,8 +96,8 @@ struct TestRunnerFixture
 
 namespace Filter
 {
-    bool AllTests(const xUnitpp::TestDetails &) { return true; }
-    bool NoTests(const xUnitpp::TestDetails &) { return false; }
+    bool AllTests(const xUnitpp::ITestDetails &) { return true; }
+    bool NoTests(const xUnitpp::ITestDetails &) { return false; }
 }
 
 struct EmptyTest

@@ -1,14 +1,21 @@
 #include "ConsoleReporter.h"
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_map>
+#include "xUnit++/EventLevel.h"
+#include "xUnit++/LineInfo.h"
+#include "xUnit++/ITestDetails.h"
+#include "xUnit++/ITestEvent.h"
 
 #if defined (_WIN32)
 #include <Windows.h>
 #undef ReportEvent
+#undef GetMessage
 
 namespace
 {
@@ -41,10 +48,6 @@ namespace
 
 #else
 #endif
-
-#include "xUnit++/LineInfo.h"
-#include "xUnit++/TestDetails.h"
-#include "xUnit++/TestEvent.h"
 
 namespace
 {
@@ -149,12 +152,18 @@ namespace
         return "\033[m";
     }
 
-    std::string FileAndLine(const xUnitpp::TestDetails &td, const xUnitpp::LineInfo &lineInfo)
+    template<typename T>
+    xUnitpp::LineInfo GetSafeLineInfo(const T &t)
+    {
+        return xUnitpp::LineInfo(t.GetFile(), t.GetLine());
+    }
+
+    std::string FileAndLine(const xUnitpp::ITestDetails &td, const xUnitpp::LineInfo &lineInfo)
     {
         auto result = to_string(lineInfo);
         if (result.empty())
         {
-            result = to_string(td.LineInfo);
+            result = to_string(GetSafeLineInfo(td));
         }
 
         return result;
@@ -178,6 +187,11 @@ namespace
 #endif
 
         return stream;
+    }
+
+    std::string safestr(const char *s)
+    {
+        return s == nullptr ? "" : s;
     }
 }
 
@@ -206,7 +220,7 @@ class ConsoleReporter::ReportCache
             std::string message;
         };
 
-        TestOutput(const xUnitpp::TestDetails &td, bool verbose)
+        TestOutput(const xUnitpp::ITestDetails &td, bool verbose)
             : testDetails(td)
             , failed(false)
             , verbose(verbose)
@@ -243,14 +257,16 @@ class ConsoleReporter::ReportCache
 
                 if (!grouped)
                 {
-                    if (!testDetails.Suite.empty())
+                    auto suite = safestr(testDetails.GetSuite());
+                    if (!suite.empty())
                     {
-                        std::cout << Fragment(Color::Suite, testDetails.Suite);
+                        std::cout << Fragment(Color::Suite, suite);
                         std::cout << Fragment(Color::Separator, TestSeparator);
                     }
                 }
 
-                std::cout << Fragment(Color::TestName, testDetails.FullName() + "\n");
+                auto fullName = safestr(testDetails.GetFullName());
+                std::cout << Fragment(Color::TestName, fullName + "\n");
 
                 for (auto &&msg : fragments)
                 {
@@ -261,48 +277,48 @@ class ConsoleReporter::ReportCache
 
         void Skip(const std::string &reason)
         {
-            fragments.emplace_back(Color::FileAndLine, to_string(testDetails.LineInfo));
+            fragments.emplace_back(Color::FileAndLine, to_string(xUnitpp::LineInfo(testDetails.GetFile(), testDetails.GetLine())));
             fragments.emplace_back(Color::Separator, ": ");
             fragments.emplace_back(Color::Skip, reason);
             fragments.emplace_back(Color::Default, "\n");
             skipped = true;
         }
 
-        TestOutput &operator <<(const xUnitpp::TestEvent &event)
+        TestOutput &operator <<(const xUnitpp::ITestEvent &event)
         {
-            if (event.IsFailure())
+            if (event.GetIsFailure())
             {
                 failed = true;
             }
 
-            fragments.emplace_back(Color::FileAndLine, FileAndLine(testDetails, event.LineInfo()));
+            fragments.emplace_back(Color::FileAndLine, FileAndLine(testDetails, GetSafeLineInfo(event)));
             fragments.emplace_back(Color::Separator, ": ");
-            fragments.emplace_back(to_color(event.Level()), to_string(event.Level()));
+            fragments.emplace_back(to_color(event.GetLevel()), to_string(event.GetLevel()));
             fragments.emplace_back(Color::Separator, ": ");
 
             // unfortunately, this code should almost completely match the to_string(const TestEvent &)
             // function found in TestEvent.cpp, but is kept separate because of the color coding
-            if (event.IsAssertType())
+            if (event.GetIsAssertType())
             {
-                auto &&assert = event.Assert();
-
-                fragments.emplace_back(Color::Call, assert.Call() + "()");
+                auto &&assert = event.GetAssertInterface();
+                fragments.emplace_back(Color::Call, assert.GetCall() + std::string("()"));
 
                 std::string message = " failure";
 
-                std::string userMessage = assert.UserMessage();
+                std::string userMessage = assert.GetUserMessage();
+                std::string customMessage = assert.GetCustomMessage();
                 if (!userMessage.empty())
                 {
                     message += ": " + userMessage;
 
-                    if (!assert.CustomMessage().empty())
+                    if (!customMessage.empty())
                     {
-                        message += "\n     " + assert.CustomMessage();
+                        message += "\n     " + customMessage;
                     }
                 }
-                else if (!assert.CustomMessage().empty())
+                else if (!customMessage.empty())
                 {
-                    message += ": " + assert.CustomMessage();
+                    message += ": " + customMessage;
                 }
                 else
                 {
@@ -311,17 +327,20 @@ class ConsoleReporter::ReportCache
 
                 fragments.emplace_back(Color::Default, message);
 
-                if (!assert.Expected().empty() || !assert.Actual().empty())
+                std::string expected = assert.GetExpected();
+                std::string actual = assert.GetActual();
+                if (!expected.empty() || !actual.empty())
                 {
                     fragments.emplace_back(Color::Expected, "\n     Expected: ");
-                    fragments.emplace_back(Color::Default, assert.Expected());
+                    fragments.emplace_back(Color::Default, expected);
                     fragments.emplace_back(Color::Actual, "\n       Actual: ");
-                    fragments.emplace_back(Color::Default, assert.Actual());
+                    fragments.emplace_back(Color::Default, actual);
                 }
             }
             else
             {
-                fragments.emplace_back(Color::Default, event.Message());
+                std::string message = event.GetMessage();
+                fragments.emplace_back(Color::Default, message);
             }
 
             fragments.emplace_back(Color::Default, "\n");
@@ -338,7 +357,7 @@ class ConsoleReporter::ReportCache
             return *this;
         }
 
-        const xUnitpp::TestDetails &TestDetails() const
+        const xUnitpp::ITestDetails &TestDetails() const
         {
             return testDetails;
         }
@@ -348,7 +367,7 @@ class ConsoleReporter::ReportCache
         TestOutput &operator =(TestOutput) /* = delete */;
 
     private:
-        const xUnitpp::TestDetails &testDetails;
+        const xUnitpp::ITestDetails &testDetails;
         std::vector<Fragment> fragments;
         bool failed;
         bool verbose;
@@ -370,31 +389,35 @@ public:
         std::cout << TestOutput::Fragment(color, message);
     }
 
-    TestOutput &Cache(const xUnitpp::TestDetails &td)
+    TestOutput &Cache(const xUnitpp::ITestDetails &td)
     {
-        auto it = cache.find(td.Id);
+        auto id = td.GetId();
+
+        auto it = cache.find(id);
         if (it == cache.end())
         {
-            cache.insert(std::make_pair(td.Id, std::make_shared<TestOutput>(td, verbose)));
+            cache.insert(std::make_pair(id, std::make_shared<TestOutput>(td, verbose)));
         }
 
-        return *cache[td.Id];
+        return *cache[id];
     }
 
-    void Skip(const xUnitpp::TestDetails &testDetails, const std::string &reason)
+    void Skip(const xUnitpp::ITestDetails &testDetails, const std::string &reason)
     {
         if (!sort)
         {
             Instant(Color::Skip, "\n[ Skipped ] ");
 
-            if (!testDetails.Suite.empty())
+            auto suite = safestr(testDetails.GetSuite());
+            if (!suite.empty())
             {
-                Instant(Color::Suite, testDetails.Suite);
+                Instant(Color::Suite, suite);
                 Instant(Color::Separator, TestSeparator);
             }
 
-            Instant(Color::TestName, testDetails.Name + "\n");
-            Instant(Color::FileAndLine, to_string(testDetails.LineInfo) + ": ");
+            auto name = safestr(testDetails.GetName());
+            Instant(Color::TestName, name + "\n");
+            Instant(Color::FileAndLine, to_string(GetSafeLineInfo(testDetails)) + ": ");
             Instant(Color::Skip, reason);
             Instant(Color::Default, "\n");
         }
@@ -404,11 +427,11 @@ public:
         }
     }
 
-    void Finish(const xUnitpp::TestDetails &td)
+    void Finish(const xUnitpp::ITestDetails &td)
     {
         if (!sort)
         {
-            auto it = cache.find(td.Id);
+            auto it = cache.find(td.GetId());
             if (it != cache.end())
             {
                 it->second->Print(false);
@@ -432,12 +455,16 @@ public:
             std::sort(finalResults.begin(), finalResults.end(),
                 [](const std::shared_ptr<TestOutput> &lhs, const std::shared_ptr<TestOutput> &rhs)
                 {
-                    if (lhs->TestDetails().Suite != rhs->TestDetails().Suite)
+                    auto lhsSuite = safestr(lhs->TestDetails().GetSuite());
+                    auto rhsSuite = safestr(rhs->TestDetails().GetSuite());
+                    if (lhsSuite != rhsSuite)
                     {
-                        return lhs->TestDetails().Suite < rhs->TestDetails().Suite;
+                        return lhsSuite < rhsSuite;
                     }
 
-                    return lhs->TestDetails().Name < rhs->TestDetails().Name;
+                    auto lhsName = lhs->TestDetails().GetName();
+                    auto rhsName = rhs->TestDetails().GetName();
+                    return lhsName < rhsName;
                 });
 
             std::string curSuite = "";
@@ -448,9 +475,10 @@ public:
                 {
                     if (group)
                     {
-                        if (curSuite != result->TestDetails().Suite)
+                        auto suite = safestr(result->TestDetails().GetSuite());
+                        if (curSuite != suite)
                         {
-                            curSuite = result->TestDetails().Suite;
+                            curSuite = suite;
 
                             std::string sep(curSuite.length() + 4, '=');
                             std::cout << TestOutput::Fragment(Color::Suite, "\n\n" + sep + "\n[ " + curSuite + " ]\n" + sep + "\n");
@@ -476,28 +504,30 @@ ConsoleReporter::ConsoleReporter(bool verbose, bool sort, bool group)
     //std::cout.sync_with_stdio(false);
 }
 
-void ConsoleReporter::ReportStart(const TestDetails &)
+void ConsoleReporter::ReportStart(const ITestDetails &)
 {
 }
 
-void ConsoleReporter::ReportEvent(const TestDetails &testDetails, const TestEvent &evt)
+void ConsoleReporter::ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt)
 {
     cache->Cache(testDetails) << evt;
 }
 
-void ConsoleReporter::ReportSkip(const TestDetails &testDetails, const std::string &reason)
+void ConsoleReporter::ReportSkip(const ITestDetails &testDetails, const char *reason)
 {
     cache->Skip(testDetails, reason);
 }
 
-void ConsoleReporter::ReportFinish(const TestDetails &testDetails, Time::Duration timeTaken)
+void ConsoleReporter::ReportFinish(const ITestDetails &testDetails, long long nsTaken)
 {
-    cache->Cache(testDetails) << timeTaken;
+    cache->Cache(testDetails) << Time::Duration(nsTaken);
     cache->Finish(testDetails);
 }
 
-void ConsoleReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, Time::Duration totalTime)
+void ConsoleReporter::ReportAllTestsComplete(size_t testCount, size_t skipped, size_t failureCount, long long nsTotal)
 {
+    auto totalTime = Time::Duration(nsTotal);
+
     cache->Finish();
 
     Color failColor = Color::Default;

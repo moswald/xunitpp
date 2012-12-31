@@ -1,4 +1,5 @@
 #include "TestEvent.h"
+#include "EventLevel.h"
 #include "xUnitAssert.h"
 
 namespace xUnitpp
@@ -21,7 +22,7 @@ const std::string &to_string(EventLevel level)
 
 std::string to_string(const TestEvent &event)
 {
-    if (event.IsAssertType())
+    if (event.GetIsAssertType())
     {
         auto &&assert = event.Assert();
         auto message = assert.Call() + "() failure";
@@ -81,17 +82,47 @@ TestEvent::TestEvent(const std::exception &e)
 {
 }
 
-bool TestEvent::IsFailure() const
+bool TestEvent::GetIsFailure() const
 {
     return level > EventLevel::Warning;
 }
 
-EventLevel TestEvent::Level() const
+const char *TestEvent::GetToString() const
+{
+    if (toString.empty())
+    {
+        toString = to_string(*this);
+    }
+
+    return toString.c_str();
+}
+
+const char *TestEvent::GetFile() const
+{
+    return lineInfo.file.c_str();
+}
+
+int TestEvent::GetLine() const
+{
+    return lineInfo.line;
+}
+
+const xUnitpp::ITestAssert &TestEvent::GetAssertInterface() const
+{
+    return *this;
+}
+
+EventLevel TestEvent::GetLevel() const
 {
     return level;
 }
 
-bool TestEvent::IsAssertType() const
+const char *TestEvent::GetMessage() const
+{
+    return message.c_str();
+}
+
+bool TestEvent::GetIsAssertType() const
 {
     return !assert.Call().empty();
 }
@@ -109,6 +140,31 @@ const std::string &TestEvent::Message() const
 const xUnitpp::LineInfo &TestEvent::LineInfo() const
 {
     return lineInfo;
+}
+
+const char *TestEvent::GetCall() const 
+{
+    return assert.Call().c_str();
+}
+
+const char *TestEvent::GetUserMessage() const 
+{
+    return assert.UserMessage().c_str();
+}
+
+const char *TestEvent::GetCustomMessage() const 
+{
+    return assert.CustomMessage().c_str();
+}
+
+const char *TestEvent::GetExpected() const 
+{
+    return assert.Expected().c_str();
+}
+
+const char *TestEvent::GetActual() const 
+{
+    return assert.Actual().c_str();
 }
 
 }

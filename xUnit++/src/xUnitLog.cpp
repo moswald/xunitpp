@@ -1,4 +1,5 @@
 #include "xUnitLog.h"
+#include "EventLevel.h"
 #include "TestEventRecorder.h"
 
 namespace xUnitpp

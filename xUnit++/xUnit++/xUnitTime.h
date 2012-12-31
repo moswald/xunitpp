@@ -37,11 +37,6 @@ inline Duration ToDuration(TDuration time)
     return std::chrono::duration_cast<Duration>(time);
 }
 
-inline Duration ToDuration(int ns)
-{
-    return Duration(ns);
-}
-
 inline std::string to_string(Duration time)
 {
     using std::to_string;

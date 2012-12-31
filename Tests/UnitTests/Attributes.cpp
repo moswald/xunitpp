@@ -53,7 +53,7 @@ FACT("SkippedTestsShouldNotBeInstantiated")
         "SkippedTest", "Attributes", std::forward<decltype(attributes)>(attributes), -1, __FILE__, __LINE__, std::forward<decltype(localEventRecorders)>(localEventRecorders));
     (void)reg;
 
-    xUnitpp::RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
+    xUnitpp::RunTests(record, [](const xUnitpp::ITestDetails &) { return true; },
         collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
 }
 

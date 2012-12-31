@@ -7,18 +7,18 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
+#include "EventLevel.h"
+#include "ExportApi.h"
 #include "IOutput.h"
 #include "TestCollection.h"
 #include "TestDetails.h"
 #include "xUnitAssert.h"
 #include "xUnitTime.h"
 
-#include <iostream>
-
 namespace
 {
 
-class SharedOutput : public xUnitpp::IOutput
+class SharedOutput
 {
 public:
     SharedOutput(xUnitpp::IOutput &testReporter)
@@ -26,33 +26,33 @@ public:
     {
     }
 
-    virtual void ReportStart(const xUnitpp::TestDetails &details) override
+    void ReportStart(const xUnitpp::TestDetails &details)
     {
         std::lock_guard<std::mutex> guard(mLock);
         mOutput.get().ReportStart(details);
     }
 
-    virtual void ReportEvent(const xUnitpp::TestDetails &details, const xUnitpp::TestEvent &evt) override
+    void ReportEvent(const xUnitpp::TestDetails &details, const xUnitpp::TestEvent &evt)
     {
         std::lock_guard<std::mutex> guard(mLock);
         mOutput.get().ReportEvent(details, evt);
     }
 
-    virtual void ReportSkip(const xUnitpp::TestDetails &details, const std::string &reason) override
+    void ReportSkip(const xUnitpp::TestDetails &details, const std::string &reason)
     {
         std::lock_guard<std::mutex> guard(mLock);
-        mOutput.get().ReportSkip(details, reason);
+        mOutput.get().ReportSkip(details, reason.c_str());
     }
 
-    virtual void ReportFinish(const xUnitpp::TestDetails &details, xUnitpp::Time::Duration time) override
+    void ReportFinish(const xUnitpp::TestDetails &details, xUnitpp::Time::Duration time)
     {
         std::lock_guard<std::mutex> guard(mLock);
-        mOutput.get().ReportFinish(details, time);
+        mOutput.get().ReportFinish(details, time.count());
     }
 
-    virtual void ReportAllTestsComplete(size_t total, size_t skipped, size_t failed, xUnitpp::Time::Duration totalTime) override
+    void ReportAllTestsComplete(size_t total, size_t skipped, size_t failed, xUnitpp::Time::Duration totalTime)
     {
-        mOutput.get().ReportAllTestsComplete(total, skipped, failed, totalTime);
+        mOutput.get().ReportAllTestsComplete(total, skipped, failed, totalTime.count());
     }
 
 private:
@@ -139,7 +139,7 @@ private:
 namespace xUnitpp
 {
 
-int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, const std::vector<std::shared_ptr<xUnitTest>> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
+int RunTests(IOutput &output, TestFilterCallback filter, const std::vector<std::shared_ptr<xUnitTest>> &tests, Time::Duration maxTestRunTime, size_t maxConcurrent)
 {
     auto timeStart = Time::Clock::now();
 
@@ -191,14 +191,11 @@ int RunTests(IOutput &output, std::function<bool(const TestDetails &)> filter, c
     std::vector<std::future<void>> futures;
     for (auto &test : activeTests)
     {
+        if (test->TestDetails().Attributes.Skipped().first)
         {
-            auto skip = test->TestDetails().Attributes.Skipped();
-            if (skip.first)
-            {
-                skippedTests++;
-                sharedOutput.ReportSkip(test->TestDetails(), skip.second);
-                continue;
-            }
+            skippedTests++;
+            sharedOutput.ReportSkip(test->TestDetails(), test->TestDetails().Attributes.Skipped().second);
+            continue;
         }
 
         futures.push_back(std::async([&]()

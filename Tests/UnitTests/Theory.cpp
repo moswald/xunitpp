@@ -45,7 +45,7 @@ public:
 
     void Run()
     {
-        RunTests(record, [](const xUnitpp::TestDetails &) { return true; },
+        RunTests(record, [](const xUnitpp::ITestDetails &) { return true; },
             collection.Tests(), xUnitpp::Time::Duration::zero(), 0);
     }
 
