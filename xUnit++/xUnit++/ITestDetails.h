@@ -24,6 +24,8 @@ public:
     virtual const char * __stdcall GetName() const = 0;
     virtual const char * __stdcall GetFullName() const = 0;
     virtual const char * __stdcall GetSuite() const = 0;
+    virtual const char * __stdcall GetParams() const = 0;
+    virtual int __stdcall GetTestInstance() const = 0;
     virtual size_t __stdcall GetAttributeCount() const = 0;
     virtual const char * __stdcall GetAttributeKey(size_t index) const = 0;
     virtual const char * __stdcall GetAttributeValue(size_t index) const = 0;

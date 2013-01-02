@@ -22,6 +22,27 @@ using namespace msclr::interop;
 
 namespace
 {
+    String ^TestKey(const xUnitpp::ITestDetails &td)
+    {
+        return marshal_as<String ^>(td.GetFullName());
+    }
+
+    std::string DisplayName(const xUnitpp::ITestDetails &td)
+    {
+        std::string name = td.GetName();
+        if (!std::string(td.GetParams()).empty())
+        {
+            name += " [" + std::to_string(td.GetTestInstance()) + "]";
+        }
+
+        return name;
+    }
+
+    String ^TestName(const xUnitpp::ITestDetails &td)
+    {
+        return marshal_as<String ^>(DisplayName(td));
+    }
+
     ref class ManagedReporter
     {
     public:
@@ -30,18 +51,20 @@ namespace
         {
             for (auto &test : testCases)
             {
-                if (!this->testCases.ContainsKey(test->DisplayName))
-                this->testCases.Add(test->DisplayName, test);
+                if (!this->testCases.ContainsKey(test->FullyQualifiedName))
+                {
+                    this->testCases.Add(test->FullyQualifiedName, test);
+                }
             }
         }
 
         void ReportStart(const xUnitpp::ITestDetails &td)
         {
-            auto key = marshal_as<String ^>(td.GetFullName());
-            auto name = marshal_as<String ^>(td.GetName());
-            recorder->RecordStart(testCases[name]);
+            auto key = TestKey(td);
+            auto name = TestName(td);
+            recorder->RecordStart(testCases[key]);
 
-            auto result = gcnew TestResult(testCases[name]);
+            auto result = gcnew TestResult(testCases[key]);
             result->ComputerName = Environment::MachineName;
             result->DisplayName = name;
             result->Outcome = TestOutcome::None;
@@ -51,7 +74,7 @@ namespace
 
         void ReportEvent(const xUnitpp::ITestDetails &td, const xUnitpp::ITestEvent &evt)
         {
-            auto key = marshal_as<String ^>(td.GetName());
+            auto key = TestKey(td);
             auto result = testResults[key];
 
             if (evt.GetIsFailure())
@@ -64,11 +87,11 @@ namespace
 
         void ReportSkip(const xUnitpp::ITestDetails &td, const std::string &)
         {
-            auto key = marshal_as<String ^>(td.GetFullName());
+            auto key = TestKey(td);
             auto testCase = testCases[key];
             auto result = gcnew TestResult(testCase);
             result->ComputerName = Environment::MachineName;
-            result->DisplayName = marshal_as<String ^>(td.GetName());
+            result->DisplayName = TestName(td);
             result->Duration = TimeSpan::FromSeconds(0);
             result->Outcome = TestOutcome::Skipped;
             recorder->RecordEnd(testCase, result->Outcome);
@@ -77,7 +100,7 @@ namespace
 
         void ReportFinish(const xUnitpp::ITestDetails &td, xUnitpp::Time::Duration timeTaken)
         {
-            auto key = marshal_as<String ^>(td.GetFullName());
+            auto key = TestKey(td);
             auto result = testResults[key];
             result->Duration = TimeSpan::FromSeconds(xUnitpp::Time::ToSeconds(timeTaken).count());
 
@@ -86,7 +109,7 @@ namespace
                 result->Outcome = TestOutcome::Passed;
             }
 
-            recorder->RecordEnd(testCases[marshal_as<String ^>(td.GetFullName())], result->Outcome);
+            recorder->RecordEnd(testCases[key], result->Outcome);
             recorder->RecordResult(result);
         }
 
@@ -162,7 +185,7 @@ namespace
                     return !cancelled && std::find_if(tests.begin(), tests.end(),
                         [&](gcroot<TestCase ^> test)
                         {
-                            return marshal_as<std::string>(test->DisplayName) == testDetails.GetName();
+                            return test->DisplayName == TestName(testDetails);
                         }) != tests.end();
                 });
         }
@@ -171,14 +194,9 @@ namespace
         std::vector<gcroot<TestCase ^>> tests;
     };
 
-    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^_source, Uri ^_uri, IMessageLogger ^logger)
+    IEnumerable<TestCase ^> ^SingleSourceTestCases(String ^_source, Uri ^_uri)
     {
-        logger->SendMessage(TestMessageLevel::Informational, "Inside SingleSourceTestCases");
-
         auto results = gcnew List<TestCase ^>();
-
-        logger->SendMessage(TestMessageLevel::Informational, "SingleSourceTestCases _source: " + _source);
-
         auto source = marshal_as<std::string>(_source);
 
         if (auto assembly = ManagedTestAssembly(source))
@@ -196,7 +214,7 @@ namespace
             assembly.EnumerateTestDetails(
                 [&](const xUnitpp::ITestDetails &td)
                 {
-                    testDetails testDetails = { td.GetFullName(), td.GetName(), td.GetFile(), td.GetLine() };
+                    testDetails testDetails = { td.GetFullName(), DisplayName(td), td.GetFile(), td.GetLine() };
                     tests.push_back(testDetails);
                 });
 
@@ -226,30 +244,15 @@ xUnitppVsRunner::xUnitppVsRunner()
 {
 }
 
-void xUnitppVsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^logger, ITestCaseDiscoverySink ^discoverySink)
+void xUnitppVsRunner::DiscoverTests(IEnumerable<String ^> ^sources, IDiscoveryContext ^, IMessageLogger ^, ITestCaseDiscoverySink ^discoverySink)
 {
-    logger->SendMessage(TestMessageLevel::Informational, "Test discovery starting.");
-
-    try
-    {
-
     for each (String ^source in sources)
     {
-        logger->SendMessage(TestMessageLevel::Informational, source);
-        logger->SendMessage(TestMessageLevel::Informational, "about to call singlesourcetestcases");
-        for each (TestCase ^test in SingleSourceTestCases(source, mUri, logger))
+        for each (TestCase ^test in SingleSourceTestCases(source, mUri))
         {
             discoverySink->SendTestCase(test);
         }
     }
-
-    }
-    catch(Exception ^e)
-    {
-        logger->SendMessage(TestMessageLevel::Error, e->ToString());
-    }
-
-    logger->SendMessage(TestMessageLevel::Informational, "Test discovery finished.");
 }
 
 void xUnitppVsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IFrameworkHandle ^framework)
@@ -258,7 +261,7 @@ void xUnitppVsRunner::RunTests(IEnumerable<String ^> ^sources, IRunContext ^, IF
 
     for each (String ^source in sources)
     {
-        if (RunTests(SingleSourceTestCases(source, mUri, nullptr), framework))
+        if (RunTests(SingleSourceTestCases(source, mUri), framework))
         {
             // cancelled
             break;

@@ -63,6 +63,16 @@ const char * __stdcall TestDetails::GetSuite() const
     return Suite.c_str();
 }
 
+const char * __stdcall TestDetails::GetParams() const
+{
+    return Params.c_str();
+}
+
+int __stdcall TestDetails::GetTestInstance() const
+{
+    return TestInstance;
+}
+
 size_t __stdcall TestDetails::GetAttributeCount() const 
 {
     return Attributes.size();
