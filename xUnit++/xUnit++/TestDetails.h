@@ -27,6 +27,8 @@ struct TestDetails : public ITestDetails
     virtual const char * __stdcall GetName() const override;
     virtual const char * __stdcall GetFullName() const override;
     virtual const char * __stdcall GetSuite() const override;
+    virtual const char * __stdcall GetParams() const override;
+    virtual int __stdcall GetTestInstance() const override;
     virtual size_t __stdcall GetAttributeCount() const override;
     virtual const char * __stdcall GetAttributeKey(size_t index) const override;
     virtual const char * __stdcall GetAttributeValue(size_t index) const override;
