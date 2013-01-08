@@ -24,7 +24,10 @@
     <ClCompile Include="src\TestCollection.cpp" />
     <ClCompile Include="src\TestDetails.cpp" />
     <ClCompile Include="src\xUnitAssert.cpp" />
-    <ClCompile Include="src\xUnitTest.cpp" />
+    <ClCompile Include="src\xUnitTest.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+    </ClCompile>
     <ClCompile Include="src\xUnitTestRunner.cpp" />
     <ClCompile Include="src\TestEventRecorder.cpp" />
     <ClCompile Include="src\xUnitCheck.cpp" />
