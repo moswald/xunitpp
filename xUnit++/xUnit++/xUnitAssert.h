@@ -35,7 +35,7 @@ public:
     template<typename T>
     xUnitAssert &AppendUserMessage(T &&value)
     {
-        *userMessage << std::forward<T>(value);
+        *userMessage << ToString(std::forward<T>(value));
         return *this;
     }
 

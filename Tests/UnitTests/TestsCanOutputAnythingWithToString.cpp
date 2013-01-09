@@ -94,4 +94,10 @@ FACT("Testing NotInRange with ADL")
     Check.Contains(result.Actual(), "(5, 0)");
 }
 
+FACT("Testing overloaded << operator")
+{
+    // this will be a compile error if it is not supported
+    Check.True(true) << Point(0, 0);
+}
+
 }
