@@ -3,7 +3,7 @@
     <Identifier Id="xUnit++.e4924ae0-47b7-4887-89c0-b32d45f85bbe">
         <Name>xUnit++ Test Adapter for Visual Studio.</Name>
         <Author>xUnit++</Author>
-        <Version>1.0.0</Version>
+        <Version>1.3.1</Version>
         <Description xml:space="preserve">xUnit++ is a modern unit testing framework for C++.</Description>
         <Locale>1033</Locale>
         <MoreInfoUrl>https://bitbucket.org/moswald/xunit/wiki</MoreInfoUrl>
