@@ -2,6 +2,7 @@
 #define COMMANDLINE_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -20,7 +21,7 @@ namespace CommandLine
         std::vector<std::string> testNames;
         std::multimap<std::string, std::string> inclusiveAttributes;
         std::multimap<std::string, std::string> exclusiveAttributes;
-        std::vector<std::string> libraries;
+        std::set<std::string> libraries;
         std::string xmlOutput;
         int timeLimit;
         int threadLimit;
