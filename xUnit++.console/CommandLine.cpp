@@ -141,12 +141,15 @@ namespace CommandLine
                 }
                 else if (opt == "-x" || opt == "--xml")
                 {
-                    if (arguments.empty())
+                    if (arguments.empty() || arguments.front().front() == '-')
                     {
-                        return opt + " expects a following filename argument." + Usage(exe());
+                        // "." is a special filename meaning "use stdout"
+                        options.xmlOutput = ".";
                     }
-
-                    options.xmlOutput = TakeFront(arguments);
+                    else
+                    {
+                        options.xmlOutput = TakeFront(arguments);
+                    }
                 }
                 else if (opt == "-t" || opt == "--timelimit")
                 {
@@ -212,7 +215,7 @@ namespace CommandLine
             "  -i --include <NAME=[VALUE]>+   : Include tests with exactly matching <name=value> attribute(s)\n"
             "  -e --exclude <NAME=[VALUE]>+   : Exclude tests with exactly matching <name=value> attribute(s)\n"
             "  -t --timelimit <milliseconds>  : Set the default test time limit\n"
-            "  -x --xml <FILENAME>            : Output Xunit-style XML file\n"
+            "  -x --xml [FILENAME]            : Output Xunit-style XML, to optional file named FILENAME\n"
             "  -c --concurrent <max tests>    : Set maximum number of concurrent tests\n"
             "  -o --sort                      : Sort tests by suite and then by test name\n"
             "  -g --group                     : Group test output under suite headers (implies --sort)\n"
