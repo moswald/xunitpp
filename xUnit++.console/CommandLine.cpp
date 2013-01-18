@@ -1,5 +1,6 @@
 #include "CommandLine.h"
 #include <algorithm>
+#include <cctype>
 #include <functional>
 #include <queue>
 #include <sstream>
@@ -181,7 +182,12 @@ namespace CommandLine
             }
             else
             {
-                options.libraries.push_back(opt);
+                for (auto &c : opt)
+                {
+                    c = (char)std::tolower(c);
+                }
+
+                options.libraries.insert(opt);
             }
         }
 
