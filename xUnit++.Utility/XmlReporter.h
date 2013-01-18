@@ -2,6 +2,7 @@
 #define XMLREPORTER_H_
 
 #include <map>
+#include <ostream>
 #include "xUnit++/IOutput.h"
 
 namespace xUnitpp { namespace Utilities
@@ -10,7 +11,8 @@ namespace xUnitpp { namespace Utilities
 class XmlReporter : public IOutput
 {
 public:
-    XmlReporter(const std::string &filename);
+    XmlReporter(std::ostream &output);
+    virtual ~XmlReporter();
 
     virtual void __stdcall ReportStart(const ITestDetails &td) override;
     virtual void __stdcall ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt) override;
@@ -22,7 +24,10 @@ public:
     struct SuiteResult;
 
 private:
-    std::string filename;
+    XmlReporter &operator =(XmlReporter) /* = delete; */;
+
+private:
+    std::ostream &output;
     std::map<std::string, SuiteResult> suiteResults;
 };
 

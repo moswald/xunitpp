@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <string>
@@ -183,14 +184,37 @@ int main(int argc, char **argv)
         {
             std::sort(activeTestIds.begin(), activeTestIds.end());
 
-            std::unique_ptr<xUnitpp::IOutput> reporter(options.xmlOutput.empty() ?
-                (xUnitpp::IOutput *)new xUnitpp::ConsoleReporter(options.verbose, options.sort, options.group) :
-                (xUnitpp::IOutput *)new xUnitpp::Utilities::XmlReporter(options.xmlOutput));
-            totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, *reporter,
-                [&](const xUnitpp::ITestDetails &testDetails)
+            auto runTests = [&](xUnitpp::IOutput &reporter)
                 {
-                    return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.GetId());
-                });
+                    totalFailures += testAssembly.FilteredTestsRunner(options.timeLimit, options.threadLimit, reporter,
+                        [&](const xUnitpp::ITestDetails &testDetails)
+                        {
+                            return std::binary_search(activeTestIds.begin(), activeTestIds.end(), testDetails.GetId());
+                        });
+                };
+
+            if (options.xmlOutput.empty())
+            {
+                xUnitpp::ConsoleReporter reporter(options.verbose, options.sort, options.group);
+                runTests(reporter);
+            }
+            else if (options.xmlOutput == ".")
+            {
+                xUnitpp::Utilities::XmlReporter reporter(std::cout);
+                runTests(reporter);
+            }
+            else
+            {
+                std::ofstream file(options.xmlOutput, std::ios::binary);
+
+                if (!file)
+                {
+                    std::cerr << "Unable to open " << options.xmlOutput << " for writing.\n\n";
+                }
+
+                xUnitpp::Utilities::XmlReporter reporter(!file ? std::cerr : file);
+                runTests(reporter);
+            }
         }
     }
 

@@ -216,75 +216,62 @@ namespace
 namespace xUnitpp { namespace Utilities
 {
 
-XmlReporter::XmlReporter(const std::string &filename)
-    : filename(filename)
+XmlReporter::XmlReporter(std::ostream &output)
+    : output(output)
+{
+}
+
+XmlReporter::~XmlReporter()
 {
 }
 
 void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failureCount, long long nsTotal)
 {
-    auto report = [&](std::ostream &stream)
+    output << XmlBeginDoc();
+    output << XmlBeginResults(testCount, failureCount, nsTotal);
+
+    for (const auto &itSuite : suiteResults)
+    {
+        output << XmlBeginSuite(itSuite.second);
+
+        for (const auto &test : itSuite.second.testResults)
         {
-            stream << XmlBeginDoc();
-            stream << XmlBeginResults(testCount, failureCount, nsTotal);
+            output << XmlBeginTest(test.testDetails.GetFullName(), test);
 
-            for (const auto &itSuite : suiteResults)
+            if (test.status != TestResult::Success || test.testDetails.GetAttributeCount() == 0)
             {
-                stream << XmlBeginSuite(itSuite.second);
-
-                for (const auto &test : itSuite.second.testResults)
-                {
-                    stream << XmlBeginTest(test.testDetails.GetFullName(), test);
-
-                    if (test.status != TestResult::Success || test.testDetails.GetAttributeCount() == 0)
-                    {
-                        // close <TestCase>
-                        stream << ">\n";
-                    }
-
-                    for (auto i = 0U; i != test.testDetails.GetAttributeCount(); ++i)
-                    {
-                        std::string key = test.testDetails.GetAttributeKey(i);
-                        if (key != "Skip")
-                        {
-                            std::string value = test.testDetails.GetAttributeValue(i);
-
-                            stream << XmlTestAttribute(key, value);
-                        }
-                    }
-
-                    if (test.status == TestResult::Failure)
-                    {
-                        xUnitpp::LineInfo li(test.testDetails.GetFile(), test.testDetails.GetLine());
-                        stream << XmlTestFailed(to_string(li), test.messages);
-                    }
-                    else if (test.status == TestResult::Skipped)
-                    {
-                        stream << XmlTestSkipped(test.messages[0]);
-                    }
-
-                    stream << XmlEndTest(test.status == TestResult::Success && test.testDetails.GetAttributeCount() == 0);
-                }
-
-                stream << XmlEndSuite();
+                // close <TestCase>
+                output << ">\n";
             }
 
-            stream << XmlEndResults();
+            for (auto i = 0U; i != test.testDetails.GetAttributeCount(); ++i)
+            {
+                std::string key = test.testDetails.GetAttributeKey(i);
+                if (key != "Skip")
+                {
+                    std::string value = test.testDetails.GetAttributeValue(i);
 
-        };
+                    output << XmlTestAttribute(key, value);
+                }
+            }
 
-    std::ofstream file(filename, std::ios::binary);
+            if (test.status == TestResult::Failure)
+            {
+                xUnitpp::LineInfo li(test.testDetails.GetFile(), test.testDetails.GetLine());
+                output << XmlTestFailed(to_string(li), test.messages);
+            }
+            else if (test.status == TestResult::Skipped)
+            {
+                output << XmlTestSkipped(test.messages[0]);
+            }
 
-    if (!file)
-    {
-        std::cerr << "Unable to open " << filename << " for writing.\n\n";
+            output << XmlEndTest(test.status == TestResult::Success && test.testDetails.GetAttributeCount() == 0);
+        }
 
-        report(std::cerr);
+        output << XmlEndSuite();
     }
-    else
-    {
-        report(file);
-    }
+
+    output << XmlEndResults();
 }
 
 void XmlReporter::ReportStart(const ITestDetails &testDetails)
