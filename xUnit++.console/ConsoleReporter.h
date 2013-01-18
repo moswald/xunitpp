@@ -11,6 +11,7 @@ class ConsoleReporter : public IOutput
 {
 public:
     ConsoleReporter(bool verbose, bool sort, bool group);
+    virtual ~ConsoleReporter();
 
     virtual void __stdcall ReportStart(const ITestDetails &) override;
     virtual void __stdcall ReportEvent(const ITestDetails &testDetails, const ITestEvent &evt) override;

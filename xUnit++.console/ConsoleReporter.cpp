@@ -504,6 +504,10 @@ ConsoleReporter::ConsoleReporter(bool verbose, bool sort, bool group)
     //std::cout.sync_with_stdio(false);
 }
 
+ConsoleReporter::~ConsoleReporter()
+{
+}
+
 void ConsoleReporter::ReportStart(const ITestDetails &)
 {
 }
