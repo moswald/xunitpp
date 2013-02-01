@@ -21,13 +21,16 @@
     <ClCompile Include="Theory.cpp" />
     <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="TestRunner.cpp" />
-    <ClCompile Include="Helpers\OutputRecord.cpp">
-      <Filter>Test Helpers</Filter>
-    </ClCompile>
     <ClCompile Include="TestsCanOutputAnythingWithToString.cpp" />
     <ClCompile Include="TestEvents.cpp" />
     <ClCompile Include="ToString.cpp" />
     <ClCompile Include="ErrorHandling.cpp" />
+    <ClCompile Include="..\Helpers\OutputRecord.cpp">
+      <Filter>Test Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Helpers\TestFactory.cpp">
+      <Filter>Test Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Test Helpers">
@@ -35,7 +38,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Helpers\OutputRecord.h">
+    <ClInclude Include="..\Helpers\OutputRecord.h">
+      <Filter>Test Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Helpers\TestFactory.h">
       <Filter>Test Helpers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,15 +5,30 @@
     <ClCompile Include="..\..\external\tinyxml2\tinyxml2.cpp">
       <Filter>tinyxml2</Filter>
     </ClCompile>
+    <ClCompile Include="..\Helpers\OutputRecord.cpp">
+      <Filter>Test Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Helpers\TestFactory.cpp">
+      <Filter>Test Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tinyxml2">
       <UniqueIdentifier>{b5b936d5-a571-420f-b567-afbdd474d2c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test Helpers">
+      <UniqueIdentifier>{d337c62d-1644-4d9c-bce5-590605af4060}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\external\tinyxml2\tinyxml2.h">
       <Filter>tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Helpers\OutputRecord.h">
+      <Filter>Test Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Helpers\TestFactory.h">
+      <Filter>Test Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

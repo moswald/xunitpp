@@ -3,78 +3,17 @@
 #include "xUnit++/xUnitTestRunner.h"
 #include "xUnit++/xUnitTime.h"
 #include "Helpers/OutputRecord.h"
+#include "Helpers/TestFactory.h"
 
 using xUnitpp::Assert;
 using xUnitpp::xUnitTest;
 using xUnitpp::RunTests;
 namespace Tests = xUnitpp::Tests;
 namespace Time = xUnitpp::Time;
+using Tests::TestFactory;
 
 SUITE("TestRunner")
 {
-
-struct TestFactory
-{
-    TestFactory(std::function<void()> testFn, std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> testEventRecorders)
-        : testFn(testFn)
-        , testEventRecorders(testEventRecorders)
-        , timeLimit(-1)
-        , file("dummy.cpp")
-        , line(0)
-    {
-    }
-
-    TestFactory &Name(const std::string &name)
-    {
-        this->name = name;
-        return *this;
-    }
-
-    TestFactory &Suite(const std::string &suite)
-    {
-        this->suite = suite;
-        return *this;
-    }
-
-    TestFactory &Duration(Time::Duration timeLimit)
-    {
-        this->timeLimit = timeLimit;
-        return *this;
-    }
-
-    TestFactory &Attributes(const xUnitpp::AttributeCollection &attributes)
-    {
-        this->attributes = attributes;
-        return *this;
-    }
-
-    TestFactory &TestFile(const std::string &file)
-    {
-        this->file = file;
-        return *this;
-    }
-
-    TestFactory &TestLine(int line)
-    {
-        this->line = line;
-        return *this;
-    }
-
-    operator std::shared_ptr<xUnitTest>()
-    {
-        return std::make_shared<xUnitTest>(std::move(testFn), std::string(name), 0, "", suite, std::move(attributes), timeLimit, std::move(file), line, testEventRecorders);
-    }
-
-private:
-    std::function<void()> testFn;
-    std::vector<std::shared_ptr<xUnitpp::TestEventRecorder>> testEventRecorders;
-    std::string name;
-    std::string suite;
-    Time::Duration timeLimit;
-    xUnitpp::AttributeCollection attributes;
-    std::string file;
-    int line;
-};
 
 struct TestRunnerFixture
 {
