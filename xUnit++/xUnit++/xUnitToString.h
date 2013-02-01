@@ -76,7 +76,7 @@ std::string ToString(T &&t)
     using ToStringImpl::fallback::to_string;
     using std::to_string;
 
-    return ToStringImpl::to_string_impl<(sizeof (ToStringImpl::fallback::flag(), to_string(t), ToStringImpl::fallback::flag()) != sizeof(char))>::to_string(t);
+    return ToStringImpl::to_string_impl<(sizeof (ToStringImpl::fallback::flag(), to_string(std::declval<T>()), ToStringImpl::fallback::flag()) != sizeof(char))>::to_string(t);
 }
 
 template<typename T>
@@ -93,7 +93,7 @@ bool has_to_string()
     using ToStringImpl::fallback::to_string;
     using std::to_string;
 
-    return (sizeof (ToStringImpl::fallback::flag(), to_string((T &)*(T *)nullptr), ToStringImpl::fallback::flag()) != sizeof(char));
+    return (sizeof (ToStringImpl::fallback::flag(), to_string(std::declval<T>()), ToStringImpl::fallback::flag()) != sizeof(char));
 }
 
 }

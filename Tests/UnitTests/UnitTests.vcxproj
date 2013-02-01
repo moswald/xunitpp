@@ -80,7 +80,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)" -g</Command>
@@ -91,12 +91,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;../</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)" -g</Command>
@@ -107,7 +107,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
@@ -115,6 +115,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Helpers\OutputRecord.cpp" />
+    <ClCompile Include="..\Helpers\TestFactory.cpp" />
     <ClCompile Include="Assert.Contains.cpp" />
     <ClCompile Include="Assert.DoesNotContain.cpp" />
     <ClCompile Include="Assert.DoesNotThrow.cpp" />
@@ -133,7 +135,6 @@
     <ClCompile Include="Assert.True.cpp" />
     <ClCompile Include="Attributes.cpp" />
     <ClCompile Include="ErrorHandling.cpp" />
-    <ClCompile Include="Helpers\OutputRecord.cpp" />
     <ClCompile Include="LineInfo.cpp" />
     <ClCompile Include="TestEvents.cpp" />
     <ClCompile Include="TestRunner.cpp" />
@@ -147,7 +148,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Helpers\OutputRecord.h" />
+    <ClInclude Include="..\Helpers\OutputRecord.h" />
+    <ClInclude Include="..\Helpers\TestFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

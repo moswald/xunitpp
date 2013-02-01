@@ -198,7 +198,7 @@ namespace
             result += std::string("         ") +
                 "<failure" +
                     XmlAttribute("message", fileAndLine + ": " + XmlEscape(message)) +
-                "</failure>\n";
+                " />\n";
         }
 
         return result;
@@ -238,7 +238,7 @@ void XmlReporter::ReportAllTestsComplete(size_t testCount, size_t, size_t failur
         {
             output << XmlBeginTest(test.testDetails.GetFullName(), test);
 
-            if (test.status != TestResult::Success || test.testDetails.GetAttributeCount() == 0)
+            if (test.status != TestResult::Success || test.testDetails.GetAttributeCount() != 0)
             {
                 // close <TestCase>
                 output << ">\n";

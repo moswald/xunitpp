@@ -80,7 +80,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
@@ -91,7 +91,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
@@ -100,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
@@ -109,7 +109,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xUnit++;$(SolutionDir)xUnit++.Utility;$(SolutionDir)external/tinyxml2;../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>"$(OutputPath)../xUnit++.console/xUnit++.console.$(PlatformShortName)$(DebugTag).exe" "$(TargetPath)"</Command>
@@ -126,10 +126,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\external\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="..\Helpers\OutputRecord.cpp" />
+    <ClCompile Include="..\Helpers\TestFactory.cpp" />
     <ClCompile Include="TestXmlReporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\external\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="..\Helpers\OutputRecord.h" />
+    <ClInclude Include="..\Helpers\TestFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
