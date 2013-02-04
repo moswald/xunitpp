@@ -574,37 +574,79 @@ public:
 
 const class : public Assert
 {
+private:
+    // Fixes #10: can't Assert.Throws<std::exception> because std::exception is then caught twice
+    // with thanks to Alf on StackOverflow for this one
+    // http://stackoverflow.com/questions/5101516/why-function-template-cannot-be-partially-specialized
+    template<typename TException, typename TFunc>
+    struct ThrowsImpl
+    {
+        static TException impl(const std::string &callPrefix, TFunc &&fn, const std::string &msg, LineInfo &&lineInfo = LineInfo())
+        {
+            try
+            {
+                fn();
+            }
+            catch (const TException &e)
+            {
+                return e;
+            }
+            catch (const std::exception &e)
+            {
+                throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
+                    .Expected(typeid(TException).name())
+                    .Actual(e.what())
+                    .AppendUserMessage(msg);
+            }
+            catch (...)
+            {
+                throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
+                    .Expected(typeid(TException).name())
+                    .Actual("Crash: unknown exception.")
+                    .AppendUserMessage(msg);
+            }
+
+            throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
+                .Expected(typeid(TException).name())
+                .Actual("No exception.")
+                .AppendUserMessage(msg);
+        }
+    };
+
+    // partial specialization for catching std::exception
+    template<typename TFunc>
+    struct ThrowsImpl<std::exception, TFunc>
+    {
+        static std::exception impl(const std::string &callPrefix, TFunc &&fn, const std::string &msg, LineInfo &&lineInfo = LineInfo())
+        {
+            try
+            {
+                fn();
+            }
+            catch (const std::exception &e)
+            {
+                return e;
+            }
+            catch (...)
+            {
+                throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
+                    .Expected(typeid(std::exception).name())
+                    .Actual("Crash: unknown exception.")
+                    .AppendUserMessage(msg);
+            }
+
+            throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
+                .Expected(typeid(std::exception).name())
+                .Actual("No exception.")
+                .AppendUserMessage(msg);
+        }
+    };
+
 public:
     template<typename TException, typename TFunc>
     TException Throws(TFunc &&fn, const std::string &msg, LineInfo &&lineInfo = LineInfo()) const
     {
-        try
-        {
-            fn();
-        }
-        catch (const TException &e)
-        {
-            return e;
-        }
-        catch (const std::exception &e)
-        {
-            throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
-                .Expected(typeid(TException).name())
-                .Actual(e.what())
-                .AppendUserMessage(msg);
-        }
-        catch (...)
-        {
-            throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
-                .Expected(typeid(TException).name())
-                .Actual("Crash: unknown exception.")
-                .AppendUserMessage(msg);
-        }
-
-        throw xUnitAssert(callPrefix + "Throws", std::move(lineInfo))
-            .Expected(typeid(TException).name())
-            .Actual("No exception.")
-            .AppendUserMessage(msg);
+        return ThrowsImpl<TException, TFunc>::impl(callPrefix, std::forward<TFunc>(fn), msg, std::move(lineInfo));
     }
 
     template<typename TException, typename TFunc>

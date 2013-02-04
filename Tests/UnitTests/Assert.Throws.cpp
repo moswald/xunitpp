@@ -53,4 +53,9 @@ FACT("ThrowAppendsMessages")
     Assert.Fail();
 }
 
+FACT("Can catch std::exception")
+{
+    Assert.Throws<std::exception>([]() { throw std::exception("test"); });
+}
+
 }
