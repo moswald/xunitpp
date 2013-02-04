@@ -50,6 +50,9 @@ if debug == 0 and release == 0:
     debug = 1
 
 def buildProjects(env):
+    tinyxml2 = SConscript('external/tinyxml2/sconscript', exports = 'env')
+    env['tinyxml2'] = tinyxml2
+
     xUnit = SConscript('xUnit++/sconscript', exports = 'env')
     env['xUnit'] = xUnit
 
@@ -60,14 +63,21 @@ def buildProjects(env):
     Depends(console, xUnit)
 
     if ARGUMENTS.get('test', 1) == 1:
+
+        testHelpers = SConscript('Tests/Helpers/sconscript', exports = 'env')
+        env['testHelpers'] = testHelpers
+
         bareTests = SConscript('Tests/BareTests/sconscript', exports = 'env')
         unitTests = SConscript('Tests/UnitTests/sconscript', exports = 'env')
+        utilityTests = SConscript('Tests/UtilityTests/sconscript', exports = 'env')
 
         Depends(bareTests, [xUnit, console])
         Depends(unitTests, [xUnit, console])
+        Depends(utilityTests, [xUnit, console])
 
         AddPostAction(bareTests, Action(str(console[0]) + " " + str(bareTests[0])))
         AddPostAction(unitTests, Action(str(console[0]) + " " + str(unitTests[0]) + " -g"))
+        AddPostAction(utilityTests, Action(str(console[0]) + " " + str(utilityTests[0]) + " -g"))
 
 if debug != 0:
     env['debug'] = True

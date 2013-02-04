@@ -5,7 +5,7 @@ intDir = env['getIntDir']('BareTests')
 
 local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
-local.Append(CPPPATH = ['../../xUnit++'])
+local.Append(CPPPATH = ['../../xUnit++', '..'])
 
 target = local.SharedLibrary(targetFile, Glob(intDir + '*.cpp'), LIBS = env['xUnit'])
 
