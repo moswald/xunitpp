@@ -55,7 +55,7 @@ FACT("ThrowAppendsMessages")
 
 FACT("Can catch std::exception")
 {
-    Assert.Throws<std::exception>([]() { throw std::exception("test"); });
+    Assert.Throws<std::exception>([]() { throw std::logic_error("test"); });
 }
 
 }
