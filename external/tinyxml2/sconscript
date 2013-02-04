@@ -1,0 +1,10 @@
+Import('env')
+
+intDir = env['getIntDir']('external/tinyxml2')
+
+local = env.Clone()
+local.VariantDir(intDir, './', duplicate = 0)
+
+target = local.SharedObject(Glob(intDir + '*.cpp'))
+
+Return('target')

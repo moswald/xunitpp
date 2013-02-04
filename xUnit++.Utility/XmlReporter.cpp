@@ -221,7 +221,7 @@ XmlReporter::XmlReporter(std::ostream &output)
 {
 }
 
-XmlReporter::~XmlReporter()
+XmlReporter::~XmlReporter() noexcept(true)
 {
 }
 
@@ -292,7 +292,7 @@ void XmlReporter::ReportEvent(const ITestDetails &testDetails, const ITestEvent 
     {
         std::string suite = testDetails.GetSuite();
         std::string name = testDetails.GetFullName();
-        
+
         suiteResults[suite].failures++;
 
         auto &testResult = GetTestResult(suiteResults[suite].testResults, name);

@@ -185,10 +185,10 @@ namespace CommandLine
             }
             else
             {
-                for (auto &c : opt)
-                {
-                    c = (char)std::tolower(c);
-                }
+                //for (auto &c : opt)
+                //{
+                //    c = (char)std::tolower(c);
+                //}
 
                 options.libraries.insert(opt);
             }

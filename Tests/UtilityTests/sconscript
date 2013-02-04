@@ -1,0 +1,18 @@
+Import('env')
+
+targetFile = env['getTargetFile']('UtilityTests', 'shared')
+intDir = env['getIntDir']('UtilityTests')
+
+local = env.Clone()
+local.VariantDir(intDir, './', duplicate = 0)
+local.Append(CPPPATH = ['../../xUnit++', '../../xUnit++.Utility', '..', '../../external/tinyxml2'])
+
+sources = Glob(intDir + '*.cpp')
+sources = sources + env['testHelpers']
+sources = sources + env['tinyxml2']
+
+libs = [env['xUnitUtility'], env['xUnit']]
+
+target = local.SharedLibrary(targetFile, sources, LIBS = libs)
+
+Return('target')

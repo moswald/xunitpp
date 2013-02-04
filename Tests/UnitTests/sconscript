@@ -5,10 +5,10 @@ intDir = env['getIntDir']('UnitTests')
 
 local = env.Clone()
 local.VariantDir(intDir, './', duplicate = 0)
-local.Append(CPPPATH = ['../../xUnit++'])
+local.Append(CPPPATH = ['../../xUnit++', '..'])
 
 sources = Glob(intDir + '*.cpp')
-sources = sources + Glob(intDir + '/Helpers/*.cpp')
+sources = sources + env['testHelpers']
 
 target = local.SharedLibrary(targetFile, sources, LIBS = env['xUnit'])
 
