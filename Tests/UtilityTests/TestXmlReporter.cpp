@@ -46,22 +46,21 @@ FACT("XmlReporter generates valid xml with no tests")
     Assert.Equal(tinyxml2::XMLError::XML_SUCCESS, tinyxml2::XMLDocument().Parse(out.str().c_str()));
 }
 
-// sigh, I broke something with G++, but I don't have time to fix it today.
-// I'm goiing to check it in with this guard for now so I can get the build working again.
-#if defined(_MSC_VER)
-DATA_THEORY("XmlReporter generates valid xml after running tests", (std::function<void ()> test),
-    ([]() -> std::vector<std::tuple<std::function<void()>>>
+// G++ doesn't like a tuple consisting of just a std::function<>
+// the extra int is just a dummy parameter to make it compile
+DATA_THEORY("XmlReporter generates valid xml after running tests", (std::function<void ()> test, int),
+    ([]() -> std::vector<std::tuple<std::function<void()>, int>>
     {
-        std::vector<std::tuple<std::function<void()>>> tests;
+        std::vector<std::tuple<std::function<void()>, int>> tests;
 
-        tests.emplace_back([]() { Assert.True(true); });
-        tests.emplace_back([]() { Assert.True(false); });
+        tests.emplace_back([]() { Assert.True(true); }, 0);
+        tests.emplace_back([]() { Assert.True(false); }, 0);
         tests.emplace_back(
             []()
             {
                 Assert.True(true);
                 Assert.True(false);
-            });
+            }, 0);
 
         return tests;
     })
@@ -80,6 +79,5 @@ DATA_THEORY("XmlReporter generates valid xml after running tests", (std::functio
 
     Assert.Equal(tinyxml2::XMLError::XML_SUCCESS, tinyxml2::XMLDocument().Parse(out.str().c_str()));
 }
-#endif
 
 }
