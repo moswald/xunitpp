@@ -58,14 +58,24 @@ namespace ToStringImpl
     struct to_string_impl<false>
     {
         template<typename T>
-        static std::string to_string(T &&)
+        static std::string to_string(T)
         {
             // going to truncate the type if it is longer than 20 characters
             std::string type = typeid(T).name();
 
-            return type.size() > 20 ?
+            return (type.size() > 20 ?
                 type.substr(0, 20) + "..." :
-                type;
+                type);
+        }
+
+        template<typename T>
+        static std::string to_string(T *val)
+        {
+            auto addr = reinterpret_cast<int>(val);
+
+            std::stringstream str;
+            str << to_string(*val) << " *: " << std::showbase << std::hex << addr;
+            return str.str();
         }
     };
 }
