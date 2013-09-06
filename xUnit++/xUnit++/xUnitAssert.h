@@ -40,7 +40,7 @@ public:
     }
 
     const std::string &Call() const;
-    std::string UserMessage() const;
+    const std::string &UserMessage() const;
     const std::string &CustomMessage() const;
     const std::string &Expected() const;
     const std::string &Actual() const;
@@ -55,6 +55,7 @@ private:
     std::string customMessage;
     std::string expected;
     std::string actual;
+    mutable std::string userMessageString;
     std::shared_ptr<std::stringstream> userMessage;
 };
 
