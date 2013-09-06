@@ -39,9 +39,10 @@ const std::string &xUnitAssert::Call() const
     return call;
 }
 
-std::string xUnitAssert::UserMessage() const
+const std::string &xUnitAssert::UserMessage() const
 {
-    return userMessage->str();
+    userMessageString = userMessage->str();
+    return userMessageString;
 }
 
 const std::string &xUnitAssert::CustomMessage() const
