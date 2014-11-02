@@ -1,5 +1,4 @@
 #include <sstream>
-#include <typeinfo>
 #include "xUnit++/xUnit++.h"
 
 SUITE("ToString")
@@ -24,7 +23,7 @@ FACT("ToString will print pointer addresses")
     auto result = Assert.Throws<xUnitpp::xUnitAssert>([&]() { Assert.Equal(&x, &y); });
 
     std::stringstream str;
-    str << typeid(int).name() << " *: " << std::showbase << std::hex << reinterpret_cast<int>(&x);
+    str << "int *: " << std::showbase << std::hex << reinterpret_cast<int>(&x);
 
     Assert.Equal(str.str(), result.Expected());
 }
