@@ -6,6 +6,7 @@
 // modified to fix Visual Studio warning C4913
 
 #include <string>
+#include <cstdint>
 
 namespace xUnitpp
 {
@@ -71,7 +72,7 @@ namespace ToStringImpl
         template<typename T>
         static std::string to_string(T *val)
         {
-            auto addr = reinterpret_cast<int>(val);
+            auto addr = reinterpret_cast<intptr_t>(val);
 
             std::stringstream str;
             str << to_string(*val) << " *: " << std::showbase << std::hex << addr;
